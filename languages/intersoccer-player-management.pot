@@ -1,0 +1,458 @@
+# Copyright (C) 2025 Jeremy Lee
+# This file is distributed under the GPL-2.0+.
+msgid ""
+msgstr ""
+"Project-Id-Version: InterSoccer Player Management 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/intersoccer-player-management\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2025-04-07T21:43:57+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.11.0\n"
+"X-Domain: intersoccer-player-management\n"
+
+#. Plugin Name of the plugin
+#: intersoccer-player-management.php
+msgid "InterSoccer Player Management"
+msgstr ""
+
+#. Description of the plugin
+#: intersoccer-player-management.php
+msgid "Adds player management for Summer Football Camps to WooCommerce."
+msgstr ""
+
+#. Author of the plugin
+#: intersoccer-player-management.php
+msgid "Jeremy Lee"
+msgstr ""
+
+#: includes/admin-players.php:10
+#: includes/player-management.php:15
+msgid "Player Management"
+msgstr ""
+
+#: includes/admin-players.php:11
+msgid "Players & Orders"
+msgstr ""
+
+#: includes/admin-players.php:64
+msgid "Failed to create user for %s: %s"
+msgstr ""
+
+#: includes/admin-players.php:75
+msgid "Players imported successfully from Zoho CRM!"
+msgstr ""
+
+#: includes/admin-players.php:77
+msgid "No records found in Zoho CRM or an error occurred."
+msgstr ""
+
+#: includes/admin-players.php:80
+msgid "WP Swings Zoho CRM Connect plugin is required for importing players."
+msgstr ""
+
+#: includes/admin-players.php:85
+msgid "Player Management - All Players & Orders"
+msgstr ""
+
+#: includes/admin-players.php:88
+msgid "Import Players from Zoho CRM"
+msgstr ""
+
+#: includes/admin-players.php:93
+msgid "Zoho Module"
+msgstr ""
+
+#: includes/admin-players.php:96
+msgid "Contacts"
+msgstr ""
+
+#: includes/admin-players.php:97
+msgid "Leads"
+msgstr ""
+
+#: includes/admin-players.php:99
+msgid "Select the Zoho CRM module to import players from."
+msgstr ""
+
+#: includes/admin-players.php:104
+msgid "Import Players"
+msgstr ""
+
+#: includes/admin-players.php:109
+msgid "All Players"
+msgstr ""
+
+#: includes/admin-players.php:113
+msgid "User"
+msgstr ""
+
+#: includes/admin-players.php:114
+#: includes/player-management.php:106
+#: includes/player-management.php:107
+#: includes/player-management.php:598
+#: includes/player-management.php:640
+msgid "Player Name"
+msgstr ""
+
+#: includes/admin-players.php:115
+msgid "DOB"
+msgstr ""
+
+#: includes/admin-players.php:116
+#: includes/player-management.php:136
+#: includes/player-management.php:137
+#: includes/player-management.php:613
+#: includes/player-management.php:655
+msgid "Medical Conditions"
+msgstr ""
+
+#: includes/admin-players.php:117
+msgid "Consent File"
+msgstr ""
+
+#: includes/admin-players.php:118
+msgid "Order ID"
+msgstr ""
+
+#: includes/admin-players.php:119
+msgid "Product"
+msgstr ""
+
+#: includes/admin-players.php:120
+msgid "Categories"
+msgstr ""
+
+#: includes/admin-players.php:121
+msgid "Variations & Attributes"
+msgstr ""
+
+#: includes/admin-players.php:146
+msgid "View Consent"
+msgstr ""
+
+#: includes/admin-players.php:146
+msgid "None"
+msgstr ""
+
+#: includes/admin-players.php:147
+#: includes/admin-players.php:148
+#: includes/admin-players.php:149
+#: includes/admin-players.php:150
+#: includes/admin-players.php:167
+#: includes/admin-players.php:201
+msgid "N/A"
+msgstr ""
+
+#: includes/admin-players.php:178
+msgid "Event Terms"
+msgstr ""
+
+#: includes/admin-players.php:179
+msgid "InterSoccer Venues"
+msgstr ""
+
+#: includes/admin-players.php:180
+msgid "Summer Camp Terms - 2025"
+msgstr ""
+
+#: includes/admin-players.php:181
+msgid "Hot Lunch"
+msgstr ""
+
+#: includes/admin-players.php:182
+msgid "Camp Times"
+msgstr ""
+
+#: includes/admin-players.php:183
+msgid "Camp Holidays"
+msgstr ""
+
+#: includes/admin-players.php:184
+msgid "Booking Type"
+msgstr ""
+
+#: includes/admin-players.php:185
+msgid "Age Open"
+msgstr ""
+
+#: includes/player-management.php:31
+msgid "Button Texts"
+msgstr ""
+
+#: includes/player-management.php:39
+msgid "Add Player Button Text"
+msgstr ""
+
+#: includes/player-management.php:41
+#: includes/player-management.php:42
+#: includes/player-management.php:632
+msgid "Add Another Player"
+msgstr ""
+
+#: includes/player-management.php:49
+msgid "Remove Player Button Text"
+msgstr ""
+
+#: includes/player-management.php:51
+#: includes/player-management.php:52
+#: includes/player-management.php:626
+#: includes/player-management.php:665
+msgid "Remove"
+msgstr ""
+
+#: includes/player-management.php:59
+msgid "Save Players Button Text"
+msgstr ""
+
+#: includes/player-management.php:61
+#: includes/player-management.php:62
+#: includes/player-management.php:634
+msgid "Save Players"
+msgstr ""
+
+#: includes/player-management.php:69
+msgid "Show Add Player Button"
+msgstr ""
+
+#: includes/player-management.php:71
+#: includes/player-management.php:83
+msgid "Show"
+msgstr ""
+
+#: includes/player-management.php:72
+#: includes/player-management.php:84
+msgid "Hide"
+msgstr ""
+
+#: includes/player-management.php:81
+msgid "Show Remove Player Button"
+msgstr ""
+
+#: includes/player-management.php:96
+msgid "Field Labels"
+msgstr ""
+
+#: includes/player-management.php:104
+msgid "Player Name Label"
+msgstr ""
+
+#: includes/player-management.php:114
+msgid "Date of Birth Label"
+msgstr ""
+
+#: includes/player-management.php:116
+#: includes/player-management.php:117
+#: includes/player-management.php:603
+#: includes/player-management.php:645
+msgid "Date of Birth"
+msgstr ""
+
+#: includes/player-management.php:124
+msgid "Has Medical Conditions Label"
+msgstr ""
+
+#: includes/player-management.php:126
+#: includes/player-management.php:127
+#: includes/player-management.php:609
+#: includes/player-management.php:651
+msgid "Has Known Medical Conditions?"
+msgstr ""
+
+#: includes/player-management.php:134
+msgid "Medical Conditions Label"
+msgstr ""
+
+#: includes/player-management.php:144
+msgid "Medical Consent Label"
+msgstr ""
+
+#: includes/player-management.php:146
+#: includes/player-management.php:147
+#: includes/player-management.php:619
+#: includes/player-management.php:661
+msgid "Medical Consent Form (PDF/Image)"
+msgstr ""
+
+#: includes/player-management.php:157
+msgid "Form Styles"
+msgstr ""
+
+#: includes/player-management.php:165
+msgid "Form Alignment"
+msgstr ""
+
+#: includes/player-management.php:169
+#: includes/player-management.php:322
+#: includes/player-management.php:379
+#: includes/player-management.php:436
+msgid "Left"
+msgstr ""
+
+#: includes/player-management.php:173
+#: includes/player-management.php:326
+#: includes/player-management.php:383
+#: includes/player-management.php:440
+msgid "Center"
+msgstr ""
+
+#: includes/player-management.php:177
+#: includes/player-management.php:330
+#: includes/player-management.php:387
+#: includes/player-management.php:444
+msgid "Right"
+msgstr ""
+
+#: includes/player-management.php:193
+msgid "Form Background Color"
+msgstr ""
+
+#: includes/player-management.php:205
+msgid "Form Border Color"
+msgstr ""
+
+#: includes/player-management.php:217
+msgid "Form Padding"
+msgstr ""
+
+#: includes/player-management.php:239
+msgid "Text and Field Styles"
+msgstr ""
+
+#: includes/player-management.php:247
+msgid "Label Text Color"
+msgstr ""
+
+#: includes/player-management.php:259
+msgid "Field Text Color"
+msgstr ""
+
+#: includes/player-management.php:271
+msgid "Error Text Color"
+msgstr ""
+
+#: includes/player-management.php:283
+msgid "Field Background Color"
+msgstr ""
+
+#: includes/player-management.php:298
+msgid "Button Styles"
+msgstr ""
+
+#: includes/player-management.php:306
+msgid "Add Button Background Color"
+msgstr ""
+
+#: includes/player-management.php:318
+msgid "Add Button Alignment"
+msgstr ""
+
+#: includes/player-management.php:344
+msgid "Add Button Spacing"
+msgstr ""
+
+#: includes/player-management.php:363
+msgid "Remove Button Background Color"
+msgstr ""
+
+#: includes/player-management.php:375
+msgid "Remove Button Alignment"
+msgstr ""
+
+#: includes/player-management.php:401
+msgid "Remove Button Spacing"
+msgstr ""
+
+#: includes/player-management.php:420
+msgid "Save Button Background Color"
+msgstr ""
+
+#: includes/player-management.php:432
+msgid "Save Button Alignment"
+msgstr ""
+
+#: includes/player-management.php:458
+msgid "Save Button Spacing"
+msgstr ""
+
+#: includes/player-management.php:491
+msgid "Please log in to manage players."
+msgstr ""
+
+#: includes/player-management.php:520
+msgid "A player name is empty."
+msgstr ""
+
+#: includes/player-management.php:526
+msgid "Player name \"%s\" already exists."
+msgstr ""
+
+#: includes/player-management.php:532
+msgid "Date of birth for %s is required."
+msgstr ""
+
+#: includes/player-management.php:538
+msgid "Player %s must be between 4 and 18 years old."
+msgstr ""
+
+#: includes/player-management.php:545
+msgid "Medical conditions for %s are required if checked."
+msgstr ""
+
+#: includes/player-management.php:562
+msgid "Failed to upload consent file for %s: %s"
+msgstr ""
+
+#: includes/player-management.php:579
+msgid "Players updated successfully!"
+msgstr ""
+
+#: includes/player-management.php:582
+msgid "Failed to save players. Please try again."
+msgstr ""
+
+#: includes/player-management.php:586
+msgid "No valid players to save."
+msgstr ""
+
+#: includes/player-management.php:590
+msgid "Manage Players"
+msgstr ""
+
+#: includes/player-management.php:591
+msgid "Add your children as Players for Summer Football Camps."
+msgstr ""
+
+#: includes/player-management.php:600
+#: includes/player-management.php:642
+msgid "Player name is required."
+msgstr ""
+
+#: includes/player-management.php:605
+#: includes/player-management.php:647
+msgid "Date of birth is required."
+msgstr ""
+
+#: includes/player-management.php:615
+#: includes/player-management.php:657
+msgid "Medical conditions are required if checked."
+msgstr ""
+
+#: includes/player-management.php:622
+msgid "View Current Consent"
+msgstr ""
+
+#: includes/player-management.php:712
+msgid "Are you sure?"
+msgstr ""
+
+#: includes/player-management.php:788
+msgid "Please fill in all required fields."
+msgstr ""
+
+#: includes/player-management.php:791
+msgid "Please add at least one player."
+msgstr ""
