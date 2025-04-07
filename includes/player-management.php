@@ -1,6 +1,6 @@
 <?php
 /**
- * Player Management - Elementor Widget and Form Logic
+ * Player Management - Elementor Widget with Custom Controls
  */
 
 // Register the Elementor widget
@@ -23,16 +23,224 @@ function register_player_management_widget($widgets_manager) {
             return ['woocommerce'];
         }
 
+        protected function register_controls() {
+            // Content Tab: Button Texts
+            $this->start_controls_section(
+                'section_button_texts',
+                [
+                    'label' => __('Button Texts', 'woocommerce'),
+                    'tab' => \Elementor\Controls_Manager::TAB_CONTENT,
+                ]
+            );
+
+            $this->add_control(
+                'add_player_button_text',
+                [
+                    'label' => __('Add Player Button Text', 'woocommerce'),
+                    'type' => \Elementor\Controls_Manager::TEXT,
+                    'default' => __('Add Another Player', 'woocommerce'),
+                    'placeholder' => __('Add Another Player', 'woocommerce'),
+                ]
+            );
+
+            $this->add_control(
+                'remove_player_button_text',
+                [
+                    'label' => __('Remove Player Button Text', 'woocommerce'),
+                    'type' => \Elementor\Controls_Manager::TEXT,
+                    'default' => __('Remove', 'woocommerce'),
+                    'placeholder' => __('Remove', 'woocommerce'),
+                ]
+            );
+
+            $this->add_control(
+                'save_players_button_text',
+                [
+                    'label' => __('Save Players Button Text', 'woocommerce'),
+                    'type' => \Elementor\Controls_Manager::TEXT,
+                    'default' => __('Save Players', 'woocommerce'),
+                    'placeholder' => __('Save Players', 'woocommerce'),
+                ]
+            );
+
+            $this->end_controls_section();
+
+            // Content Tab: Field Labels
+            $this->start_controls_section(
+                'section_field_labels',
+                [
+                    'label' => __('Field Labels', 'woocommerce'),
+                    'tab' => \Elementor\Controls_Manager::TAB_CONTENT,
+                ]
+            );
+
+            $this->add_control(
+                'player_name_label',
+                [
+                    'label' => __('Player Name Label', 'woocommerce'),
+                    'type' => \Elementor\Controls_Manager::TEXT,
+                    'default' => __('Player Name', 'woocommerce'),
+                    'placeholder' => __('Player Name', 'woocommerce'),
+                ]
+            );
+
+            $this->add_control(
+                'dob_label',
+                [
+                    'label' => __('Date of Birth Label', 'woocommerce'),
+                    'type' => \Elementor\Controls_Manager::TEXT,
+                    'default' => __('Date of Birth', 'woocommerce'),
+                    'placeholder' => __('Date of Birth', 'woocommerce'),
+                ]
+            );
+
+            $this->add_control(
+                'has_medical_conditions_label',
+                [
+                    'label' => __('Has Medical Conditions Label', 'woocommerce'),
+                    'type' => \Elementor\Controls_Manager::TEXT,
+                    'default' => __('Has Known Medical Conditions?', 'woocommerce'),
+                    'placeholder' => __('Has Known Medical Conditions?', 'woocommerce'),
+                ]
+            );
+
+            $this->add_control(
+                'medical_conditions_label',
+                [
+                    'label' => __('Medical Conditions Label', 'woocommerce'),
+                    'type' => \Elementor\Controls_Manager::TEXT,
+                    'default' => __('Medical Conditions', 'woocommerce'),
+                    'placeholder' => __('Medical Conditions', 'woocommerce'),
+                ]
+            );
+
+            $this->add_control(
+                'medical_consent_label',
+                [
+                    'label' => __('Medical Consent Label', 'woocommerce'),
+                    'type' => \Elementor\Controls_Manager::TEXT,
+                    'default' => __('Medical Consent Form (PDF/Image)', 'woocommerce'),
+                    'placeholder' => __('Medical Consent Form (PDF/Image)', 'woocommerce'),
+                ]
+            );
+
+            $this->end_controls_section();
+
+            // Style Tab: Form Styles
+            $this->start_controls_section(
+                'section_form_styles',
+                [
+                    'label' => __('Form Styles', 'woocommerce'),
+                    'tab' => \Elementor\Controls_Manager::TAB_STYLE,
+                ]
+            );
+
+            $this->add_control(
+                'form_background_color',
+                [
+                    'label' => __('Form Background Color', 'woocommerce'),
+                    'type' => \Elementor\Controls_Manager::COLOR,
+                    'default' => '#f9f9f9',
+                    'selectors' => [
+                        '{{WRAPPER}} .player-entry' => 'background-color: {{VALUE}};',
+                    ],
+                ]
+            );
+
+            $this->add_control(
+                'form_border_color',
+                [
+                    'label' => __('Form Border Color', 'woocommerce'),
+                    'type' => \Elementor\Controls_Manager::COLOR,
+                    'default' => '#ddd',
+                    'selectors' => [
+                        '{{WRAPPER}} .player-entry' => 'border-color: {{VALUE}};',
+                    ],
+                ]
+            );
+
+            $this->add_control(
+                'form_padding',
+                [
+                    'label' => __('Form Padding', 'woocommerce'),
+                    'type' => \Elementor\Controls_Manager::DIMENSIONS,
+                    'size_units' => ['px', 'em', '%'],
+                    'default' => [
+                        'top' => '15',
+                        'right' => '15',
+                        'bottom' => '15',
+                        'left' => '15',
+                        'unit' => 'px',
+                    ],
+                    'selectors' => [
+                        '{{WRAPPER}} .player-entry' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    ],
+                ]
+            );
+
+            $this->end_controls_section();
+
+            // Style Tab: Button Styles
+            $this->start_controls_section(
+                'section_button_styles',
+                [
+                    'label' => __('Button Styles', 'woocommerce'),
+                    'tab' => \Elementor\Controls_Manager::TAB_STYLE,
+                ]
+            );
+
+            $this->add_control(
+                'add_button_background_color',
+                [
+                    'label' => __('Add Button Background Color', 'woocommerce'),
+                    'type' => \Elementor\Controls_Manager::COLOR,
+                    'default' => '#007cba',
+                    'selectors' => [
+                        '{{WRAPPER}} #add-player' => 'background-color: {{VALUE}};',
+                    ],
+                ]
+            );
+
+            $this->add_control(
+                'remove_button_background_color',
+                [
+                    'label' => __('Remove Button Background Color', 'woocommerce'),
+                    'type' => \Elementor\Controls_Manager::COLOR,
+                    'default' => '#dc3545',
+                    'selectors' => [
+                        '{{WRAPPER}} .remove-player' => 'background-color: {{VALUE}};',
+                    ],
+                ]
+            );
+
+            $this->add_control(
+                'save_button_background_color',
+                [
+                    'label' => __('Save Button Background Color', 'woocommerce'),
+                    'type' => \Elementor\Controls_Manager::COLOR,
+                    'default' => '#28a745',
+                    'selectors' => [
+                        '{{WRAPPER}} input[name="save_players"]' => 'background-color: {{VALUE}};',
+                    ],
+                ]
+            );
+
+            $this->end_controls_section();
+        }
+
         protected function render() {
-            display_players_form();
+            $settings = $this->get_settings_for_display();
+
+            // Pass the settings to the display_players_form function
+            display_players_form($settings);
         }
     }
 
     $widgets_manager->register(new Player_Management_Widget());
 }
 
-// The display_players_form function
-function display_players_form() {
+// The display_players_form function, updated to use Elementor settings
+function display_players_form($settings = []) {
     if (!is_user_logged_in()) {
         wc_add_notice(__('Please log in to manage players.', 'woocommerce'), 'error');
         return;
@@ -139,71 +347,71 @@ function display_players_form() {
         <?php wp_nonce_field('save_players_action', 'players_nonce'); ?>
         <div id="players-list">
             <?php foreach ($players as $i => $player): ?>
-                <div class="player-entry" style="margin-bottom: 20px; border: 1px solid #ddd; padding: 15px; background: #f9f9f9; border-radius: 5px;">
+                <div class="player-entry">
                     <label style="display: block; margin-bottom: 10px;">
-                        <?php _e('Player Name', 'woocommerce'); ?>
+                        <?php echo esc_html($settings['player_name_label'] ?? __('Player Name', 'woocommerce')); ?>
                         <input type="text" name="player_name[<?php echo $i; ?>]" value="<?php echo esc_attr($player['name']); ?>" style="width: 100%; max-width: 300px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
                         <span class="error-message" style="color: red; display: none; font-size: 0.9em;"><?php _e('Player name is required.', 'woocommerce'); ?></span>
                     </label>
                     <label style="display: block; margin-bottom: 10px;">
-                        <?php _e('Date of Birth', 'woocommerce'); ?>
+                        <?php echo esc_html($settings['dob_label'] ?? __('Date of Birth', 'woocommerce')); ?>
                         <input type="date" name="player_dob[<?php echo $i; ?>]" value="<?php echo esc_attr($player['dob']); ?>" style="width: 100%; max-width: 300px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
                         <span class="error-message" style="color: red; display: none; font-size: 0.9em;"><?php _e('Date of birth is required.', 'woocommerce'); ?></span>
                     </label>
                     <label style="display: block; margin-bottom: 10px;">
                         <input type="checkbox" name="has_medical_conditions[<?php echo $i; ?>]" class="has-medical-conditions" <?php checked($player['medical_conditions'] !== 'No known medical conditions'); ?> />
-                        <?php _e('Has Known Medical Conditions?', 'woocommerce'); ?>
+                        <?php echo esc_html($settings['has_medical_conditions_label'] ?? __('Has Known Medical Conditions?', 'woocommerce')); ?>
                     </label>
                     <div class="medical-conditions" style="display: <?php echo $player['medical_conditions'] !== 'No known medical conditions' ? 'block' : 'none'; ?>; margin-bottom: 10px;">
                         <label style="display: block; margin-bottom: 5px;">
-                            <?php _e('Medical Conditions', 'woocommerce'); ?>
+                            <?php echo esc_html($settings['medical_conditions_label'] ?? __('Medical Conditions', 'woocommerce')); ?>
                             <textarea name="medical_conditions[<?php echo $i; ?>]" style="width: 100%; max-width: 300px; height: 100px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"><?php echo esc_textarea($player['medical_conditions'] !== 'No known medical conditions' ? $player['medical_conditions'] : ''); ?></textarea>
                             <span class="error-message" style="color: red; display: none; font-size: 0.9em;"><?php _e('Medical conditions are required if checked.', 'woocommerce'); ?></span>
                         </label>
                     </div>
                     <label style="display: block; margin-bottom: 10px;">
-                        <?php _e('Medical Consent Form (PDF/Image)', 'woocommerce'); ?>
+                        <?php echo esc_html($settings['medical_consent_label'] ?? __('Medical Consent Form (PDF/Image)', 'woocommerce')); ?>
                         <input type="file" name="medical_consent[<?php echo $i; ?>]" accept=".pdf,.jpg,.png" style="width: 100%; max-width: 300px;" />
                         <?php if (!empty($player['consent_url'])): ?>
                             <a href="<?php echo esc_url($player['consent_url']); ?>" target="_blank" style="display: block; margin-top: 5px;"><?php _e('View Current Consent', 'woocommerce'); ?></a>
                         <?php endif; ?>
                     </label>
-                    <button type="button" class="remove-player button" style="background: #dc3545; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;"><?php _e('Remove', 'woocommerce'); ?></button>
+                    <button type="button" class="remove-player button"><?php echo esc_html($settings['remove_player_button_text'] ?? __('Remove', 'woocommerce')); ?></button>
                 </div>
             <?php endforeach; ?>
         </div>
-        <button type="button" id="add-player" class="button" style="background: #007cba; color: white; padding: 8px 16px; border: none; border-radius: 4px; margin: 10px 0;"><?php _e('Add Another Player', 'woocommerce'); ?></button>
-        <p><input type="submit" name="save_players" class="button" value="<?php _e('Save Players', 'woocommerce'); ?>" style="background: #28a745; color: white; padding: 8px 16px; border: none; border-radius: 4px;" /></p>
+        <button type="button" id="add-player" class="button"><?php echo esc_html($settings['add_player_button_text'] ?? __('Add Another Player', 'woocommerce')); ?></button>
+        <p><input type="submit" name="save_players" class="button" value="<?php echo esc_attr($settings['save_players_button_text'] ?? __('Save Players', 'woocommerce')); ?>" /></p>
     </form>
 
     <div id="player-template" style="display: none;">
-        <div class="player-entry" style="margin-bottom: 20px; border: 1px solid #ddd; padding: 15px; background: #f9f9f9; border-radius: 5px;">
+        <div class="player-entry">
             <label style="display: block; margin-bottom: 10px;">
-                <?php _e('Player Name', 'woocommerce'); ?>
+                <?php echo esc_html($settings['player_name_label'] ?? __('Player Name', 'woocommerce')); ?>
                 <input type="text" name="player_name_template" value="" style="width: 100%; max-width: 300px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" disabled />
                 <span class="error-message" style="color: red; display: none; font-size: 0.9em;"><?php _e('Player name is required.', 'woocommerce'); ?></span>
             </label>
             <label style="display: block; margin-bottom: 10px;">
-                <?php _e('Date of Birth', 'woocommerce'); ?>
+                <?php echo esc_html($settings['dob_label'] ?? __('Date of Birth', 'woocommerce')); ?>
                 <input type="date" name="player_dob_template" value="" style="width: 100%; max-width: 300px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" disabled />
                 <span class="error-message" style="color: red; display: none; font-size: 0.9em;"><?php _e('Date of birth is required.', 'woocommerce'); ?></span>
             </label>
             <label style="display: block; margin-bottom: 10px;">
                 <input type="checkbox" name="has_medical_conditions_template" class="has-medical-conditions" />
-                <?php _e('Has Known Medical Conditions?', 'woocommerce'); ?>
+                <?php echo esc_html($settings['has_medical_conditions_label'] ?? __('Has Known Medical Conditions?', 'woocommerce')); ?>
             </label>
             <div class="medical-conditions" style="display: none; margin-bottom: 10px;">
                 <label style="display: block; margin-bottom: 5px;">
-                    <?php _e('Medical Conditions', 'woocommerce'); ?>
+                    <?php echo esc_html($settings['medical_conditions_label'] ?? __('Medical Conditions', 'woocommerce')); ?>
                     <textarea name="medical_conditions_template" style="width: 100%; max-width: 300px; height: 100px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
                     <span class="error-message" style="color: red; display: none; font-size: 0.9em;"><?php _e('Medical conditions are required if checked.', 'woocommerce'); ?></span>
                 </label>
             </div>
             <label style="display: block; margin-bottom: 10px;">
-                <?php _e('Medical Consent Form (PDF/Image)', 'woocommerce'); ?>
+                <?php echo esc_html($settings['medical_consent_label'] ?? __('Medical Consent Form (PDF/Image)', 'woocommerce')); ?>
                 <input type="file" name="medical_consent_template" accept=".pdf,.jpg,.png" style="width: 100%; max-width: 300px;" disabled />
             </label>
-            <button type="button" class="remove-player button" style="background: #dc3545; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;"><?php _e('Remove', 'woocommerce'); ?></button>
+            <button type="button" class="remove-player button"><?php echo esc_html($settings['remove_player_button_text'] ?? __('Remove', 'woocommerce')); ?></button>
         </div>
     </div>
 
@@ -336,4 +544,3 @@ function display_players_form() {
     <?php
 }
 ?>
-
