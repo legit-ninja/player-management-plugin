@@ -1,6 +1,6 @@
 <?php
 /**
- * Player Management - Enhanced Elementor Widget with Additional Options
+ * Player Management - Enhanced Elementor Widget with Fixed Button Alignments and Title Customization
  */
 
 // Register the Elementor widget
@@ -24,6 +24,27 @@ function register_player_management_widget($widgets_manager) {
         }
 
         protected function register_controls() {
+            // Content Tab: General Settings
+            $this->start_controls_section(
+                'section_general_settings',
+                [
+                    'label' => __('General Settings', 'intersoccer-player-management'),
+                    'tab' => \Elementor\Controls_Manager::TAB_CONTENT,
+                ]
+            );
+
+            $this->add_control(
+                'form_title',
+                [
+                    'label' => __('Form Title', 'intersoccer-player-management'),
+                    'type' => \Elementor\Controls_Manager::TEXT,
+                    'default' => __('Manage Players', 'intersoccer-player-management'),
+                    'placeholder' => __('Manage Players', 'intersoccer-player-management'),
+                ]
+            );
+
+            $this->end_controls_section();
+
             // Content Tab: Form Settings
             $this->start_controls_section(
                 'section_form_settings',
@@ -483,7 +504,7 @@ function register_player_management_widget($widgets_manager) {
                     ],
                     'default' => 'left',
                     'selectors' => [
-                        '{{WRAPPER}} #add-player' => 'display: block; margin-left: {{VALUE}} === "left" ? "0" : "auto"; margin-right: {{VALUE}} === "right" ? "0" : "auto";',
+                        '{{WRAPPER}} #add-player' => 'display: block; width: auto; text-align: {{VALUE}}; margin: 0 auto; float: {{VALUE}};',
                     ],
                 ]
             );
@@ -540,7 +561,7 @@ function register_player_management_widget($widgets_manager) {
                     ],
                     'default' => 'left',
                     'selectors' => [
-                        '{{WRAPPER}} .remove-player' => 'display: block; margin-left: {{VALUE}} === "left" ? "0" : "auto"; margin-right: {{VALUE}} === "right" ? "0" : "auto";',
+                        '{{WRAPPER}} .remove-player' => 'display: block; width: auto; text-align: {{VALUE}}; margin: 0 auto; float: {{VALUE}};',
                     ],
                 ]
             );
@@ -597,7 +618,7 @@ function register_player_management_widget($widgets_manager) {
                     ],
                     'default' => 'left',
                     'selectors' => [
-                        '{{WRAPPER}} input[name="save_players"]' => 'display: block; margin-left: {{VALUE}} === "left" ? "0" : "auto"; margin-right: {{VALUE}} === "right" ? "0" : "auto";',
+                        '{{WRAPPER}} input[name="save_players"]' => 'display: block; width: auto; text-align: {{VALUE}}; margin: 0 auto; float: {{VALUE}};',
                     ],
                 ]
             );
@@ -741,7 +762,7 @@ function display_players_form($settings = []) {
         }
     }
     ?>
-    <h2><?php _e('Manage Players', 'intersoccer-player-management'); ?></h2>
+    <h2><?php echo esc_html($settings['form_title'] ?? __('Manage Players', 'intersoccer-player-management')); ?></h2>
     <p><?php _e('Add your children as Players for Summer Football Camps.', 'intersoccer-player-management'); ?></p>
     <form method="post" id="manage-players-form" action="" enctype="multipart/form-data">
         <?php wp_nonce_field('save_players_action', 'players_nonce'); ?>
@@ -963,4 +984,3 @@ function display_players_form($settings = []) {
     <?php
 }
 ?>
-
