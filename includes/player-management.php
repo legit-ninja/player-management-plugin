@@ -1,6 +1,6 @@
 <?php
 /**
- * Player Management - Elementor Widget with Custom Controls
+ * Player Management - Elementor Widget with Enhanced Custom Controls
  */
 
 // Register the Elementor widget
@@ -60,6 +60,30 @@ function register_player_management_widget($widgets_manager) {
                     'type' => \Elementor\Controls_Manager::TEXT,
                     'default' => __('Save Players', 'woocommerce'),
                     'placeholder' => __('Save Players', 'woocommerce'),
+                ]
+            );
+
+            $this->add_control(
+                'show_add_player_button',
+                [
+                    'label' => __('Show Add Player Button', 'woocommerce'),
+                    'type' => \Elementor\Controls_Manager::SWITCHER,
+                    'label_on' => __('Show', 'woocommerce'),
+                    'label_off' => __('Hide', 'woocommerce'),
+                    'return_value' => 'yes',
+                    'default' => 'yes',
+                ]
+            );
+
+            $this->add_control(
+                'show_remove_player_button',
+                [
+                    'label' => __('Show Remove Player Button', 'woocommerce'),
+                    'type' => \Elementor\Controls_Manager::SWITCHER,
+                    'label_on' => __('Show', 'woocommerce'),
+                    'label_off' => __('Hide', 'woocommerce'),
+                    'return_value' => 'yes',
+                    'default' => 'yes',
                 ]
             );
 
@@ -136,6 +160,34 @@ function register_player_management_widget($widgets_manager) {
             );
 
             $this->add_control(
+                'form_alignment',
+                [
+                    'label' => __('Form Alignment', 'woocommerce'),
+                    'type' => \Elementor\Controls_Manager::CHOOSE,
+                    'options' => [
+                        'left' => [
+                            'title' => __('Left', 'woocommerce'),
+                            'icon' => 'eicon-text-align-left',
+                        ],
+                        'center' => [
+                            'title' => __('Center', 'woocommerce'),
+                            'icon' => 'eicon-text-align-center',
+                        ],
+                        'right' => [
+                            'title' => __('Right', 'woocommerce'),
+                            'icon' => 'eicon-text-align-right',
+                        ],
+                    ],
+                    'default' => 'left',
+                    'selectors' => [
+                        '{{WRAPPER}} .player-entry' => 'text-align: {{VALUE}};',
+                        '{{WRAPPER}} .player-entry label' => 'display: inline-block; text-align: {{VALUE}};',
+                        '{{WRAPPER}} .player-entry input, {{WRAPPER}} .player-entry textarea' => 'display: inline-block; width: 100%; max-width: 300px;',
+                    ],
+                ]
+            );
+
+            $this->add_control(
                 'form_background_color',
                 [
                     'label' => __('Form Background Color', 'woocommerce'),
@@ -180,6 +232,65 @@ function register_player_management_widget($widgets_manager) {
 
             $this->end_controls_section();
 
+            // Style Tab: Text and Field Styles
+            $this->start_controls_section(
+                'section_text_styles',
+                [
+                    'label' => __('Text and Field Styles', 'woocommerce'),
+                    'tab' => \Elementor\Controls_Manager::TAB_STYLE,
+                ]
+            );
+
+            $this->add_control(
+                'label_text_color',
+                [
+                    'label' => __('Label Text Color', 'woocommerce'),
+                    'type' => \Elementor\Controls_Manager::COLOR,
+                    'default' => '#333',
+                    'selectors' => [
+                        '{{WRAPPER}} .player-entry label' => 'color: {{VALUE}};',
+                    ],
+                ]
+            );
+
+            $this->add_control(
+                'field_text_color',
+                [
+                    'label' => __('Field Text Color', 'woocommerce'),
+                    'type' => \Elementor\Controls_Manager::COLOR,
+                    'default' => '#333',
+                    'selectors' => [
+                        '{{WRAPPER}} .player-entry input, {{WRAPPER}} .player-entry textarea' => 'color: {{VALUE}};',
+                    ],
+                ]
+            );
+
+            $this->add_control(
+                'error_text_color',
+                [
+                    'label' => __('Error Text Color', 'woocommerce'),
+                    'type' => \Elementor\Controls_Manager::COLOR,
+                    'default' => '#ff0000',
+                    'selectors' => [
+                        '{{WRAPPER}} .player-entry .error-message' => 'color: {{VALUE}};',
+                    ],
+                ]
+            );
+
+            $this->add_control(
+                'field_background_color',
+                [
+                    'label' => __('Field Background Color', 'woocommerce'),
+                    'type' => \Elementor\Controls_Manager::COLOR,
+                    'default' => '#ffffff',
+                    'selectors' => [
+                        '{{WRAPPER}} .player-entry input, {{WRAPPER}} .player-entry textarea' => 'background-color: {{VALUE}};',
+                    ],
+                ]
+            );
+
+            $this->end_controls_section();
+
             // Style Tab: Button Styles
             $this->start_controls_section(
                 'section_button_styles',
@@ -202,6 +313,51 @@ function register_player_management_widget($widgets_manager) {
             );
 
             $this->add_control(
+                'add_button_alignment',
+                [
+                    'label' => __('Add Button Alignment', 'woocommerce'),
+                    'type' => \Elementor\Controls_Manager::CHOOSE,
+                    'options' => [
+                        'left' => [
+                            'title' => __('Left', 'woocommerce'),
+                            'icon' => 'eicon-text-align-left',
+                        ],
+                        'center' => [
+                            'title' => __('Center', 'woocommerce'),
+                            'icon' => 'eicon-text-align-center',
+                        ],
+                        'right' => [
+                            'title' => __('Right', 'woocommerce'),
+                            'icon' => 'eicon-text-align-right',
+                        ],
+                    ],
+                    'default' => 'left',
+                    'selectors' => [
+                        '{{WRAPPER}} #add-player' => 'display: block; margin-left: {{VALUE}} === "left" ? "0" : "auto"; margin-right: {{VALUE}} === "right" ? "0" : "auto";',
+                    ],
+                ]
+            );
+
+            $this->add_control(
+                'add_button_spacing',
+                [
+                    'label' => __('Add Button Spacing', 'woocommerce'),
+                    'type' => \Elementor\Controls_Manager::DIMENSIONS,
+                    'size_units' => ['px', 'em', '%'],
+                    'default' => [
+                        'top' => '10',
+                        'right' => '0',
+                        'bottom' => '10',
+                        'left' => '0',
+                        'unit' => 'px',
+                    ],
+                    'selectors' => [
+                        '{{WRAPPER}} #add-player' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    ],
+                ]
+            );
+
+            $this->add_control(
                 'remove_button_background_color',
                 [
                     'label' => __('Remove Button Background Color', 'woocommerce'),
@@ -214,6 +370,51 @@ function register_player_management_widget($widgets_manager) {
             );
 
             $this->add_control(
+                'remove_button_alignment',
+                [
+                    'label' => __('Remove Button Alignment', 'woocommerce'),
+                    'type' => \Elementor\Controls_Manager::CHOOSE,
+                    'options' => [
+                        'left' => [
+                            'title' => __('Left', 'woocommerce'),
+                            'icon' => 'eicon-text-align-left',
+                        ],
+                        'center' => [
+                            'title' => __('Center', 'woocommerce'),
+                            'icon' => 'eicon-text-align-center',
+                        ],
+                        'right' => [
+                            'title' => __('Right', 'woocommerce'),
+                            'icon' => 'eicon-text-align-right',
+                        ],
+                    ],
+                    'default' => 'left',
+                    'selectors' => [
+                        '{{WRAPPER}} .remove-player' => 'display: block; margin-left: {{VALUE}} === "left" ? "0" : "auto"; margin-right: {{VALUE}} === "right" ? "0" : "auto";',
+                    ],
+                ]
+            );
+
+            $this->add_control(
+                'remove_button_spacing',
+                [
+                    'label' => __('Remove Button Spacing', 'woocommerce'),
+                    'type' => \Elementor\Controls_Manager::DIMENSIONS,
+                    'size_units' => ['px', 'em', '%'],
+                    'default' => [
+                        'top' => '0',
+                        'right' => '0',
+                        'bottom' => '0',
+                        'left' => '0',
+                        'unit' => 'px',
+                    ],
+                    'selectors' => [
+                        '{{WRAPPER}} .remove-player' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    ],
+                ]
+            );
+
+            $this->add_control(
                 'save_button_background_color',
                 [
                     'label' => __('Save Button Background Color', 'woocommerce'),
@@ -221,6 +422,51 @@ function register_player_management_widget($widgets_manager) {
                     'default' => '#28a745',
                     'selectors' => [
                         '{{WRAPPER}} input[name="save_players"]' => 'background-color: {{VALUE}};',
+                    ],
+                ]
+            );
+
+            $this->add_control(
+                'save_button_alignment',
+                [
+                    'label' => __('Save Button Alignment', 'woocommerce'),
+                    'type' => \Elementor\Controls_Manager::CHOOSE,
+                    'options' => [
+                        'left' => [
+                            'title' => __('Left', 'woocommerce'),
+                            'icon' => 'eicon-text-align-left',
+                        ],
+                        'center' => [
+                            'title' => __('Center', 'woocommerce'),
+                            'icon' => 'eicon-text-align-center',
+                        ],
+                        'right' => [
+                            'title' => __('Right', 'woocommerce'),
+                            'icon' => 'eicon-text-align-right',
+                        ],
+                    ],
+                    'default' => 'left',
+                    'selectors' => [
+                        '{{WRAPPER}} input[name="save_players"]' => 'display: block; margin-left: {{VALUE}} === "left" ? "0" : "auto"; margin-right: {{VALUE}} === "right" ? "0" : "auto";',
+                    ],
+                ]
+            );
+
+            $this->add_control(
+                'save_button_spacing',
+                [
+                    'label' => __('Save Button Spacing', 'woocommerce'),
+                    'type' => \Elementor\Controls_Manager::DIMENSIONS,
+                    'size_units' => ['px', 'em', '%'],
+                    'default' => [
+                        'top' => '0',
+                        'right' => '0',
+                        'bottom' => '0',
+                        'left' => '0',
+                        'unit' => 'px',
+                    ],
+                    'selectors' => [
+                        '{{WRAPPER}} input[name="save_players"]' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                     ],
                 ]
             );
@@ -351,12 +597,12 @@ function display_players_form($settings = []) {
                     <label style="display: block; margin-bottom: 10px;">
                         <?php echo esc_html($settings['player_name_label'] ?? __('Player Name', 'woocommerce')); ?>
                         <input type="text" name="player_name[<?php echo $i; ?>]" value="<?php echo esc_attr($player['name']); ?>" style="width: 100%; max-width: 300px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
-                        <span class="error-message" style="color: red; display: none; font-size: 0.9em;"><?php _e('Player name is required.', 'woocommerce'); ?></span>
+                        <span class="error-message" style="display: none; font-size: 0.9em;"><?php _e('Player name is required.', 'woocommerce'); ?></span>
                     </label>
                     <label style="display: block; margin-bottom: 10px;">
                         <?php echo esc_html($settings['dob_label'] ?? __('Date of Birth', 'woocommerce')); ?>
                         <input type="date" name="player_dob[<?php echo $i; ?>]" value="<?php echo esc_attr($player['dob']); ?>" style="width: 100%; max-width: 300px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
-                        <span class="error-message" style="color: red; display: none; font-size: 0.9em;"><?php _e('Date of birth is required.', 'woocommerce'); ?></span>
+                        <span class="error-message" style="display: none; font-size: 0.9em;"><?php _e('Date of birth is required.', 'woocommerce'); ?></span>
                     </label>
                     <label style="display: block; margin-bottom: 10px;">
                         <input type="checkbox" name="has_medical_conditions[<?php echo $i; ?>]" class="has-medical-conditions" <?php checked($player['medical_conditions'] !== 'No known medical conditions'); ?> />
@@ -366,7 +612,7 @@ function display_players_form($settings = []) {
                         <label style="display: block; margin-bottom: 5px;">
                             <?php echo esc_html($settings['medical_conditions_label'] ?? __('Medical Conditions', 'woocommerce')); ?>
                             <textarea name="medical_conditions[<?php echo $i; ?>]" style="width: 100%; max-width: 300px; height: 100px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"><?php echo esc_textarea($player['medical_conditions'] !== 'No known medical conditions' ? $player['medical_conditions'] : ''); ?></textarea>
-                            <span class="error-message" style="color: red; display: none; font-size: 0.9em;"><?php _e('Medical conditions are required if checked.', 'woocommerce'); ?></span>
+                            <span class="error-message" style="display: none; font-size: 0.9em;"><?php _e('Medical conditions are required if checked.', 'woocommerce'); ?></span>
                         </label>
                     </div>
                     <label style="display: block; margin-bottom: 10px;">
@@ -376,11 +622,15 @@ function display_players_form($settings = []) {
                             <a href="<?php echo esc_url($player['consent_url']); ?>" target="_blank" style="display: block; margin-top: 5px;"><?php _e('View Current Consent', 'woocommerce'); ?></a>
                         <?php endif; ?>
                     </label>
-                    <button type="button" class="remove-player button"><?php echo esc_html($settings['remove_player_button_text'] ?? __('Remove', 'woocommerce')); ?></button>
+                    <?php if ($settings['show_remove_player_button'] === 'yes'): ?>
+                        <button type="button" class="remove-player button"><?php echo esc_html($settings['remove_player_button_text'] ?? __('Remove', 'woocommerce')); ?></button>
+                    <?php endif; ?>
                 </div>
             <?php endforeach; ?>
         </div>
-        <button type="button" id="add-player" class="button"><?php echo esc_html($settings['add_player_button_text'] ?? __('Add Another Player', 'woocommerce')); ?></button>
+        <?php if ($settings['show_add_player_button'] === 'yes'): ?>
+            <button type="button" id="add-player" class="button"><?php echo esc_html($settings['add_player_button_text'] ?? __('Add Another Player', 'woocommerce')); ?></button>
+        <?php endif; ?>
         <p><input type="submit" name="save_players" class="button" value="<?php echo esc_attr($settings['save_players_button_text'] ?? __('Save Players', 'woocommerce')); ?>" /></p>
     </form>
 
@@ -389,12 +639,12 @@ function display_players_form($settings = []) {
             <label style="display: block; margin-bottom: 10px;">
                 <?php echo esc_html($settings['player_name_label'] ?? __('Player Name', 'woocommerce')); ?>
                 <input type="text" name="player_name_template" value="" style="width: 100%; max-width: 300px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" disabled />
-                <span class="error-message" style="color: red; display: none; font-size: 0.9em;"><?php _e('Player name is required.', 'woocommerce'); ?></span>
+                <span class="error-message" style="display: none; font-size: 0.9em;"><?php _e('Player name is required.', 'woocommerce'); ?></span>
             </label>
             <label style="display: block; margin-bottom: 10px;">
                 <?php echo esc_html($settings['dob_label'] ?? __('Date of Birth', 'woocommerce')); ?>
                 <input type="date" name="player_dob_template" value="" style="width: 100%; max-width: 300px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" disabled />
-                <span class="error-message" style="color: red; display: none; font-size: 0.9em;"><?php _e('Date of birth is required.', 'woocommerce'); ?></span>
+                <span class="error-message" style="display: none; font-size: 0.9em;"><?php _e('Date of birth is required.', 'woocommerce'); ?></span>
             </label>
             <label style="display: block; margin-bottom: 10px;">
                 <input type="checkbox" name="has_medical_conditions_template" class="has-medical-conditions" />
@@ -404,14 +654,16 @@ function display_players_form($settings = []) {
                 <label style="display: block; margin-bottom: 5px;">
                     <?php echo esc_html($settings['medical_conditions_label'] ?? __('Medical Conditions', 'woocommerce')); ?>
                     <textarea name="medical_conditions_template" style="width: 100%; max-width: 300px; height: 100px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
-                    <span class="error-message" style="color: red; display: none; font-size: 0.9em;"><?php _e('Medical conditions are required if checked.', 'woocommerce'); ?></span>
+                    <span class="error-message" style="display: none; font-size: 0.9em;"><?php _e('Medical conditions are required if checked.', 'woocommerce'); ?></span>
                 </label>
             </div>
             <label style="display: block; margin-bottom: 10px;">
                 <?php echo esc_html($settings['medical_consent_label'] ?? __('Medical Consent Form (PDF/Image)', 'woocommerce')); ?>
                 <input type="file" name="medical_consent_template" accept=".pdf,.jpg,.png" style="width: 100%; max-width: 300px;" disabled />
             </label>
-            <button type="button" class="remove-player button"><?php echo esc_html($settings['remove_player_button_text'] ?? __('Remove', 'woocommerce')); ?></button>
+            <?php if ($settings['show_remove_player_button'] === 'yes'): ?>
+                <button type="button" class="remove-player button"><?php echo esc_html($settings['remove_player_button_text'] ?? __('Remove', 'woocommerce')); ?></button>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -544,3 +796,4 @@ function display_players_form($settings = []) {
     <?php
 }
 ?>
+
