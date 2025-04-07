@@ -1,6 +1,6 @@
 <?php
 /**
- * Admin Feature: Manage Players, Products, Orders, Import from Zoho CRM, Courses Report, and Sync Products to Events
+ * Admin Feature: Manage Players, Products, Orders, Import from Zoho CRM, Courses Report with Dynamic Taxonomies, Sync Products to Events, and Generate Events
  */
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -49,6 +49,85 @@ function intersoccer_players_admin_page() {
             }
         }
         echo '<div class="notice notice-success is-dismissible"><p>' . __('Product to event mappings updated successfully!', 'intersoccer-player-management') . '</p></div>';
+    }
+
+    // Handle generate events from variable products
+    if (isset($_POST['generate_events']) && !empty($_POST['generate_events_nonce']) && wp_verify_nonce($_POST['generate_events_nonce'], 'generate_events_action')) {
+        $products = wc_get_products(array(
+            'limit' => -1,
+            'status' => 'publish',
+            'type' => array('variable'),
+        ));
+
+        foreach ($products as $product) {
+            $variations = $product->get_available_variations();
+            foreach ($variations as $variation) {
+                $variation_id = $variation['variation_id'];
+                $variation_obj = wc_get_product($variation_id);
+                $event_id = get_post_meta($variation_id, '_tribe_event_id', true);
+
+                // Skip if already linked to an event
+                if ($event_id && tribe_is_event($event_id)) {
+                    continue;
+                }
+
+                // Get variation attributes to build event details
+                $variation_attributes = $variation_obj->get_variation_attributes();
+                $event_title = $product->get_name();
+                $event_description = $product->get_description() ?: $product->get_short_description() ?: '';
+                $event_date = '';
+                $event_location = '';
+
+                foreach ($variation_attributes as $attribute_key => $attribute_value) {
+                    $attribute_name = wc_attribute_label(str_replace('attribute_', '', $attribute_key));
+                    if (stripos($attribute_name, 'date') !== false) {
+                        $event_date = $attribute_value;
+                    } elseif (stripos($attribute_name, 'location') !== false || stripos($attribute_name, 'venue') !== false) {
+                        $event_location = $attribute_value;
+                    }
+                    $event_title .= ' - ' . $attribute_name . ': ' . $attribute_value;
+                }
+
+                // Create the event
+                $event_args = array(
+                    'post_title' => $event_title,
+                    'post_content' => $event_description,
+                    'post_type' => 'tribe_events',
+                    'post_status' => 'publish',
+                    'meta_input' => array(
+                        '_EventStartDate' => $event_date ? date('Y-m-d H:i:s', strtotime($event_date)) : date('Y-m-d H:i:s'), // Default to today if no date
+                        '_EventEndDate' => $event_date ? date('Y-m-d H:i:s', strtotime($event_date . ' +1 hour')) : date('Y-m-d H:i:s', strtotime('+1 hour')),
+                        '_EventVenue' => $event_location,
+                    ),
+                );
+
+                $new_event_id = wp_insert_post($event_args);
+                if (is_wp_error($new_event_id)) {
+                    error_log('Failed to create Event Tickets event: ' . $new_event_id->get_error_message());
+                    continue;
+                }
+
+                // Add an RSVP ticket to the event
+                $ticket_args = array(
+                    'ticket_name' => __('General Admission', 'intersoccer-player-management'),
+                    'ticket_description' => __('General admission ticket for the event.', 'intersoccer-player-management'),
+                    'ticket_price' => 0, // Free ticket for the free version of Event Tickets
+                    'ticket_capacity' => -1, // Unlimited capacity
+                    'ticket_start_date' => date('Y-m-d'),
+                    'ticket_end_date' => $event_date ? date('Y-m-d', strtotime($event_date)) : date('Y-m-d', strtotime('+1 month')),
+                );
+
+                $ticket_id = tribe_tickets()->create_ticket($new_event_id, 'rsvp', $ticket_args);
+                if (is_wp_error($ticket_id)) {
+                    error_log('Failed to create RSVP ticket for event ID ' . $new_event_id . ': ' . $ticket_id->get_error_message());
+                }
+
+                // Link the event to the variation
+                update_post_meta($variation_id, '_tribe_event_id', $new_event_id);
+            }
+        }
+
+        echo '<div class="notice notice-success is-dismissible"><p>' . __('Events generated successfully from variable products!', 'intersoccer-player-management') . '</p></div>';
     }
 
     // Handle import from Zoho CRM
@@ -231,7 +310,7 @@ function intersoccer_players_admin_page() {
                                             if ($variation_id && isset($variation_attributes[$attribute_key])) {
                                                 $term = $variation_attributes[$attribute_key];
                                             } else {
-                                                $terms = wc_get_product_terms($product_id, 'pa_intersoccer-venues', array('fields' => 'names'));
+                                                $terms = wc_get_product_terms($product_id, $attribute_key, array('fields' => 'names'));
                                                 $term = !empty($terms) ? $terms[0] : '';
                                             }
                                             if ($term) {
@@ -289,92 +368,70 @@ function intersoccer_players_admin_page() {
                 <a href="?page=intersoccer-players&tab=courses-report&export=pdf" class="button"><?php _e('Export to PDF', 'intersoccer-player-management'); ?></a>
             </p>
             <?php
-            // Define locations and courses (based on the example report)
-            $locations = array(
-                'VERSOIX - MIES' => array(
-                    'Wed Mini Soccer Versoix' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Wed After School Soccer Versoix' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Friday Mini Soccer Versoix' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Friday After School Versoix' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Sunday Mini Soccer' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Sunday Fun Footy' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Sunday Fun Footy GIRLS' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Sunday Soccer League' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                ),
-                'GENEVA' => array(
-                    'Mon Mini Soccer, Chêne-Bourg, Belle Idée' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Mon After School, Chêne-Bourg, Belle Idée' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Wed Mini Soccer, Vernier, CS Bois-des-Frères' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Wed After School, Vernier, CS Bois-des-Frères' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Wed Mini Soccer, Chêne-Bourg, Belle Idée' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Wed After School, Chêne-Bourg, Belle Idée' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Sunday Mini Soccer, Varembé' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Sunday Fun Footy, Varembé' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Sunday Fun Footy GIRLS, Varembé' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Sunday Soccer League, Varembé' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Sunday Soccer League GIRLS, Varembé' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Sunday Mini Soccer, Chênois' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Sunday Fun Footy, Chênois' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Sunday Fun Footy GIRLS, Chênois' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Sunday Soccer League, Chênois' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Sunday Soccer League GIRLS, Chênois' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                ),
-                'NYON / ETOY' => array(
-                    'Sunday Mini Soccer Nyon Colovray Sports' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Sunday Fun Footy Nyon Colovray Sports' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Sunday Soccer League Nyon Colovray Sports' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Sunday Mini Soccer CS Etoy' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Sunday Fun Footy CS Etoy' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Sunday Soccer League CS Etoy' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                ),
-                'LAUSANNE' => array(
-                    'Mon Mini Soccer, Rochettaz, Pully' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Mon After School, Rochettaz, Pully' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Sunday Mini Soccer, Le Mont' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Sunday Fun Footy, Le Mont' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Sunday Soccer League, Le Mont' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                ),
-                'BASEL' => array(
-                    'Monday Mini Soccer, Bachgraben' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Monday After School, Bachgraben' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Wed Mini Soccer Rankhof' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Saturday Mini Soccer, Bachgraben' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Saturday Fun Footy, Bachgraben' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Saturday Soccer League, Bachgraben' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Sunday Mini Soccer Rankhof' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Sunday Fun Footy Rankhof' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Sunday Soccer League Rankhof' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                ),
-                'ZUG' => array(
-                    'Tue Mini Soccer, Cham' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Tue After School, Cham' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Wed Mini Soccer Zug ISZL Walterswil' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Wed After School Zug ISZL Walterswil' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Sunday Mini Soccer Zug ISZL Walterswil' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Sunday Fun Footy ISZL Walterswil' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Sunday Fun Footy GIRLS ISZL Walterswil' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Sunday Soccer League ISZL Walterswil' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                ),
-                'ZURICH' => array(
-                    'Mon Mini Soccer FC Seefeld' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Tues After School ICS Gr. EY1-EY2' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Tues After School ICS KG-GR1' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Tues After School ICS Gr. 2-5' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Tues After School GIRLS ICS Gr. 2-5' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Wed Mini Soccer Langnau' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Wed After School Langnau' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Wed Mini ZIS' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Wed After School ZIS' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Thurs After School FC Seefeld' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Fri Mini Soccer Langnau am Albis' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Sunday Mini Soccer ZIS' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Sunday Fun Footy ZIS' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Sunday Soccer League ZIS' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Sunday Mini Soccer Greifensee' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Sunday Fun Footy Greifensee' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                    'Sunday Soccer League Greifensee' => array('bo' => 0, 'pitch_side' => 0, 'buy_club' => 0, 'total' => 0, 'final_2023' => 0, 'girls_free' => 0),
-                ),
-            );
+            // Fetch all locations from the pa_intersoccer-venues taxonomy
+            $locations_terms = get_terms(array(
+                'taxonomy' => 'pa_intersoccer-venues',
+                'hide_empty' => false,
+            ));
+
+            if (is_wp_error($locations_terms) || empty($locations_terms)) {
+                echo '<p>' . __('No locations found in the pa_intersoccer-venues taxonomy.', 'intersoccer-player-management') . '</p>';
+                return;
+            }
+
+            // Initialize the locations array dynamically
+            $locations = array();
+            foreach ($locations_terms as $term) {
+                $location_name = strtoupper($term->name);
+                $locations[$location_name] = array();
+            }
+
+            // Fetch all course names from product names and taxonomies
+            $products = wc_get_products(array(
+                'limit' => -1,
+                'status' => 'publish',
+            ));
+
+            $course_names = array();
+            foreach ($products as $product) {
+                $product_id = $product->get_id();
+                $product_type = $product->get_type();
+
+                if ($product_type === 'variable') {
+                    $variations = $product->get_available_variations();
+                    foreach ($variations as $variation) {
+                        $variation_id = $variation['variation_id'];
+                        $variation_obj = wc_get_product($variation_id);
+                        $variation_attributes = $variation_obj->get_variation_attributes();
+
+                        // Get location
+                        $location = isset($variation_attributes['pa_intersoccer-venues']) ? strtoupper($variation_attributes['pa_intersoccer-venues']) : '';
+                        if (!$location || !isset($locations[$location])) {
+                            continue;
+                        }
+
+                        // Build course name using product name and relevant taxonomies
+                        $course_name = $product->get_name();
+                        $taxonomies_to_check = array('pa_day-of-week', 'pa_event-terms', 'pa_summer-camp-terms-2025', 'pa_camp-times', 'pa_camp-holidays');
+                        foreach ($taxonomies_to_check as $taxonomy) {
+                            if (isset($variation_attributes[$taxonomy]) && !empty($variation_attributes[$taxonomy])) {
+                                $course_name .= ' ' . ucfirst(str_replace('attribute_', '', $taxonomy)) . ': ' . $variation_attributes[$taxonomy];
+                            }
+                        }
+
+                        if (!isset($locations[$location][$course_name])) {
+                            $locations[$location][$course_name] = array(
+                                'bo' => 0,
+                                'pitch_side' => 0,
+                                'buy_club' => 0,
+                                'total' => 0,
+                                'final_2023' => 0,
+                                'girls_free' => 0,
+                            );
+                        }
+                    }
+                }
+            }
 
             // Fetch orders for 2024 and 2023
             $orders_2024 = wc_get_orders(array(
@@ -423,79 +480,61 @@ function intersoccer_players_admin_page() {
                     if ($variation_id) {
                         $variation = wc_get_product($variation_id);
                         $variation_attributes = $variation->get_attributes();
-                        $location = $variation_attributes['pa_intersoccer-venues'] ?? '';
+                        $location = isset($variation_attributes['pa_intersoccer-venues']) ? strtoupper($variation_attributes['pa_intersoccer-venues']) : '';
                     } else {
                         $terms = wc_get_product_terms($product_id, 'pa_intersoccer-venues', array('fields' => 'names'));
-                        $location = !empty($terms) ? $terms[0] : '';
+                        $location = !empty($terms) ? strtoupper($terms[0]) : '';
                     }
 
-                    // Map location to report structure
-                    $location_key = '';
-                    switch (strtolower($location)) {
-                        case 'versoix':
-                        case 'mies':
-                            $location_key = 'VERSOIX - MIES';
-                            break;
-                        case 'varembé':
-                        case 'chêne-bourg':
-                        case 'belle idée':
-                        case 'vernier':
-                        case 'cs bois-des-frères':
-                        case 'chênois':
-                            $location_key = 'GENEVA';
-                            break;
-                        case 'nyon colovray sports':
-                        case 'cs etoy':
-                            $location_key = 'NYON / ETOY';
-                            break;
-                        case 'rochettaz':
-                        case 'pully':
-                        case 'le mont':
-                            $location_key = 'LAUSANNE';
-                            break;
-                        case 'bachgraben':
-                        case 'rankhof':
-                            $location_key = 'BASEL';
-                            break;
-                        case 'cham':
-                        case 'zug iszl walterswil':
-                            $location_key = 'ZUG';
-                            break;
-                        case 'fc seefeld':
-                        case 'ics':
-                        case 'langnau':
-                        case 'zis':
-                        case 'langnau am albis':
-                        case 'greifensee':
-                            $location_key = 'ZURICH';
-                            break;
-                    }
-
-                    if (!$location_key || !isset($locations[$location_key])) {
+                    if (!$location || !isset($locations[$location])) {
                         continue;
                     }
 
-                    // Get course/day (product name)
+                    // Build course name
                     $course_name = $product->get_name();
-                    if (!isset($locations[$location_key][$course_name])) {
-                        continue;
+                    $taxonomies_to_check = array('pa_day-of-week', 'pa_event-terms', 'pa_summer-camp-terms-2025', 'pa_camp-times', 'pa_camp-holidays');
+                    if ($variation_id) {
+                        $variation_attributes = $variation->get_attributes();
+                        foreach ($taxonomies_to_check as $taxonomy) {
+                            if (isset($variation_attributes[$taxonomy]) && !empty($variation_attributes[$taxonomy])) {
+                                $course_name .= ' ' . ucfirst(str_replace('attribute_', '', $taxonomy)) . ': ' . $variation_attributes[$taxonomy];
+                            }
+                        }
+                    } else {
+                        foreach ($taxonomies_to_check as $taxonomy) {
+                            $terms = wc_get_product_terms($product_id, $taxonomy, array('fields' => 'names'));
+                            if (!empty($terms)) {
+                                $course_name .= ' ' . ucfirst(str_replace('attribute_', '', $taxonomy)) . ': ' . $terms[0];
+                            }
+                        }
+                    }
+
+                    if (!isset($locations[$location][$course_name])) {
+                        $locations[$location][$course_name] = array(
+                            'bo' => 0,
+                            'pitch_side' => 0,
+                            'buy_club' => 0,
+                            'total' => 0,
+                            'final_2023' => 0,
+                            'girls_free' => 0,
+                        );
                     }
 
                     // Update metrics
-                    $locations[$location_key][$course_name]['total']++;
+                    $locations[$location][$course_name]['total']++;
                     if ($is_buy_club) {
-                        $locations[$location_key][$course_name]['buy_club']++;
+                        $locations[$location][$course_name]['buy_club']++;
                     }
                     if ($is_girls_free) {
-                        $locations[$location_key][$course_name]['girls_free']++;
+                        $locations[$location][$course_name]['girls_free']++;
                     }
 
                     // Determine booking type (BO, Pitch Side, Buy Club)
                     $booking_type = $item->get_meta('Booking Type') ?? 'BO';
                     if ($booking_type === 'Pitch Side') {
-                        $locations[$location_key][$course_name]['pitch_side']++;
+                        $locations[$location][$course_name]['pitch_side']++;
                     } else {
-                        $locations[$location_key][$course_name]['bo']++;
+                        $locations[$location][$course_name]['bo']++;
                     }
                 }
             }
@@ -517,66 +556,48 @@ function intersoccer_players_admin_page() {
                     if ($variation_id) {
                         $variation = wc_get_product($variation_id);
                         $variation_attributes = $variation->get_attributes();
-                        $location = $variation_attributes['pa_intersoccer-venues'] ?? '';
+                        $location = isset($variation_attributes['pa_intersoccer-venues']) ? strtoupper($variation_attributes['pa_intersoccer-venues']) : '';
                     } else {
                         $terms = wc_get_product_terms($product_id, 'pa_intersoccer-venues', array('fields' => 'names'));
-                        $location = !empty($terms) ? $terms[0] : '';
+                        $location = !empty($terms) ? strtoupper($terms[0]) : '';
                     }
 
-                    // Map location to report structure
-                    $location_key = '';
-                    switch (strtolower($location)) {
-                        case 'versoix':
-                        case 'mies':
-                            $location_key = 'VERSOIX - MIES';
-                            break;
-                        case 'varembé':
-                        case 'chêne-bourg':
-                        case 'belle idée':
-                        case 'vernier':
-                        case 'cs bois-des-frères':
-                        case 'chênois':
-                            $location_key = 'GENEVA';
-                            break;
-                        case 'nyon colovray sports':
-                        case 'cs etoy':
-                            $location_key = 'NYON / ETOY';
-                            break;
-                        case 'rochettaz':
-                        case 'pully':
-                        case 'le mont':
-                            $location_key = 'LAUSANNE';
-                            break;
-                        case 'bachgraben':
-                        case 'rankhof':
-                            $location_key = 'BASEL';
-                            break;
-                        case 'cham':
-                        case 'zug iszl walterswil':
-                            $location_key = 'ZUG';
-                            break;
-                        case 'fc seefeld':
-                        case 'ics':
-                        case 'langnau':
-                        case 'zis':
-                        case 'langnau am albis':
-                        case 'greifensee':
-                            $location_key = 'ZURICH';
-                            break;
-                    }
-
-                    if (!$location_key || !isset($locations[$location_key])) {
+                    if (!$location || !isset($locations[$location])) {
                         continue;
                     }
 
-                    // Get course/day (product name)
+                    // Build course name
                     $course_name = $product->get_name();
-                    if (!isset($locations[$location_key][$course_name])) {
-                        continue;
+                    $taxonomies_to_check = array('pa_day-of-week', 'pa_event-terms', 'pa_summer-camp-terms-2025', 'pa_camp-times', 'pa_camp-holidays');
+                    if ($variation_id) {
+                        $variation_attributes = $variation->get_attributes();
+                        foreach ($taxonomies_to_check as $taxonomy) {
+                            if (isset($variation_attributes[$taxonomy]) && !empty($variation_attributes[$taxonomy])) {
+                                $course_name .= ' ' . ucfirst(str_replace('attribute_', '', $taxonomy)) . ': ' . $variation_attributes[$taxonomy];
+                            }
+                        }
+                    } else {
+                        foreach ($taxonomies_to_check as $taxonomy) {
+                            $terms = wc_get_product_terms($product_id, $taxonomy, array('fields' => 'names'));
+                            if (!empty($terms)) {
+                                $course_name .= ' ' . ucfirst(str_replace('attribute_', '', $taxonomy)) . ': ' . $terms[0];
+                            }
+                        }
+                    }
+
+                    if (!isset($locations[$location][$course_name])) {
+                        $locations[$location][$course_name] = array(
+                            'bo' => 0,
+                            'pitch_side' => 0,
+                            'buy_club' => 0,
+                            'total' => 0,
+                            'final_2023' => 0,
+                            'girls_free' => 0,
+                        );
                     }
 
                     // Update Final 2023 metric
-                    $locations[$location_key][$course_name]['final_2023']++;
+                    $locations[$location][$course_name]['final_2023']++;
                 }
             }
 
@@ -616,13 +637,13 @@ function intersoccer_players_admin_page() {
                     'girls_free' => 0,
                 );
 
-                foreach ($location as $course) {
-                    $location_total['bo'] += $course['bo'];
-                    $location_total['pitch_side'] += $course['pitch_side'];
-                    $location_total['buy_club'] += $course['buy_club'];
-                    $location_total['total'] += $course['total'];
-                    $location_total['final_2023'] += $course['final_2023'];
-                    $location_total['girls_free'] += $course['girls_free'];
+                foreach ($location as $course_name => $data) {
+                    $location_total['bo'] += $data['bo'];
+                    $location_total['pitch_side'] += $data['pitch_side'];
+                    $location_total['buy_club'] += $data['buy_club'];
+                    $location_total['total'] += $data['total'];
+                    $location_total['final_2023'] += $data['final_2023'];
+                    $location_total['girls_free'] += $data['girls_free'];
                 }
 
                 if ($location_total['final_2023'] > 0) {
@@ -742,10 +763,14 @@ function intersoccer_players_admin_page() {
 
             if (empty($products)) {
                 echo '<p>' . __('No WooCommerce products found.', 'intersoccer-player-management') . '</p>';
-            } elseif (empty($events)) {
-                echo '<p>' . __('No Event Tickets events found. Please create an event first.', 'intersoccer-player-management') . '</p>';
             } else {
                 ?>
+                <form method="post" action="">
+                    <?php wp_nonce_field('generate_events_action', 'generate_events_nonce'); ?>
+                    <p class="submit">
+                        <input type="submit" name="generate_events" class="button button-primary" value="<?php _e('Generate Events from Variable Products', 'intersoccer-player-management'); ?>" />
+                    </p>
+                </form>
                 <form method="post" action="">
                     <?php wp_nonce_field('sync_products_to_events_action', 'sync_products_nonce'); ?>
                     <table class="wp-list-table widefat fixed striped">
@@ -761,28 +786,33 @@ function intersoccer_players_admin_page() {
                             foreach ($products as $product) {
                                 $product_id = $product->get_id();
                                 $product_type = $product->get_type();
+                                $product_name = $product->get_name();
 
-                                if ($product_type === 'simple') {
-                                    // Simple product (e.g., Birthday Party)
+                                if ($product_type === 'simple' && $product_name === 'Birthday Party') {
+                                    // Handle the Birthday Party simple product
                                     $event_id = get_post_meta($product_id, '_tribe_event_id', true);
                                     ?>
                                     <tr>
                                         <td><?php echo esc_html($product->get_name()); ?></td>
                                         <td><?php _e('Simple', 'intersoccer-player-management'); ?></td>
                                         <td>
-                                            <select name="product_event_mapping[<?php echo esc_attr($product_id); ?>]">
-                                                <option value=""><?php _e('None', 'intersoccer-player-management'); ?></option>
-                                                <?php foreach ($events as $event): ?>
-                                                    <option value="<?php echo esc_attr($event->ID); ?>" <?php selected($event_id, $event->ID); ?>>
-                                                        <?php echo esc_html($event->post_title); ?>
-                                                    </option>
-                                                <?php endforeach; ?>
-                                            </select>
+                                            <?php if (empty($events)): ?>
+                                                <?php _e('No events available. Please create an event or generate events from variable products.', 'intersoccer-player-management'); ?>
+                                            <?php else: ?>
+                                                <select name="product_event_mapping[<?php echo esc_attr($product_id); ?>]">
+                                                    <option value=""><?php _e('None', 'intersoccer-player-management'); ?></option>
+                                                    <?php foreach ($events as $event): ?>
+                                                        <option value="<?php echo esc_attr($event->ID); ?>" <?php selected($event_id, $event->ID); ?>>
+                                                            <?php echo esc_html($event->post_title); ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            <?php endif; ?>
                                         </td>
                                     </tr>
                                     <?php
                                 } elseif ($product_type === 'variable') {
-                                    // Variable product (e.g., events with variations)
+                                    // Handle variable products (events)
                                     $variations = $product->get_available_variations();
                                     foreach ($variations as $variation) {
                                         $variation_id = $variation['variation_id'];
@@ -797,14 +827,18 @@ function intersoccer_players_admin_page() {
                                             <td><?php echo esc_html($product->get_name() . ' - ' . $variation_label); ?></td>
                                             <td><?php _e('Variation', 'intersoccer-player-management'); ?></td>
                                             <td>
-                                                <select name="product_event_mapping[variation_<?php echo esc_attr($variation_id); ?>]">
-                                                    <option value=""><?php _e('None', 'intersoccer-player-management'); ?></option>
-                                                    <?php foreach ($events as $event): ?>
-                                                        <option value="<?php echo esc_attr($event->ID); ?>" <?php selected($event_id, $event->ID); ?>>
-                                                            <?php echo esc_html($event->post_title); ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
-                                                </select>
+                                                <?php if (empty($events)): ?>
+                                                    <?php _e('No events available. Please generate events from variable products.', 'intersoccer-player-management'); ?>
+                                                <?php else: ?>
+                                                    <select name="product_event_mapping[variation_<?php echo esc_attr($variation_id); ?>]">
+                                                        <option value=""><?php _e('None', 'intersoccer-player-management'); ?></option>
+                                                        <?php foreach ($events as $event): ?>
+                                                            <option value="<?php echo esc_attr($event->ID); ?>" <?php selected($event_id, $event->ID); ?>>
+                                                                <?php echo esc_html($event->post_title); ?>
+                                                            </option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                <?php endif; ?>
                                             </td>
                                         </tr>
                                         <?php
