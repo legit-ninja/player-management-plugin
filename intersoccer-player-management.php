@@ -15,6 +15,9 @@ if (!defined('ABSPATH')) {
 // Include the player management functionality
 require_once plugin_dir_path(__FILE__) . 'includes/player-management.php';
 
+// Include the admin players management feature
+require_once plugin_dir_path(__FILE__) . 'includes/admin-players.php';
+
 // Optionally include other files if needed (e.g., checkout.php, admin.php)
 // require_once plugin_dir_path(__FILE__) . 'includes/checkout.php';
 ?>
