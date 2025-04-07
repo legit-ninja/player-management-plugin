@@ -1,14 +1,14 @@
 <?php
 /**
- * Admin Feature: Manage Players, Products, and Orders
+ * Admin Feature: Manage Players, Products, Orders, and Import from Zoho CRM with Localization
  */
 
 // Add admin menu page
 add_action('admin_menu', 'intersoccer_admin_menu');
 function intersoccer_admin_menu() {
     add_menu_page(
-        __('Player Management', 'woocommerce'),
-        __('Players & Orders', 'woocommerce'),
+        __('Player Management', 'intersoccer-player-management'),
+        __('Players & Orders', 'intersoccer-player-management'),
         'manage_options',
         'intersoccer-players',
         'intersoccer_players_admin_page',
@@ -19,21 +19,106 @@ function intersoccer_admin_menu() {
 
 // Render the admin page
 function intersoccer_players_admin_page() {
+    // Handle import from Zoho CRM
+    if (isset($_POST['import_players']) && !empty($_POST['import_players_nonce']) && wp_verify_nonce($_POST['import_players_nonce'], 'import_players_action')) {
+        $module = sanitize_text_field($_POST['zoho_module'] ?? 'Contacts');
+        $field_mappings = array(
+            'First_Name' => 'first_name',
+            'Last_Name' => 'last_name',
+            'Date_of_Birth' => 'dob',
+            'Medical_Conditions' => 'medical_conditions',
+            'Consent_URL' => 'consent_url',
+        );
+
+        // Fetch data from Zoho CRM using WP Swings Zoho CRM Connect
+        if (function_exists('wpswings_zoho_crm_get_records')) {
+            $records = wpswings_zoho_crm_get_records($module);
+            if (is_array($records) && !empty($records)) {
+                foreach ($records as $record) {
+                    // Map Zoho fields to player data
+                    $player_data = array(
+                        'name' => trim(($record['First_Name'] ?? '') . ' ' . ($record['Last_Name'] ?? '')),
+                        'dob' => $record['Date_of_Birth'] ?? '',
+                        'medical_conditions' => $record['Medical_Conditions'] ?? 'No known medical conditions',
+                        'consent_url' => $record['Consent_URL'] ?? '',
+                    );
+
+                    // Skip if essential fields are missing
+                    if (empty($player_data['name']) || empty($player_data['dob'])) {
+                        continue;
+                    }
+
+                    // Find user by email (assuming Zoho Contact has an Email field)
+                    $email = $record['Email'] ?? '';
+                    if (empty($email)) {
+                        continue;
+                    }
+
+                    $user = get_user_by('email', $email);
+                    if (!$user) {
+                        // Optionally create a new user if not found
+                        $username = sanitize_user(str_replace(' ', '_', $player_data['name']));
+                        $password = wp_generate_password();
+                        $user_id = wp_create_user($username, $password, $email);
+                        if (is_wp_error($user_id)) {
+                            wc_add_notice(sprintf(__('Failed to create user for %s: %s', 'intersoccer-player-management'), $email, $user_id->get_error_message()), 'error');
+                            continue;
+                        }
+                        $user = get_user_by('id', $user_id);
+                    }
+
+                    // Update user meta with player data
+                    $existing_players = get_user_meta($user->ID, 'intersoccer_players', true) ?: array();
+                    $existing_players[] = $player_data;
+                    update_user_meta($user->ID, 'intersoccer_players', $existing_players);
+                }
+                wc_add_notice(__('Players imported successfully from Zoho CRM!', 'intersoccer-player-management'), 'success');
+            } else {
+                wc_add_notice(__('No records found in Zoho CRM or an error occurred.', 'intersoccer-player-management'), 'error');
+            }
+        } else {
+            wc_add_notice(__('WP Swings Zoho CRM Connect plugin is required for importing players.', 'intersoccer-player-management'), 'error');
+        }
+    }
     ?>
     <div class="wrap">
-        <h1><?php _e('Player Management - All Players & Orders', 'woocommerce'); ?></h1>
+        <h1><?php _e('Player Management - All Players & Orders', 'intersoccer-player-management'); ?></h1>
+
+        <!-- Import Form -->
+        <h2><?php _e('Import Players from Zoho CRM', 'intersoccer-player-management'); ?></h2>
+        <form method="post" action="">
+            <?php wp_nonce_field('import_players_action', 'import_players_nonce'); ?>
+            <table class="form-table">
+                <tr>
+                    <th scope="row"><label for="zoho_module"><?php _e('Zoho Module', 'intersoccer-player-management'); ?></label></th>
+                    <td>
+                        <select name="zoho_module" id="zoho_module">
+                            <option value="Contacts"><?php _e('Contacts', 'intersoccer-player-management'); ?></option>
+                            <option value="Leads"><?php _e('Leads', 'intersoccer-player-management'); ?></option>
+                        </select>
+                        <p class="description"><?php _e('Select the Zoho CRM module to import players from.', 'intersoccer-player-management'); ?></p>
+                    </td>
+                </tr>
+            </table>
+            <p class="submit">
+                <input type="submit" name="import_players" class="button button-primary" value="<?php _e('Import Players', 'intersoccer-player-management'); ?>" />
+            </p>
+        </form>
+
+        <!-- Players Table -->
+        <h2><?php _e('All Players', 'intersoccer-player-management'); ?></h2>
         <table class="wp-list-table widefat fixed striped">
             <thead>
                 <tr>
-                    <th><?php _e('User', 'woocommerce'); ?></th>
-                    <th><?php _e('Player Name', 'woocommerce'); ?></th>
-                    <th><?php _e('DOB', 'woocommerce'); ?></th>
-                    <th><?php _e('Medical Conditions', 'woocommerce'); ?></th>
-                    <th><?php _e('Consent File', 'woocommerce'); ?></th>
-                    <th><?php _e('Order ID', 'woocommerce'); ?></th>
-                    <th><?php _e('Product', 'woocommerce'); ?></th>
-                    <th><?php _e('Categories', 'woocommerce'); ?></th>
-                    <th><?php _e('Variations & Attributes', 'woocommerce'); ?></th>
+                    <th><?php _e('User', 'intersoccer-player-management'); ?></th>
+                    <th><?php _e('Player Name', 'intersoccer-player-management'); ?></th>
+                    <th><?php _e('DOB', 'intersoccer-player-management'); ?></th>
+                    <th><?php _e('Medical Conditions', 'intersoccer-player-management'); ?></th>
+                    <th><?php _e('Consent File', 'intersoccer-player-management'); ?></th>
+                    <th><?php _e('Order ID', 'intersoccer-player-management'); ?></th>
+                    <th><?php _e('Product', 'intersoccer-player-management'); ?></th>
+                    <th><?php _e('Categories', 'intersoccer-player-management'); ?></th>
+                    <th><?php _e('Variations & Attributes', 'intersoccer-player-management'); ?></th>
                 </tr>
             </thead>
             <tbody>
@@ -58,11 +143,11 @@ function intersoccer_players_admin_page() {
                             'player_name' => esc_html($player['name']),
                             'dob' => esc_html($player['dob']),
                             'medical_conditions' => esc_html($player['medical_conditions']),
-                            'consent_file' => !empty($player['consent_url']) ? '<a href="' . esc_url($player['consent_url']) . '" target="_blank">View Consent</a>' : 'None',
-                            'order_id' => 'N/A',
-                            'product' => 'N/A',
-                            'categories' => 'N/A',
-                            'variations_attributes' => 'N/A',
+                            'consent_file' => !empty($player['consent_url']) ? '<a href="' . esc_url($player['consent_url']) . '" target="_blank">' . __('View Consent', 'intersoccer-player-management') . '</a>' : __('None', 'intersoccer-player-management'),
+                            'order_id' => __('N/A', 'intersoccer-player-management'),
+                            'product' => __('N/A', 'intersoccer-player-management'),
+                            'categories' => __('N/A', 'intersoccer-player-management'),
+                            'variations_attributes' => __('N/A', 'intersoccer-player-management'),
                         );
 
                         // Find orders associated with this player
@@ -79,7 +164,7 @@ function intersoccer_players_admin_page() {
                                     // Product categories
                                     $categories = get_the_terms($product_id, 'product_cat');
                                     $category_names = $categories ? wp_list_pluck($categories, 'name') : array();
-                                    $category_list = !empty($category_names) ? implode(', ', $category_names) : 'N/A';
+                                    $category_list = !empty($category_names) ? implode(', ', $category_names) : __('N/A', 'intersoccer-player-management');
 
                                     // Product variations and attributes
                                     $variation_attributes = array();
@@ -90,14 +175,14 @@ function intersoccer_players_admin_page() {
 
                                     // Specified attributes
                                     $attributes_to_display = array(
-                                        'pa_event-terms' => 'Event Terms',
-                                        'pa_intersoccer-venues' => 'InterSoccer Venues',
-                                        'pa_summer-camp-terms-2025' => 'Summer Camp Terms - 2025',
-                                        'pa_hot-lunch' => 'Hot Lunch',
-                                        'pa_camp-times' => 'Camp Times',
-                                        'pa_camp-holidays' => 'Camp Holidays',
-                                        'pa_booking-type' => 'Booking Type',
-                                        'pa_age-open' => 'Age Open',
+                                        'pa_event-terms' => __('Event Terms', 'intersoccer-player-management'),
+                                        'pa_intersoccer-venues' => __('InterSoccer Venues', 'intersoccer-player-management'),
+                                        'pa_summer-camp-terms-2025' => __('Summer Camp Terms - 2025', 'intersoccer-player-management'),
+                                        'pa_hot-lunch' => __('Hot Lunch', 'intersoccer-player-management'),
+                                        'pa_camp-times' => __('Camp Times', 'intersoccer-player-management'),
+                                        'pa_camp-holidays' => __('Camp Holidays', 'intersoccer-player-management'),
+                                        'pa_booking-type' => __('Booking Type', 'intersoccer-player-management'),
+                                        'pa_age-open' => __('Age Open', 'intersoccer-player-management'),
                                     );
 
                                     $attribute_list = array();
@@ -113,7 +198,7 @@ function intersoccer_players_admin_page() {
                                             $attribute_list[] = "$attribute_label: $term";
                                         }
                                     }
-                                    $attributes_display = !empty($attribute_list) ? implode('<br>', $attribute_list) : 'N/A';
+                                    $attributes_display = !empty($attribute_list) ? implode('<br>', $attribute_list) : __('N/A', 'intersoccer-player-management');
 
                                     // Output row with order details
                                     $player_row['order_id'] = $order->get_id();
@@ -157,6 +242,34 @@ function intersoccer_players_admin_page() {
         </table>
     </div>
     <?php
+}
+
+// Mock function to simulate WP Swings Zoho CRM Connect API (replace with actual implementation)
+if (!function_exists('wpswings_zoho_crm_get_records')) {
+    function wpswings_zoho_crm_get_records($module) {
+        // This is a placeholder. In a real implementation, use WP Swings Zoho CRM Connect API to fetch records.
+        // Example: Fetch contacts from Zoho CRM
+        // You would need to use the WP Swings API or SDK to interact with Zoho CRM.
+        // For now, return a mock response.
+        return array(
+            array(
+                'First_Name' => 'Jessica',
+                'Last_Name' => 'Smith',
+                'Email' => 'jessica.smith@example.com',
+                'Date_of_Birth' => '2018-09-06',
+                'Medical_Conditions' => 'Asthma',
+                'Consent_URL' => 'https://example.com/consent.pdf',
+            ),
+            array(
+                'First_Name' => 'Alex',
+                'Last_Name' => 'Johnson',
+                'Email' => 'alex.johnson@example.com',
+                'Date_of_Birth' => '2015-05-20',
+                'Medical_Conditions' => 'No known medical conditions',
+                'Consent_URL' => '',
+            ),
+        );
+    }
 }
 ?>
 

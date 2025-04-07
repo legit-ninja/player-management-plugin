@@ -1,6 +1,6 @@
 <?php
 /**
- * Player Management - Elementor Widget with Enhanced Custom Controls
+ * Player Management - Enhanced Elementor Widget with Additional Options
  */
 
 // Register the Elementor widget
@@ -12,7 +12,7 @@ function register_player_management_widget($widgets_manager) {
         }
 
         public function get_title() {
-            return __('Player Management', 'woocommerce');
+            return __('Player Management Form', 'intersoccer-player-management');
         }
 
         public function get_icon() {
@@ -24,11 +24,152 @@ function register_player_management_widget($widgets_manager) {
         }
 
         protected function register_controls() {
+            // Content Tab: Form Settings
+            $this->start_controls_section(
+                'section_form_settings',
+                [
+                    'label' => __('Form Settings', 'intersoccer-player-management'),
+                    'tab' => \Elementor\Controls_Manager::TAB_CONTENT,
+                ]
+            );
+
+            $this->add_control(
+                'max_players',
+                [
+                    'label' => __('Maximum Players', 'intersoccer-player-management'),
+                    'type' => \Elementor\Controls_Manager::NUMBER,
+                    'default' => 10,
+                    'min' => 1,
+                    'description' => __('Set the maximum number of players a user can add.', 'intersoccer-player-management'),
+                ]
+            );
+
+            $this->add_control(
+                'success_message',
+                [
+                    'label' => __('Success Message', 'intersoccer-player-management'),
+                    'type' => \Elementor\Controls_Manager::TEXT,
+                    'default' => __('Players updated successfully!', 'intersoccer-player-management'),
+                    'placeholder' => __('Players updated successfully!', 'intersoccer-player-management'),
+                ]
+            );
+
+            $this->end_controls_section();
+
+            // Content Tab: Field Visibility
+            $this->start_controls_section(
+                'section_field_visibility',
+                [
+                    'label' => __('Field Visibility', 'intersoccer-player-management'),
+                    'tab' => \Elementor\Controls_Manager::TAB_CONTENT,
+                ]
+            );
+
+            $this->add_control(
+                'show_medical_conditions',
+                [
+                    'label' => __('Show Medical Conditions Field', 'intersoccer-player-management'),
+                    'type' => \Elementor\Controls_Manager::SWITCHER,
+                    'label_on' => __('Show', 'intersoccer-player-management'),
+                    'label_off' => __('Hide', 'intersoccer-player-management'),
+                    'return_value' => 'yes',
+                    'default' => 'yes',
+                ]
+            );
+
+            $this->add_control(
+                'show_consent_file',
+                [
+                    'label' => __('Show Consent File Field', 'intersoccer-player-management'),
+                    'type' => \Elementor\Controls_Manager::SWITCHER,
+                    'label_on' => __('Show', 'intersoccer-player-management'),
+                    'label_off' => __('Hide', 'intersoccer-player-management'),
+                    'return_value' => 'yes',
+                    'default' => 'yes',
+                ]
+            );
+
+            $this->end_controls_section();
+
+            // Content Tab: Required Fields
+            $this->start_controls_section(
+                'section_required_fields',
+                [
+                    'label' => __('Required Fields', 'intersoccer-player-management'),
+                    'tab' => \Elementor\Controls_Manager::TAB_CONTENT,
+                ]
+            );
+
+            $this->add_control(
+                'require_name',
+                [
+                    'label' => __('Require Player Name', 'intersoccer-player-management'),
+                    'type' => \Elementor\Controls_Manager::SWITCHER,
+                    'label_on' => __('Yes', 'intersoccer-player-management'),
+                    'label_off' => __('No', 'intersoccer-player-management'),
+                    'return_value' => 'yes',
+                    'default' => 'yes',
+                ]
+            );
+
+            $this->add_control(
+                'require_dob',
+                [
+                    'label' => __('Require Date of Birth', 'intersoccer-player-management'),
+                    'type' => \Elementor\Controls_Manager::SWITCHER,
+                    'label_on' => __('Yes', 'intersoccer-player-management'),
+                    'label_off' => __('No', 'intersoccer-player-management'),
+                    'return_value' => 'yes',
+                    'default' => 'yes',
+                ]
+            );
+
+            $this->add_control(
+                'require_medical_conditions',
+                [
+                    'label' => __('Require Medical Conditions (if shown)', 'intersoccer-player-management'),
+                    'type' => \Elementor\Controls_Manager::SWITCHER,
+                    'label_on' => __('Yes', 'intersoccer-player-management'),
+                    'label_off' => __('No', 'intersoccer-player-management'),
+                    'return_value' => 'yes',
+                    'default' => 'yes',
+                    'condition' => [
+                        'show_medical_conditions' => 'yes',
+                    ],
+                ]
+            );
+
+            $this->end_controls_section();
+
+            // Content Tab: Default Values
+            $this->start_controls_section(
+                'section_default_values',
+                [
+                    'label' => __('Default Values', 'intersoccer-player-management'),
+                    'tab' => \Elementor\Controls_Manager::TAB_CONTENT,
+                ]
+            );
+
+            $this->add_control(
+                'default_medical_conditions',
+                [
+                    'label' => __('Default Medical Conditions', 'intersoccer-player-management'),
+                    'type' => \Elementor\Controls_Manager::TEXT,
+                    'default' => __('No known medical conditions', 'intersoccer-player-management'),
+                    'placeholder' => __('No known medical conditions', 'intersoccer-player-management'),
+                    'condition' => [
+                        'show_medical_conditions' => 'yes',
+                    ],
+                ]
+            );
+
+            $this->end_controls_section();
+
             // Content Tab: Button Texts
             $this->start_controls_section(
                 'section_button_texts',
                 [
-                    'label' => __('Button Texts', 'woocommerce'),
+                    'label' => __('Button Texts', 'intersoccer-player-management'),
                     'tab' => \Elementor\Controls_Manager::TAB_CONTENT,
                 ]
             );
@@ -36,40 +177,40 @@ function register_player_management_widget($widgets_manager) {
             $this->add_control(
                 'add_player_button_text',
                 [
-                    'label' => __('Add Player Button Text', 'woocommerce'),
+                    'label' => __('Add Player Button Text', 'intersoccer-player-management'),
                     'type' => \Elementor\Controls_Manager::TEXT,
-                    'default' => __('Add Another Player', 'woocommerce'),
-                    'placeholder' => __('Add Another Player', 'woocommerce'),
+                    'default' => __('Add Another Player', 'intersoccer-player-management'),
+                    'placeholder' => __('Add Another Player', 'intersoccer-player-management'),
                 ]
             );
 
             $this->add_control(
                 'remove_player_button_text',
                 [
-                    'label' => __('Remove Player Button Text', 'woocommerce'),
+                    'label' => __('Remove Player Button Text', 'intersoccer-player-management'),
                     'type' => \Elementor\Controls_Manager::TEXT,
-                    'default' => __('Remove', 'woocommerce'),
-                    'placeholder' => __('Remove', 'woocommerce'),
+                    'default' => __('Remove', 'intersoccer-player-management'),
+                    'placeholder' => __('Remove', 'intersoccer-player-management'),
                 ]
             );
 
             $this->add_control(
                 'save_players_button_text',
                 [
-                    'label' => __('Save Players Button Text', 'woocommerce'),
+                    'label' => __('Save Players Button Text', 'intersoccer-player-management'),
                     'type' => \Elementor\Controls_Manager::TEXT,
-                    'default' => __('Save Players', 'woocommerce'),
-                    'placeholder' => __('Save Players', 'woocommerce'),
+                    'default' => __('Save Players', 'intersoccer-player-management'),
+                    'placeholder' => __('Save Players', 'intersoccer-player-management'),
                 ]
             );
 
             $this->add_control(
                 'show_add_player_button',
                 [
-                    'label' => __('Show Add Player Button', 'woocommerce'),
+                    'label' => __('Show Add Player Button', 'intersoccer-player-management'),
                     'type' => \Elementor\Controls_Manager::SWITCHER,
-                    'label_on' => __('Show', 'woocommerce'),
-                    'label_off' => __('Hide', 'woocommerce'),
+                    'label_on' => __('Show', 'intersoccer-player-management'),
+                    'label_off' => __('Hide', 'intersoccer-player-management'),
                     'return_value' => 'yes',
                     'default' => 'yes',
                 ]
@@ -78,10 +219,10 @@ function register_player_management_widget($widgets_manager) {
             $this->add_control(
                 'show_remove_player_button',
                 [
-                    'label' => __('Show Remove Player Button', 'woocommerce'),
+                    'label' => __('Show Remove Player Button', 'intersoccer-player-management'),
                     'type' => \Elementor\Controls_Manager::SWITCHER,
-                    'label_on' => __('Show', 'woocommerce'),
-                    'label_off' => __('Hide', 'woocommerce'),
+                    'label_on' => __('Show', 'intersoccer-player-management'),
+                    'label_off' => __('Hide', 'intersoccer-player-management'),
                     'return_value' => 'yes',
                     'default' => 'yes',
                 ]
@@ -93,7 +234,7 @@ function register_player_management_widget($widgets_manager) {
             $this->start_controls_section(
                 'section_field_labels',
                 [
-                    'label' => __('Field Labels', 'woocommerce'),
+                    'label' => __('Field Labels', 'intersoccer-player-management'),
                     'tab' => \Elementor\Controls_Manager::TAB_CONTENT,
                 ]
             );
@@ -101,50 +242,59 @@ function register_player_management_widget($widgets_manager) {
             $this->add_control(
                 'player_name_label',
                 [
-                    'label' => __('Player Name Label', 'woocommerce'),
+                    'label' => __('Player Name Label', 'intersoccer-player-management'),
                     'type' => \Elementor\Controls_Manager::TEXT,
-                    'default' => __('Player Name', 'woocommerce'),
-                    'placeholder' => __('Player Name', 'woocommerce'),
+                    'default' => __('Player Name', 'intersoccer-player-management'),
+                    'placeholder' => __('Player Name', 'intersoccer-player-management'),
                 ]
             );
 
             $this->add_control(
                 'dob_label',
                 [
-                    'label' => __('Date of Birth Label', 'woocommerce'),
+                    'label' => __('Date of Birth Label', 'intersoccer-player-management'),
                     'type' => \Elementor\Controls_Manager::TEXT,
-                    'default' => __('Date of Birth', 'woocommerce'),
-                    'placeholder' => __('Date of Birth', 'woocommerce'),
+                    'default' => __('Date of Birth', 'intersoccer-player-management'),
+                    'placeholder' => __('Date of Birth', 'intersoccer-player-management'),
                 ]
             );
 
             $this->add_control(
                 'has_medical_conditions_label',
                 [
-                    'label' => __('Has Medical Conditions Label', 'woocommerce'),
+                    'label' => __('Has Medical Conditions Label', 'intersoccer-player-management'),
                     'type' => \Elementor\Controls_Manager::TEXT,
-                    'default' => __('Has Known Medical Conditions?', 'woocommerce'),
-                    'placeholder' => __('Has Known Medical Conditions?', 'woocommerce'),
+                    'default' => __('Has Known Medical Conditions?', 'intersoccer-player-management'),
+                    'placeholder' => __('Has Known Medical Conditions?', 'intersoccer-player-management'),
+                    'condition' => [
+                        'show_medical_conditions' => 'yes',
+                    ],
                 ]
             );
 
             $this->add_control(
                 'medical_conditions_label',
                 [
-                    'label' => __('Medical Conditions Label', 'woocommerce'),
+                    'label' => __('Medical Conditions Label', 'intersoccer-player-management'),
                     'type' => \Elementor\Controls_Manager::TEXT,
-                    'default' => __('Medical Conditions', 'woocommerce'),
-                    'placeholder' => __('Medical Conditions', 'woocommerce'),
+                    'default' => __('Medical Conditions', 'intersoccer-player-management'),
+                    'placeholder' => __('Medical Conditions', 'intersoccer-player-management'),
+                    'condition' => [
+                        'show_medical_conditions' => 'yes',
+                    ],
                 ]
             );
 
             $this->add_control(
                 'medical_consent_label',
                 [
-                    'label' => __('Medical Consent Label', 'woocommerce'),
+                    'label' => __('Medical Consent Label', 'intersoccer-player-management'),
                     'type' => \Elementor\Controls_Manager::TEXT,
-                    'default' => __('Medical Consent Form (PDF/Image)', 'woocommerce'),
-                    'placeholder' => __('Medical Consent Form (PDF/Image)', 'woocommerce'),
+                    'default' => __('Medical Consent Form (PDF/Image)', 'intersoccer-player-management'),
+                    'placeholder' => __('Medical Consent Form (PDF/Image)', 'intersoccer-player-management'),
+                    'condition' => [
+                        'show_consent_file' => 'yes',
+                    ],
                 ]
             );
 
@@ -154,7 +304,7 @@ function register_player_management_widget($widgets_manager) {
             $this->start_controls_section(
                 'section_form_styles',
                 [
-                    'label' => __('Form Styles', 'woocommerce'),
+                    'label' => __('Form Styles', 'intersoccer-player-management'),
                     'tab' => \Elementor\Controls_Manager::TAB_STYLE,
                 ]
             );
@@ -162,19 +312,19 @@ function register_player_management_widget($widgets_manager) {
             $this->add_control(
                 'form_alignment',
                 [
-                    'label' => __('Form Alignment', 'woocommerce'),
+                    'label' => __('Form Alignment', 'intersoccer-player-management'),
                     'type' => \Elementor\Controls_Manager::CHOOSE,
                     'options' => [
                         'left' => [
-                            'title' => __('Left', 'woocommerce'),
+                            'title' => __('Left', 'intersoccer-player-management'),
                             'icon' => 'eicon-text-align-left',
                         ],
                         'center' => [
-                            'title' => __('Center', 'woocommerce'),
+                            'title' => __('Center', 'intersoccer-player-management'),
                             'icon' => 'eicon-text-align-center',
                         ],
                         'right' => [
-                            'title' => __('Right', 'woocommerce'),
+                            'title' => __('Right', 'intersoccer-player-management'),
                             'icon' => 'eicon-text-align-right',
                         ],
                     ],
@@ -190,7 +340,7 @@ function register_player_management_widget($widgets_manager) {
             $this->add_control(
                 'form_background_color',
                 [
-                    'label' => __('Form Background Color', 'woocommerce'),
+                    'label' => __('Form Background Color', 'intersoccer-player-management'),
                     'type' => \Elementor\Controls_Manager::COLOR,
                     'default' => '#f9f9f9',
                     'selectors' => [
@@ -202,7 +352,7 @@ function register_player_management_widget($widgets_manager) {
             $this->add_control(
                 'form_border_color',
                 [
-                    'label' => __('Form Border Color', 'woocommerce'),
+                    'label' => __('Form Border Color', 'intersoccer-player-management'),
                     'type' => \Elementor\Controls_Manager::COLOR,
                     'default' => '#ddd',
                     'selectors' => [
@@ -214,7 +364,7 @@ function register_player_management_widget($widgets_manager) {
             $this->add_control(
                 'form_padding',
                 [
-                    'label' => __('Form Padding', 'woocommerce'),
+                    'label' => __('Form Padding', 'intersoccer-player-management'),
                     'type' => \Elementor\Controls_Manager::DIMENSIONS,
                     'size_units' => ['px', 'em', '%'],
                     'default' => [
@@ -236,7 +386,7 @@ function register_player_management_widget($widgets_manager) {
             $this->start_controls_section(
                 'section_text_styles',
                 [
-                    'label' => __('Text and Field Styles', 'woocommerce'),
+                    'label' => __('Text and Field Styles', 'intersoccer-player-management'),
                     'tab' => \Elementor\Controls_Manager::TAB_STYLE,
                 ]
             );
@@ -244,7 +394,7 @@ function register_player_management_widget($widgets_manager) {
             $this->add_control(
                 'label_text_color',
                 [
-                    'label' => __('Label Text Color', 'woocommerce'),
+                    'label' => __('Label Text Color', 'intersoccer-player-management'),
                     'type' => \Elementor\Controls_Manager::COLOR,
                     'default' => '#333',
                     'selectors' => [
@@ -256,7 +406,7 @@ function register_player_management_widget($widgets_manager) {
             $this->add_control(
                 'field_text_color',
                 [
-                    'label' => __('Field Text Color', 'woocommerce'),
+                    'label' => __('Field Text Color', 'intersoccer-player-management'),
                     'type' => \Elementor\Controls_Manager::COLOR,
                     'default' => '#333',
                     'selectors' => [
@@ -268,7 +418,7 @@ function register_player_management_widget($widgets_manager) {
             $this->add_control(
                 'error_text_color',
                 [
-                    'label' => __('Error Text Color', 'woocommerce'),
+                    'label' => __('Error Text Color', 'intersoccer-player-management'),
                     'type' => \Elementor\Controls_Manager::COLOR,
                     'default' => '#ff0000',
                     'selectors' => [
@@ -280,7 +430,7 @@ function register_player_management_widget($widgets_manager) {
             $this->add_control(
                 'field_background_color',
                 [
-                    'label' => __('Field Background Color', 'woocommerce'),
+                    'label' => __('Field Background Color', 'intersoccer-player-management'),
                     'type' => \Elementor\Controls_Manager::COLOR,
                     'default' => '#ffffff',
                     'selectors' => [
@@ -295,7 +445,7 @@ function register_player_management_widget($widgets_manager) {
             $this->start_controls_section(
                 'section_button_styles',
                 [
-                    'label' => __('Button Styles', 'woocommerce'),
+                    'label' => __('Button Styles', 'intersoccer-player-management'),
                     'tab' => \Elementor\Controls_Manager::TAB_STYLE,
                 ]
             );
@@ -303,7 +453,7 @@ function register_player_management_widget($widgets_manager) {
             $this->add_control(
                 'add_button_background_color',
                 [
-                    'label' => __('Add Button Background Color', 'woocommerce'),
+                    'label' => __('Add Button Background Color', 'intersoccer-player-management'),
                     'type' => \Elementor\Controls_Manager::COLOR,
                     'default' => '#007cba',
                     'selectors' => [
@@ -315,19 +465,19 @@ function register_player_management_widget($widgets_manager) {
             $this->add_control(
                 'add_button_alignment',
                 [
-                    'label' => __('Add Button Alignment', 'woocommerce'),
+                    'label' => __('Add Button Alignment', 'intersoccer-player-management'),
                     'type' => \Elementor\Controls_Manager::CHOOSE,
                     'options' => [
                         'left' => [
-                            'title' => __('Left', 'woocommerce'),
+                            'title' => __('Left', 'intersoccer-player-management'),
                             'icon' => 'eicon-text-align-left',
                         ],
                         'center' => [
-                            'title' => __('Center', 'woocommerce'),
+                            'title' => __('Center', 'intersoccer-player-management'),
                             'icon' => 'eicon-text-align-center',
                         ],
                         'right' => [
-                            'title' => __('Right', 'woocommerce'),
+                            'title' => __('Right', 'intersoccer-player-management'),
                             'icon' => 'eicon-text-align-right',
                         ],
                     ],
@@ -341,7 +491,7 @@ function register_player_management_widget($widgets_manager) {
             $this->add_control(
                 'add_button_spacing',
                 [
-                    'label' => __('Add Button Spacing', 'woocommerce'),
+                    'label' => __('Add Button Spacing', 'intersoccer-player-management'),
                     'type' => \Elementor\Controls_Manager::DIMENSIONS,
                     'size_units' => ['px', 'em', '%'],
                     'default' => [
@@ -360,7 +510,7 @@ function register_player_management_widget($widgets_manager) {
             $this->add_control(
                 'remove_button_background_color',
                 [
-                    'label' => __('Remove Button Background Color', 'woocommerce'),
+                    'label' => __('Remove Button Background Color', 'intersoccer-player-management'),
                     'type' => \Elementor\Controls_Manager::COLOR,
                     'default' => '#dc3545',
                     'selectors' => [
@@ -372,19 +522,19 @@ function register_player_management_widget($widgets_manager) {
             $this->add_control(
                 'remove_button_alignment',
                 [
-                    'label' => __('Remove Button Alignment', 'woocommerce'),
+                    'label' => __('Remove Button Alignment', 'intersoccer-player-management'),
                     'type' => \Elementor\Controls_Manager::CHOOSE,
                     'options' => [
                         'left' => [
-                            'title' => __('Left', 'woocommerce'),
+                            'title' => __('Left', 'intersoccer-player-management'),
                             'icon' => 'eicon-text-align-left',
                         ],
                         'center' => [
-                            'title' => __('Center', 'woocommerce'),
+                            'title' => __('Center', 'intersoccer-player-management'),
                             'icon' => 'eicon-text-align-center',
                         ],
                         'right' => [
-                            'title' => __('Right', 'woocommerce'),
+                            'title' => __('Right', 'intersoccer-player-management'),
                             'icon' => 'eicon-text-align-right',
                         ],
                     ],
@@ -398,7 +548,7 @@ function register_player_management_widget($widgets_manager) {
             $this->add_control(
                 'remove_button_spacing',
                 [
-                    'label' => __('Remove Button Spacing', 'woocommerce'),
+                    'label' => __('Remove Button Spacing', 'intersoccer-player-management'),
                     'type' => \Elementor\Controls_Manager::DIMENSIONS,
                     'size_units' => ['px', 'em', '%'],
                     'default' => [
@@ -417,7 +567,7 @@ function register_player_management_widget($widgets_manager) {
             $this->add_control(
                 'save_button_background_color',
                 [
-                    'label' => __('Save Button Background Color', 'woocommerce'),
+                    'label' => __('Save Button Background Color', 'intersoccer-player-management'),
                     'type' => \Elementor\Controls_Manager::COLOR,
                     'default' => '#28a745',
                     'selectors' => [
@@ -429,19 +579,19 @@ function register_player_management_widget($widgets_manager) {
             $this->add_control(
                 'save_button_alignment',
                 [
-                    'label' => __('Save Button Alignment', 'woocommerce'),
+                    'label' => __('Save Button Alignment', 'intersoccer-player-management'),
                     'type' => \Elementor\Controls_Manager::CHOOSE,
                     'options' => [
                         'left' => [
-                            'title' => __('Left', 'woocommerce'),
+                            'title' => __('Left', 'intersoccer-player-management'),
                             'icon' => 'eicon-text-align-left',
                         ],
                         'center' => [
-                            'title' => __('Center', 'woocommerce'),
+                            'title' => __('Center', 'intersoccer-player-management'),
                             'icon' => 'eicon-text-align-center',
                         ],
                         'right' => [
-                            'title' => __('Right', 'woocommerce'),
+                            'title' => __('Right', 'intersoccer-player-management'),
                             'icon' => 'eicon-text-align-right',
                         ],
                     ],
@@ -455,7 +605,7 @@ function register_player_management_widget($widgets_manager) {
             $this->add_control(
                 'save_button_spacing',
                 [
-                    'label' => __('Save Button Spacing', 'woocommerce'),
+                    'label' => __('Save Button Spacing', 'intersoccer-player-management'),
                     'type' => \Elementor\Controls_Manager::DIMENSIONS,
                     'size_units' => ['px', 'em', '%'],
                     'default' => [
@@ -488,12 +638,14 @@ function register_player_management_widget($widgets_manager) {
 // The display_players_form function, updated to use Elementor settings
 function display_players_form($settings = []) {
     if (!is_user_logged_in()) {
-        wc_add_notice(__('Please log in to manage players.', 'woocommerce'), 'error');
+        wc_add_notice(__('Please log in to manage players.', 'intersoccer-player-management'), 'error');
         return;
     }
 
     $user_id = get_current_user_id();
     $players = get_user_meta($user_id, 'intersoccer_players', true) ?: array();
+    $max_players = isset($settings['max_players']) ? (int) $settings['max_players'] : 10;
+    $success_message = $settings['success_message'] ?? __('Players updated successfully!', 'intersoccer-player-management');
 
     // Handle form submission
     if (isset($_POST['save_players']) && !empty($_POST['players_nonce']) && wp_verify_nonce($_POST['players_nonce'], 'save_players_action')) {
@@ -506,7 +658,7 @@ function display_players_form($settings = []) {
         $existing_names = array_column($players, 'name');
 
         // Process only non-empty entries
-        for ($i = 0; $i < count($names); $i++) {
+        for ($i = 0; $i < count($names) && count($new_players) < $max_players; $i++) {
             $name = isset($names[$i]) ? sanitize_text_field($names[$i]) : '';
             $dob = isset($dobs[$i]) ? sanitize_text_field($dobs[$i]) : '';
 
@@ -516,39 +668,41 @@ function display_players_form($settings = []) {
             }
 
             // Validate name
-            if (empty($name)) {
-                wc_add_notice(__('A player name is empty.', 'woocommerce'), 'error');
+            if (empty($name) && ($settings['require_name'] ?? 'yes') === 'yes') {
+                wc_add_notice(__('A player name is empty.', 'intersoccer-player-management'), 'error');
                 continue;
             }
 
             // Check for duplicates, but allow the same name if it's an existing player being edited
-            if (in_array($name, $existing_names) && $name !== ($players[$i]['name'] ?? '')) {
-                wc_add_notice(sprintf(__('Player name "%s" already exists.', 'woocommerce'), $name), 'error');
+            if (!empty($name) && in_array($name, $existing_names) && $name !== ($players[$i]['name'] ?? '')) {
+                wc_add_notice(sprintf(__('Player name "%s" already exists.', 'intersoccer-player-management'), $name), 'error');
                 continue;
             }
 
             // Validate DOB
-            if (empty($dob)) {
-                wc_add_notice(sprintf(__('Date of birth for %s is required.', 'woocommerce'), $name), 'error');
+            if (empty($dob) && ($settings['require_dob'] ?? 'yes') === 'yes') {
+                wc_add_notice(sprintf(__('Date of birth for %s is required.', 'intersoccer-player-management'), $name), 'error');
                 continue;
             }
 
-            $age = date_diff(date_create($dob), date_create('today'))->y;
-            if ($age < 4 || $age > 18) {
-                wc_add_notice(sprintf(__('Player %s must be between 4 and 18 years old.', 'woocommerce'), $name), 'error');
-                continue;
+            if (!empty($dob)) {
+                $age = date_diff(date_create($dob), date_create('today'))->y;
+                if ($age < 4 || $age > 18) {
+                    wc_add_notice(sprintf(__('Player %s must be between 4 and 18 years old.', 'intersoccer-player-management'), $name), 'error');
+                    continue;
+                }
             }
 
             // Handle medical conditions
-            $condition = !empty($has_conditions[$i]) && !empty($conditions[$i]) ? sanitize_textarea_field($conditions[$i]) : 'No known medical conditions';
-            if (!empty($has_conditions[$i]) && empty($conditions[$i])) {
-                wc_add_notice(sprintf(__('Medical conditions for %s are required if checked.', 'woocommerce'), $name), 'error');
+            $condition = !empty($has_conditions[$i]) && !empty($conditions[$i]) ? sanitize_textarea_field($conditions[$i]) : ($settings['default_medical_conditions'] ?? 'No known medical conditions');
+            if (($settings['show_medical_conditions'] ?? 'yes') === 'yes' && !empty($has_conditions[$i]) && empty($conditions[$i]) && ($settings['require_medical_conditions'] ?? 'yes') === 'yes') {
+                wc_add_notice(sprintf(__('Medical conditions for %s are required if checked.', 'intersoccer-player-management'), $name), 'error');
                 continue;
             }
 
             // Handle file upload
             $consent_url = $players[$i]['consent_url'] ?? '';
-            if (!empty($consents['name'][$i]) && $consents['error'][$i] == 0) {
+            if (($settings['show_consent_file'] ?? 'yes') === 'yes' && !empty($consents['name'][$i]) && $consents['error'][$i] == 0) {
                 $file = array(
                     'name' => $consents['name'][$i],
                     'type' => $consents['type'][$i],
@@ -559,7 +713,7 @@ function display_players_form($settings = []) {
                 $upload_overrides = array('test_form' => false);
                 $upload = wp_handle_upload($file, $upload_overrides);
                 if (isset($upload['error'])) {
-                    wc_add_notice(sprintf(__('Failed to upload consent file for %s: %s', 'woocommerce'), $name, $upload['error']), 'error');
+                    wc_add_notice(sprintf(__('Failed to upload consent file for %s: %s', 'intersoccer-player-management'), $name, $upload['error']), 'error');
                     continue;
                 }
                 $consent_url = $upload['url'];
@@ -576,93 +730,101 @@ function display_players_form($settings = []) {
         if (!empty($new_players)) {
             $result = update_user_meta($user_id, 'intersoccer_players', $new_players);
             if ($result) {
-                wc_add_notice(__('Players updated successfully!', 'woocommerce'), 'success');
+                wc_add_notice($success_message, 'success');
                 $players = $new_players;
             } else {
-                wc_add_notice(__('Failed to save players. Please try again.', 'woocommerce'), 'error');
+                wc_add_notice(__('Failed to save players. Please try again.', 'intersoccer-player-management'), 'error');
                 error_log('Failed to update user meta for user ' . $user_id);
             }
         } else {
-            wc_add_notice(__('No valid players to save.', 'woocommerce'), 'error');
+            wc_add_notice(__('No valid players to save.', 'intersoccer-player-management'), 'error');
         }
     }
     ?>
-    <h2><?php _e('Manage Players', 'woocommerce'); ?></h2>
-    <p><?php _e('Add your children as Players for Summer Football Camps.', 'woocommerce'); ?></p>
+    <h2><?php _e('Manage Players', 'intersoccer-player-management'); ?></h2>
+    <p><?php _e('Add your children as Players for Summer Football Camps.', 'intersoccer-player-management'); ?></p>
     <form method="post" id="manage-players-form" action="" enctype="multipart/form-data">
         <?php wp_nonce_field('save_players_action', 'players_nonce'); ?>
         <div id="players-list">
             <?php foreach ($players as $i => $player): ?>
                 <div class="player-entry">
                     <label style="display: block; margin-bottom: 10px;">
-                        <?php echo esc_html($settings['player_name_label'] ?? __('Player Name', 'woocommerce')); ?>
+                        <?php echo esc_html($settings['player_name_label'] ?? __('Player Name', 'intersoccer-player-management')); ?>
                         <input type="text" name="player_name[<?php echo $i; ?>]" value="<?php echo esc_attr($player['name']); ?>" style="width: 100%; max-width: 300px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
-                        <span class="error-message" style="display: none; font-size: 0.9em;"><?php _e('Player name is required.', 'woocommerce'); ?></span>
+                        <span class="error-message" style="display: none; font-size: 0.9em;"><?php _e('Player name is required.', 'intersoccer-player-management'); ?></span>
                     </label>
                     <label style="display: block; margin-bottom: 10px;">
-                        <?php echo esc_html($settings['dob_label'] ?? __('Date of Birth', 'woocommerce')); ?>
+                        <?php echo esc_html($settings['dob_label'] ?? __('Date of Birth', 'intersoccer-player-management')); ?>
                         <input type="date" name="player_dob[<?php echo $i; ?>]" value="<?php echo esc_attr($player['dob']); ?>" style="width: 100%; max-width: 300px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
-                        <span class="error-message" style="display: none; font-size: 0.9em;"><?php _e('Date of birth is required.', 'woocommerce'); ?></span>
+                        <span class="error-message" style="display: none; font-size: 0.9em;"><?php _e('Date of birth is required.', 'intersoccer-player-management'); ?></span>
                     </label>
-                    <label style="display: block; margin-bottom: 10px;">
-                        <input type="checkbox" name="has_medical_conditions[<?php echo $i; ?>]" class="has-medical-conditions" <?php checked($player['medical_conditions'] !== 'No known medical conditions'); ?> />
-                        <?php echo esc_html($settings['has_medical_conditions_label'] ?? __('Has Known Medical Conditions?', 'woocommerce')); ?>
-                    </label>
-                    <div class="medical-conditions" style="display: <?php echo $player['medical_conditions'] !== 'No known medical conditions' ? 'block' : 'none'; ?>; margin-bottom: 10px;">
-                        <label style="display: block; margin-bottom: 5px;">
-                            <?php echo esc_html($settings['medical_conditions_label'] ?? __('Medical Conditions', 'woocommerce')); ?>
-                            <textarea name="medical_conditions[<?php echo $i; ?>]" style="width: 100%; max-width: 300px; height: 100px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"><?php echo esc_textarea($player['medical_conditions'] !== 'No known medical conditions' ? $player['medical_conditions'] : ''); ?></textarea>
-                            <span class="error-message" style="display: none; font-size: 0.9em;"><?php _e('Medical conditions are required if checked.', 'woocommerce'); ?></span>
+                    <?php if ($settings['show_medical_conditions'] === 'yes'): ?>
+                        <label style="display: block; margin-bottom: 10px;">
+                            <input type="checkbox" name="has_medical_conditions[<?php echo $i; ?>]" class="has-medical-conditions" <?php checked($player['medical_conditions'] !== ($settings['default_medical_conditions'] ?? 'No known medical conditions')); ?> />
+                            <?php echo esc_html($settings['has_medical_conditions_label'] ?? __('Has Known Medical Conditions?', 'intersoccer-player-management')); ?>
                         </label>
-                    </div>
-                    <label style="display: block; margin-bottom: 10px;">
-                        <?php echo esc_html($settings['medical_consent_label'] ?? __('Medical Consent Form (PDF/Image)', 'woocommerce')); ?>
-                        <input type="file" name="medical_consent[<?php echo $i; ?>]" accept=".pdf,.jpg,.png" style="width: 100%; max-width: 300px;" />
-                        <?php if (!empty($player['consent_url'])): ?>
-                            <a href="<?php echo esc_url($player['consent_url']); ?>" target="_blank" style="display: block; margin-top: 5px;"><?php _e('View Current Consent', 'woocommerce'); ?></a>
-                        <?php endif; ?>
-                    </label>
+                        <div class="medical-conditions" style="display: <?php echo $player['medical_conditions'] !== ($settings['default_medical_conditions'] ?? 'No known medical conditions') ? 'block' : 'none'; ?>; margin-bottom: 10px;">
+                            <label style="display: block; margin-bottom: 5px;">
+                                <?php echo esc_html($settings['medical_conditions_label'] ?? __('Medical Conditions', 'intersoccer-player-management')); ?>
+                                <textarea name="medical_conditions[<?php echo $i; ?>]" style="width: 100%; max-width: 300px; height: 100px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"><?php echo esc_textarea($player['medical_conditions'] !== ($settings['default_medical_conditions'] ?? 'No known medical conditions') ? $player['medical_conditions'] : ''); ?></textarea>
+                                <span class="error-message" style="display: none; font-size: 0.9em;"><?php _e('Medical conditions are required if checked.', 'intersoccer-player-management'); ?></span>
+                            </label>
+                        </div>
+                    <?php endif; ?>
+                    <?php if ($settings['show_consent_file'] === 'yes'): ?>
+                        <label style="display: block; margin-bottom: 10px;">
+                            <?php echo esc_html($settings['medical_consent_label'] ?? __('Medical Consent Form (PDF/Image)', 'intersoccer-player-management')); ?>
+                            <input type="file" name="medical_consent[<?php echo $i; ?>]" accept=".pdf,.jpg,.png" style="width: 100%; max-width: 300px;" />
+                            <?php if (!empty($player['consent_url'])): ?>
+                                <a href="<?php echo esc_url($player['consent_url']); ?>" target="_blank" style="display: block; margin-top: 5px;"><?php _e('View Current Consent', 'intersoccer-player-management'); ?></a>
+                            <?php endif; ?>
+                        </label>
+                    <?php endif; ?>
                     <?php if ($settings['show_remove_player_button'] === 'yes'): ?>
-                        <button type="button" class="remove-player button"><?php echo esc_html($settings['remove_player_button_text'] ?? __('Remove', 'woocommerce')); ?></button>
+                        <button type="button" class="remove-player button"><?php echo esc_html($settings['remove_player_button_text'] ?? __('Remove', 'intersoccer-player-management')); ?></button>
                     <?php endif; ?>
                 </div>
             <?php endforeach; ?>
         </div>
-        <?php if ($settings['show_add_player_button'] === 'yes'): ?>
-            <button type="button" id="add-player" class="button"><?php echo esc_html($settings['add_player_button_text'] ?? __('Add Another Player', 'woocommerce')); ?></button>
+        <?php if ($settings['show_add_player_button'] === 'yes' && count($players) < $max_players): ?>
+            <button type="button" id="add-player" class="button"><?php echo esc_html($settings['add_player_button_text'] ?? __('Add Another Player', 'intersoccer-player-management')); ?></button>
         <?php endif; ?>
-        <p><input type="submit" name="save_players" class="button" value="<?php echo esc_attr($settings['save_players_button_text'] ?? __('Save Players', 'woocommerce')); ?>" /></p>
+        <p><input type="submit" name="save_players" class="button" value="<?php echo esc_attr($settings['save_players_button_text'] ?? __('Save Players', 'intersoccer-player-management')); ?>" /></p>
     </form>
 
     <div id="player-template" style="display: none;">
         <div class="player-entry">
             <label style="display: block; margin-bottom: 10px;">
-                <?php echo esc_html($settings['player_name_label'] ?? __('Player Name', 'woocommerce')); ?>
+                <?php echo esc_html($settings['player_name_label'] ?? __('Player Name', 'intersoccer-player-management')); ?>
                 <input type="text" name="player_name_template" value="" style="width: 100%; max-width: 300px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" disabled />
-                <span class="error-message" style="display: none; font-size: 0.9em;"><?php _e('Player name is required.', 'woocommerce'); ?></span>
+                <span class="error-message" style="display: none; font-size: 0.9em;"><?php _e('Player name is required.', 'intersoccer-player-management'); ?></span>
             </label>
             <label style="display: block; margin-bottom: 10px;">
-                <?php echo esc_html($settings['dob_label'] ?? __('Date of Birth', 'woocommerce')); ?>
+                <?php echo esc_html($settings['dob_label'] ?? __('Date of Birth', 'intersoccer-player-management')); ?>
                 <input type="date" name="player_dob_template" value="" style="width: 100%; max-width: 300px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" disabled />
-                <span class="error-message" style="display: none; font-size: 0.9em;"><?php _e('Date of birth is required.', 'woocommerce'); ?></span>
+                <span class="error-message" style="display: none; font-size: 0.9em;"><?php _e('Date of birth is required.', 'intersoccer-player-management'); ?></span>
             </label>
-            <label style="display: block; margin-bottom: 10px;">
-                <input type="checkbox" name="has_medical_conditions_template" class="has-medical-conditions" />
-                <?php echo esc_html($settings['has_medical_conditions_label'] ?? __('Has Known Medical Conditions?', 'woocommerce')); ?>
-            </label>
-            <div class="medical-conditions" style="display: none; margin-bottom: 10px;">
-                <label style="display: block; margin-bottom: 5px;">
-                    <?php echo esc_html($settings['medical_conditions_label'] ?? __('Medical Conditions', 'woocommerce')); ?>
-                    <textarea name="medical_conditions_template" style="width: 100%; max-width: 300px; height: 100px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
-                    <span class="error-message" style="display: none; font-size: 0.9em;"><?php _e('Medical conditions are required if checked.', 'woocommerce'); ?></span>
+            <?php if ($settings['show_medical_conditions'] === 'yes'): ?>
+                <label style="display: block; margin-bottom: 10px;">
+                    <input type="checkbox" name="has_medical_conditions_template" class="has-medical-conditions" />
+                    <?php echo esc_html($settings['has_medical_conditions_label'] ?? __('Has Known Medical Conditions?', 'intersoccer-player-management')); ?>
                 </label>
-            </div>
-            <label style="display: block; margin-bottom: 10px;">
-                <?php echo esc_html($settings['medical_consent_label'] ?? __('Medical Consent Form (PDF/Image)', 'woocommerce')); ?>
-                <input type="file" name="medical_consent_template" accept=".pdf,.jpg,.png" style="width: 100%; max-width: 300px;" disabled />
-            </label>
+                <div class="medical-conditions" style="display: none; margin-bottom: 10px;">
+                    <label style="display: block; margin-bottom: 5px;">
+                        <?php echo esc_html($settings['medical_conditions_label'] ?? __('Medical Conditions', 'intersoccer-player-management')); ?>
+                        <textarea name="medical_conditions_template" style="width: 100%; max-width: 300px; height: 100px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
+                        <span class="error-message" style="display: none; font-size: 0.9em;"><?php _e('Medical conditions are required if checked.', 'intersoccer-player-management'); ?></span>
+                    </label>
+                </div>
+            <?php endif; ?>
+            <?php if ($settings['show_consent_file'] === 'yes'): ?>
+                <label style="display: block; margin-bottom: 10px;">
+                    <?php echo esc_html($settings['medical_consent_label'] ?? __('Medical Consent Form (PDF/Image)', 'intersoccer-player-management')); ?>
+                    <input type="file" name="medical_consent_template" accept=".pdf,.jpg,.png" style="width: 100%; max-width: 300px;" disabled />
+                </label>
+            <?php endif; ?>
             <?php if ($settings['show_remove_player_button'] === 'yes'): ?>
-                <button type="button" class="remove-player button"><?php echo esc_html($settings['remove_player_button_text'] ?? __('Remove', 'woocommerce')); ?></button>
+                <button type="button" class="remove-player button"><?php echo esc_html($settings['remove_player_button_text'] ?? __('Remove', 'intersoccer-player-management')); ?></button>
             <?php endif; ?>
         </div>
     </div>
@@ -682,6 +844,11 @@ function display_players_form($settings = []) {
 
             // Add new player
             $('#add-player').click(function() {
+                var maxPlayers = <?php echo esc_js($max_players); ?>;
+                if ($('#players-list .player-entry').length >= maxPlayers) {
+                    alert('<?php _e('Maximum number of players reached.', 'intersoccer-player-management'); ?>');
+                    return;
+                }
                 var $newEntry = $('#player-template .player-entry').clone();
                 $newEntry.find('input, textarea').each(function() {
                     if ($(this).attr('name') === 'player_name_template') {
@@ -709,7 +876,7 @@ function display_players_form($settings = []) {
 
             // Remove player
             $(document).on('click', '.remove-player', function() {
-                if (confirm('<?php _e('Are you sure?', 'woocommerce'); ?>')) {
+                if (confirm('<?php _e('Are you sure?', 'intersoccer-player-management'); ?>')) {
                     $(this).closest('.player-entry').remove();
                     reindexFormInputs();
                 }
@@ -758,7 +925,7 @@ function display_players_form($settings = []) {
 
                     // Validate name
                     var nameValue = $name.val() ? $name.val().trim() : '';
-                    if (!nameValue) {
+                    if (!nameValue && '<?php echo esc_js($settings['require_name'] ?? 'yes'); ?>' === 'yes') {
                         $nameError.show();
                         $name.css('border', '1px solid red');
                         hasErrors = true;
@@ -766,16 +933,16 @@ function display_players_form($settings = []) {
 
                     // Validate DOB
                     var dobValue = $dob.val();
-                    if (!dobValue) {
+                    if (!dobValue && '<?php echo esc_js($settings['require_dob'] ?? 'yes'); ?>' === 'yes') {
                         $dobError.show();
                         $dob.css('border', '1px solid red');
                         hasErrors = true;
                     }
 
                     // Validate medical conditions
-                    if ($hasConditions.is(':checked')) {
+                    if ('<?php echo esc_js($settings['show_medical_conditions'] ?? 'yes'); ?>' === 'yes' && $hasConditions.is(':checked')) {
                         var conditionsValue = $conditions.val() ? $conditions.val().trim() : '';
-                        if (!conditionsValue) {
+                        if (!conditionsValue && '<?php echo esc_js($settings['require_medical_conditions'] ?? 'yes'); ?>' === 'yes') {
                             $conditionsError.show();
                             $conditions.css('border', '1px solid red');
                             hasErrors = true;
@@ -785,10 +952,10 @@ function display_players_form($settings = []) {
 
                 if (hasErrors) {
                     e.preventDefault();
-                    alert('<?php _e('Please fill in all required fields.', 'woocommerce'); ?>');
+                    alert('<?php _e('Please fill in all required fields.', 'intersoccer-player-management'); ?>');
                 } else if ($('#players-list .player-entry').length === 0) {
                     e.preventDefault();
-                    alert('<?php _e('Please add at least one player.', 'woocommerce'); ?>');
+                    alert('<?php _e('Please add at least one player.', 'intersoccer-player-management'); ?>');
                 }
             });
         });
