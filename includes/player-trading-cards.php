@@ -1,6 +1,6 @@
 <?php
 /**
- * Player Trading Cards - Elementor Widget for Displaying Player Cards with Stats and Awards
+ * Player Trading Cards - Elementor Widget for Displaying Player Cards with Stats, Awards, and Profile Image
  */
 
 // Register the Elementor widget
@@ -288,7 +288,7 @@ function register_player_trading_cards_widget($widgets_manager) {
 
                     $goals_scored = $player['goals_scored'] ?? 0;
                     $awards = $player['awards'] ?? array();
-                    $photo_url = $player['consent_url'] ?? 'https://via.placeholder.com/150'; // Fallback to a placeholder image if no photo
+                    $photo_url = $player['profile_image'] ?? 'https://via.placeholder.com/150'; // Use profile_image, fallback to placeholder
                     ?>
                     <div class="player-card">
                         <img src="<?php echo esc_url($photo_url); ?>" alt="<?php echo esc_attr($player['name']); ?>" class="player-photo" />
