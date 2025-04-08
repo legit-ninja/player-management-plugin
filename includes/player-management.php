@@ -1,6 +1,6 @@
 <?php
 /**
- * Player Management - Enhanced Elementor Widget with Fixed Button Alignments and Title Customization
+ * Player Management - Enhanced Elementor Widget with Fixed Button Alignments, Title Customization, and Stats/Awards
  */
 
 // Register the Elementor widget
@@ -102,6 +102,30 @@ function register_player_management_widget($widgets_manager) {
                 'show_consent_file',
                 [
                     'label' => __('Show Consent File Field', 'intersoccer-player-management'),
+                    'type' => \Elementor\Controls_Manager::SWITCHER,
+                    'label_on' => __('Show', 'intersoccer-player-management'),
+                    'label_off' => __('Hide', 'intersoccer-player-management'),
+                    'return_value' => 'yes',
+                    'default' => 'yes',
+                ]
+            );
+
+            $this->add_control(
+                'show_goals_scored',
+                [
+                    'label' => __('Show Goals Scored Field', 'intersoccer-player-management'),
+                    'type' => \Elementor\Controls_Manager::SWITCHER,
+                    'label_on' => __('Show', 'intersoccer-player-management'),
+                    'label_off' => __('Hide', 'intersoccer-player-management'),
+                    'return_value' => 'yes',
+                    'default' => 'yes',
+                ]
+            );
+
+            $this->add_control(
+                'show_awards',
+                [
+                    'label' => __('Show Awards Field', 'intersoccer-player-management'),
                     'type' => \Elementor\Controls_Manager::SWITCHER,
                     'label_on' => __('Show', 'intersoccer-player-management'),
                     'label_off' => __('Hide', 'intersoccer-player-management'),
@@ -315,6 +339,32 @@ function register_player_management_widget($widgets_manager) {
                     'placeholder' => __('Medical Consent Form (PDF/Image)', 'intersoccer-player-management'),
                     'condition' => [
                         'show_consent_file' => 'yes',
+                    ],
+                ]
+            );
+
+            $this->add_control(
+                'goals_scored_label',
+                [
+                    'label' => __('Goals Scored Label', 'intersoccer-player-management'),
+                    'type' => \Elementor\Controls_Manager::TEXT,
+                    'default' => __('Goals Scored', 'intersoccer-player-management'),
+                    'placeholder' => __('Goals Scored', 'intersoccer-player-management'),
+                    'condition' => [
+                        'show_goals_scored' => 'yes',
+                    ],
+                ]
+            );
+
+            $this->add_control(
+                'awards_label',
+                [
+                    'label' => __('Awards Label', 'intersoccer-player-management'),
+                    'type' => \Elementor\Controls_Manager::TEXT,
+                    'default' => __('Awards', 'intersoccer-player-management'),
+                    'placeholder' => __('Awards', 'intersoccer-player-management'),
+                    'condition' => [
+                        'show_awards' => 'yes',
                     ],
                 ]
             );
@@ -656,7 +706,7 @@ function register_player_management_widget($widgets_manager) {
     $widgets_manager->register(new Player_Management_Widget());
 }
 
-// The display_players_form function, updated to use Elementor settings
+// The display_players_form function, updated to include goals_scored and awards
 function display_players_form($settings = []) {
     if (!is_user_logged_in()) {
         wc_add_notice(__('Please log in to manage players.', 'intersoccer-player-management'), 'error');
@@ -676,6 +726,8 @@ function display_players_form($settings = []) {
         $has_conditions = $_POST['has_medical_conditions'] ?? array();
         $conditions = $_POST['medical_conditions'] ?? array();
         $consents = $_FILES['medical_consent'] ?? array();
+        $goals_scored = $_POST['goals_scored'] ?? array();
+        $awards = $_POST['awards'] ?? array();
         $existing_names = array_column($players, 'name');
 
         // Process only non-empty entries
@@ -740,11 +792,17 @@ function display_players_form($settings = []) {
                 $consent_url = $upload['url'];
             }
 
+            // Handle goals scored and awards
+            $goals = isset($goals_scored[$i]) ? absint($goals_scored[$i]) : ($players[$i]['goals_scored'] ?? 0);
+            $player_awards = isset($awards[$i]) ? array_map('sanitize_text_field', (array) $awards[$i]) : ($players[$i]['awards'] ?? array());
+
             $new_players[] = array(
                 'name' => $name,
                 'dob' => $dob,
                 'medical_conditions' => $condition,
                 'consent_url' => $consent_url,
+                'goals_scored' => $goals,
+                'awards' => $player_awards,
             );
         }
 
@@ -801,6 +859,32 @@ function display_players_form($settings = []) {
                             <?php endif; ?>
                         </label>
                     <?php endif; ?>
+                    <?php if ($settings['show_goals_scored'] === 'yes'): ?>
+                        <label style="display: block; margin-bottom: 10px;">
+                            <?php echo esc_html($settings['goals_scored_label'] ?? __('Goals Scored', 'intersoccer-player-management')); ?>
+                            <input type="number" name="goals_scored[<?php echo $i; ?>]" value="<?php echo esc_attr($player['goals_scored'] ?? 0); ?>" min="0" style="width: 100%; max-width: 300px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
+                        </label>
+                    <?php endif; ?>
+                    <?php if ($settings['show_awards'] === 'yes'): ?>
+                        <label style="display: block; margin-bottom: 10px;">
+                            <?php echo esc_html($settings['awards_label'] ?? __('Awards', 'intersoccer-player-management')); ?>
+                            <select name="awards[<?php echo $i; ?>][]" multiple style="width: 100%; max-width: 300px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                                <?php
+                                $available_awards = array(
+                                    'most_improved' => __('Most Improved', 'intersoccer-player-management'),
+                                    'top_scorer' => __('Top Scorer', 'intersoccer-player-management'),
+                                    'best_defender' => __('Best Defender', 'intersoccer-player-management'),
+                                    'team_player' => __('Team Player', 'intersoccer-player-management'),
+                                );
+                                $selected_awards = $player['awards'] ?? array();
+                                foreach ($available_awards as $value => $label): ?>
+                                    <option value="<?php echo esc_attr($value); ?>" <?php echo in_array($value, $selected_awards) ? 'selected' : ''; ?>>
+                                        <?php echo esc_html($label); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </label>
+                    <?php endif; ?>
                     <?php if ($settings['show_remove_player_button'] === 'yes'): ?>
                         <button type="button" class="remove-player button"><?php echo esc_html($settings['remove_player_button_text'] ?? __('Remove', 'intersoccer-player-management')); ?></button>
                     <?php endif; ?>
@@ -844,6 +928,31 @@ function display_players_form($settings = []) {
                     <input type="file" name="medical_consent_template" accept=".pdf,.jpg,.png" style="width: 100%; max-width: 300px;" disabled />
                 </label>
             <?php endif; ?>
+            <?php if ($settings['show_goals_scored'] === 'yes'): ?>
+                <label style="display: block; margin-bottom: 10px;">
+                    <?php echo esc_html($settings['goals_scored_label'] ?? __('Goals Scored', 'intersoccer-player-management')); ?>
+                    <input type="number" name="goals_scored_template" value="0" min="0" style="width: 100%; max-width: 300px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" disabled />
+                </label>
+            <?php endif; ?>
+            <?php if ($settings['show_awards'] === 'yes'): ?>
+                <label style="display: block; margin-bottom: 10px;">
+                    <?php echo esc_html($settings['awards_label'] ?? __('Awards', 'intersoccer-player-management')); ?>
+                    <select name="awards_template[]" multiple style="width: 100%; max-width: 300px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" disabled>
+                        <?php
+                        $available_awards = array(
+                            'most_improved' => __('Most Improved', 'intersoccer-player-management'),
+                            'top_scorer' => __('Top Scorer', 'intersoccer-player-management'),
+                            'best_defender' => __('Best Defender', 'intersoccer-player-management'),
+                            'team_player' => __('Team Player', 'intersoccer-player-management'),
+                        );
+                        foreach ($available_awards as $value => $label): ?>
+                            <option value="<?php echo esc_attr($value); ?>">
+                                <?php echo esc_html($label); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </label>
+            <?php endif; ?>
             <?php if ($settings['show_remove_player_button'] === 'yes'): ?>
                 <button type="button" class="remove-player button"><?php echo esc_html($settings['remove_player_button_text'] ?? __('Remove', 'intersoccer-player-management')); ?></button>
             <?php endif; ?>
@@ -860,6 +969,8 @@ function display_players_form($settings = []) {
                     $(this).find('input[name^="has_medical_conditions"]').attr('name', 'has_medical_conditions[' + index + ']');
                     $(this).find('textarea[name^="medical_conditions"]').attr('name', 'medical_conditions[' + index + ']');
                     $(this).find('input[name^="medical_consent"]').attr('name', 'medical_consent[' + index + ']');
+                    $(this).find('input[name^="goals_scored"]').attr('name', 'goals_scored[' + index + ']');
+                    $(this).find('select[name^="awards"]').attr('name', 'awards[' + index + '][]');
                 });
             }
 
@@ -871,7 +982,7 @@ function display_players_form($settings = []) {
                     return;
                 }
                 var $newEntry = $('#player-template .player-entry').clone();
-                $newEntry.find('input, textarea').each(function() {
+                $newEntry.find('input, textarea, select').each(function() {
                     if ($(this).attr('name') === 'player_name_template') {
                         $(this).attr('name', 'player_name[' + $('#players-list .player-entry').length + ']');
                     } else if ($(this).attr('name') === 'player_dob_template') {
@@ -882,6 +993,10 @@ function display_players_form($settings = []) {
                         $(this).attr('name', 'medical_conditions[' + $('#players-list .player-entry').length + ']');
                     } else if ($(this).attr('name') === 'medical_consent_template') {
                         $(this).attr('name', 'medical_consent[' + $('#players-list .player-entry').length + ']');
+                    } else if ($(this).attr('name') === 'goals_scored_template') {
+                        $(this).attr('name', 'goals_scored[' + $('#players-list .player-entry').length + ']');
+                    } else if ($(this).attr('name') === 'awards_template[]') {
+                        $(this).attr('name', 'awards[' + $('#players-list .player-entry').length + '][]');
                     }
                     $(this).css({
                         'display': 'block',
