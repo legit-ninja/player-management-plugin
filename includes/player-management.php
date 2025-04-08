@@ -1,6 +1,6 @@
 <?php
 /**
- * Player Management - Enhanced Elementor Widget with Fixed Button Alignments, Title Customization, and Stats/Awards
+ * Player Management - Enhanced Elementor Widget with Fixed Button Alignments, Title Customization, Stats/Awards, and Profile Image
  */
 
 // Register the Elementor widget
@@ -102,6 +102,18 @@ function register_player_management_widget($widgets_manager) {
                 'show_consent_file',
                 [
                     'label' => __('Show Consent File Field', 'intersoccer-player-management'),
+                    'type' => \Elementor\Controls_Manager::SWITCHER,
+                    'label_on' => __('Show', 'intersoccer-player-management'),
+                    'label_off' => __('Hide', 'intersoccer-player-management'),
+                    'return_value' => 'yes',
+                    'default' => 'yes',
+                ]
+            );
+
+            $this->add_control(
+                'show_profile_image',
+                [
+                    'label' => __('Show Profile Image Field', 'intersoccer-player-management'),
                     'type' => \Elementor\Controls_Manager::SWITCHER,
                     'label_on' => __('Show', 'intersoccer-player-management'),
                     'label_off' => __('Hide', 'intersoccer-player-management'),
@@ -339,6 +351,19 @@ function register_player_management_widget($widgets_manager) {
                     'placeholder' => __('Medical Consent Form (PDF/Image)', 'intersoccer-player-management'),
                     'condition' => [
                         'show_consent_file' => 'yes',
+                    ],
+                ]
+            );
+
+            $this->add_control(
+                'profile_image_label',
+                [
+                    'label' => __('Profile Image Label', 'intersoccer-player-management'),
+                    'type' => \Elementor\Controls_Manager::TEXT,
+                    'default' => __('Player Profile Image (JPG/PNG)', 'intersoccer-player-management'),
+                    'placeholder' => __('Player Profile Image (JPG/PNG)', 'intersoccer-player-management'),
+                    'condition' => [
+                        'show_profile_image' => 'yes',
                     ],
                 ]
             );
@@ -706,7 +731,7 @@ function register_player_management_widget($widgets_manager) {
     $widgets_manager->register(new Player_Management_Widget());
 }
 
-// The display_players_form function, updated to include goals_scored and awards
+// The display_players_form function, updated to include profile_image
 function display_players_form($settings = []) {
     if (!is_user_logged_in()) {
         wc_add_notice(__('Please log in to manage players.', 'intersoccer-player-management'), 'error');
@@ -726,6 +751,7 @@ function display_players_form($settings = []) {
         $has_conditions = $_POST['has_medical_conditions'] ?? array();
         $conditions = $_POST['medical_conditions'] ?? array();
         $consents = $_FILES['medical_consent'] ?? array();
+        $profile_images = $_FILES['profile_image'] ?? array();
         $goals_scored = $_POST['goals_scored'] ?? array();
         $awards = $_POST['awards'] ?? array();
         $existing_names = array_column($players, 'name');
@@ -773,7 +799,7 @@ function display_players_form($settings = []) {
                 continue;
             }
 
-            // Handle file upload
+            // Handle consent file upload
             $consent_url = $players[$i]['consent_url'] ?? '';
             if (($settings['show_consent_file'] ?? 'yes') === 'yes' && !empty($consents['name'][$i]) && $consents['error'][$i] == 0) {
                 $file = array(
@@ -792,6 +818,25 @@ function display_players_form($settings = []) {
                 $consent_url = $upload['url'];
             }
 
+            // Handle profile image upload
+            $profile_image_url = $players[$i]['profile_image'] ?? '';
+            if (($settings['show_profile_image'] ?? 'yes') === 'yes' && !empty($profile_images['name'][$i]) && $profile_images['error'][$i] == 0) {
+                $file = array(
+                    'name' => $profile_images['name'][$i],
+                    'type' => $profile_images['type'][$i],
+                    'tmp_name' => $profile_images['tmp_name'][$i],
+                    'error' => $profile_images['error'][$i],
+                    'size' => $profile_images['size'][$i]
+                );
+                $upload_overrides = array('test_form' => false);
+                $upload = wp_handle_upload($file, $upload_overrides);
+                if (isset($upload['error'])) {
+                    wc_add_notice(sprintf(__('Failed to upload profile image for %s: %s', 'intersoccer-player-management'), $name, $upload['error']), 'error');
+                    continue;
+                }
+                $profile_image_url = $upload['url'];
+            }
+
             // Handle goals scored and awards
             $goals = isset($goals_scored[$i]) ? absint($goals_scored[$i]) : ($players[$i]['goals_scored'] ?? 0);
             $player_awards = isset($awards[$i]) ? array_map('sanitize_text_field', (array) $awards[$i]) : ($players[$i]['awards'] ?? array());
@@ -801,6 +846,7 @@ function display_players_form($settings = []) {
                 'dob' => $dob,
                 'medical_conditions' => $condition,
                 'consent_url' => $consent_url,
+                'profile_image' => $profile_image_url,
                 'goals_scored' => $goals,
                 'awards' => $player_awards,
             );
@@ -856,6 +902,15 @@ function display_players_form($settings = []) {
                             <input type="file" name="medical_consent[<?php echo $i; ?>]" accept=".pdf,.jpg,.png" style="width: 100%; max-width: 300px;" />
                             <?php if (!empty($player['consent_url'])): ?>
                                 <a href="<?php echo esc_url($player['consent_url']); ?>" target="_blank" style="display: block; margin-top: 5px;"><?php _e('View Current Consent', 'intersoccer-player-management'); ?></a>
+                            <?php endif; ?>
+                        </label>
+                    <?php endif; ?>
+                    <?php if ($settings['show_profile_image'] === 'yes'): ?>
+                        <label style="display: block; margin-bottom: 10px;">
+                            <?php echo esc_html($settings['profile_image_label'] ?? __('Player Profile Image (JPG/PNG)', 'intersoccer-player-management')); ?>
+                            <input type="file" name="profile_image[<?php echo $i; ?>]" accept=".jpg,.png" style="width: 100%; max-width: 300px;" />
+                            <?php if (!empty($player['profile_image'])): ?>
+                                <a href="<?php echo esc_url($player['profile_image']); ?>" target="_blank" style="display: block; margin-top: 5px;"><?php _e('View Current Profile Image', 'intersoccer-player-management'); ?></a>
                             <?php endif; ?>
                         </label>
                     <?php endif; ?>
@@ -928,6 +983,12 @@ function display_players_form($settings = []) {
                     <input type="file" name="medical_consent_template" accept=".pdf,.jpg,.png" style="width: 100%; max-width: 300px;" disabled />
                 </label>
             <?php endif; ?>
+            <?php if ($settings['show_profile_image'] === 'yes'): ?>
+                <label style="display: block; margin-bottom: 10px;">
+                    <?php echo esc_html($settings['profile_image_label'] ?? __('Player Profile Image (JPG/PNG)', 'intersoccer-player-management')); ?>
+                    <input type="file" name="profile_image_template" accept=".jpg,.png" style="width: 100%; max-width: 300px;" disabled />
+                </label>
+            <?php endif; ?>
             <?php if ($settings['show_goals_scored'] === 'yes'): ?>
                 <label style="display: block; margin-bottom: 10px;">
                     <?php echo esc_html($settings['goals_scored_label'] ?? __('Goals Scored', 'intersoccer-player-management')); ?>
@@ -969,6 +1030,7 @@ function display_players_form($settings = []) {
                     $(this).find('input[name^="has_medical_conditions"]').attr('name', 'has_medical_conditions[' + index + ']');
                     $(this).find('textarea[name^="medical_conditions"]').attr('name', 'medical_conditions[' + index + ']');
                     $(this).find('input[name^="medical_consent"]').attr('name', 'medical_consent[' + index + ']');
+                    $(this).find('input[name^="profile_image"]').attr('name', 'profile_image[' + index + ']');
                     $(this).find('input[name^="goals_scored"]').attr('name', 'goals_scored[' + index + ']');
                     $(this).find('select[name^="awards"]').attr('name', 'awards[' + index + '][]');
                 });
@@ -993,6 +1055,8 @@ function display_players_form($settings = []) {
                         $(this).attr('name', 'medical_conditions[' + $('#players-list .player-entry').length + ']');
                     } else if ($(this).attr('name') === 'medical_consent_template') {
                         $(this).attr('name', 'medical_consent[' + $('#players-list .player-entry').length + ']');
+                    } else if ($(this).attr('name') === 'profile_image_template') {
+                        $(this).attr('name', 'profile_image[' + $('#players-list .player-entry').length + ']');
                     } else if ($(this).attr('name') === 'goals_scored_template') {
                         $(this).attr('name', 'goals_scored[' + $('#players-list .player-entry').length + ']');
                     } else if ($(this).attr('name') === 'awards_template[]') {
@@ -1099,3 +1163,4 @@ function display_players_form($settings = []) {
     <?php
 }
 ?>
+
