@@ -29,5 +29,7 @@ require_once plugin_dir_path(__FILE__) . 'includes/admin-players.php';
 
 // Include the checkout modifications
 require_once plugin_dir_path(__FILE__) . 'includes/checkout.php';
+// Include the Player Trading Cards widget
+require_once plugin_dir_path(__FILE__) . 'includes/player-trading-cards.php';
 ?>
 
