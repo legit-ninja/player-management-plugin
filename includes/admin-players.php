@@ -1,104 +1,126 @@
 <?php
 /**
  * Admin Feature: Manage Players, Courses Report, Sync Products to Events, and Event Rosters
+ *
+ * This file handles the admin menu page for the InterSoccer Player Management plugin.
+ * It defines tabs dynamically, includes necessary files, and renders content based on the selected tab.
+ *
+ * @package InterSoccer_Player_Management
  */
+
+// Prevent direct access to this file
+if (!defined('ABSPATH')) {
+    exit;
+}
 
 // Add admin menu page
 add_action('admin_menu', 'intersoccer_admin_menu');
+
+/**
+ * Registers the "Players & Orders" menu page in the WordPress admin menu.
+ */
 function intersoccer_admin_menu() {
-    $user = wp_get_current_user();
-    $is_coach_or_organizer = in_array('coach', (array) $user->roles) || in_array('organizer', (array) $user->roles);
-
-    // Define the capability based on user role
-    $capability = $is_coach_or_organizer ? 'edit_posts' : 'manage_options';
-
     add_menu_page(
-        __('Player Management', 'intersoccer-player-management'),
-        __('Players & Orders', 'intersoccer-player-management'),
-        $capability,
-        'intersoccer-players',
-        'intersoccer_players_admin_page',
-        'dashicons-groups',
-        56
+        __('Player Management', 'intersoccer-player-management'), // Page title
+        __('Players & Orders', 'intersoccer-player-management'), // Menu title
+        'manage_options', // Capability required (admin-level access)
+        'intersoccer-players', // Menu slug
+        'intersoccer_players_admin_page', // Callback function
+        'dashicons-groups', // Icon
+        56 // Position
     );
 }
 
-// Restrict menu visibility for coaches and organizers
-add_action('admin_menu', 'restrict_coach_organizer_menu_access', 999);
-function restrict_coach_organizer_menu_access() {
-    $user = wp_get_current_user();
-    if (in_array('coach', (array) $user->roles) || in_array('organizer', (array) $user->roles)) {
-        // Remove all menu items except "Players & Orders"
-        global $menu;
-        $allowed_menu = 'intersoccer-players';
-        foreach ($menu as $key => $item) {
-            if (isset($item[2]) && $item[2] !== $allowed_menu) {
-                remove_menu_page($item[2]);
-            }
-        }
-
-        // Remove all submenu items except those under "Players & Orders"
-        global $submenu;
-        foreach ($submenu as $parent => $subitems) {
-            if ($parent !== $allowed_menu) {
-                remove_submenu_page($parent, $parent);
-            }
-        }
-    }
-}
-
-// Redirect coaches and organizers to the "Players and Orders" page on admin dashboard access
-add_action('admin_init', 'redirect_coach_organizer_to_players_page');
-function redirect_coach_organizer_to_players_page() {
-    $user = wp_get_current_user();
-    if (in_array('coach', (array) $user->roles) || in_array('organizer', (array) $user->roles)) {
-        $current_page = isset($_GET['page']) ? sanitize_text_field($_GET['page']) : '';
-        $players_page = 'intersoccer-players';
-
-        // Redirect if not already on the "Players and Orders" page
-        if ($current_page !== $players_page && !wp_doing_ajax()) {
-            wp_safe_redirect(admin_url('admin.php?page=intersoccer-players'));
-            exit;
-        }
-    }
-}
-
-// Render the admin page
+/**
+ * Renders the admin page for the "Players & Orders" menu.
+ * Dynamically handles tabs and includes their respective files and render functions.
+ */
 function intersoccer_players_admin_page() {
-    // Determine the current tab
+    global $pagenow;
+
+    // Verify we're on the correct admin page
+    $current_page = isset($_GET['page']) ? sanitize_text_field($_GET['page']) : '';
+    if ($pagenow !== 'admin.php' || $current_page !== 'intersoccer-players') {
+        return;
+    }
+
+    // Define tabs with slugs, labels, files, and render functions
+    $tabs = array(
+        'players' => array(
+            'label' => __('All Players', 'intersoccer-player-management'),
+            'file' => 'admin-players-all.php',
+            'render_function' => 'intersoccer_render_players_all_tab',
+        ),
+        'courses-report' => array(
+            'label' => __('Courses Report', 'intersoccer-player-management'),
+            'file' => 'admin-courses-report.php',
+            'render_function' => 'intersoccer_render_courses_report_tab',
+        ),
+        'camps-report' => array(
+            'label' => __('Camps Report', 'intersoccer-player-management'),
+            'file' => 'admin-camps-report.php',
+            'render_function' => 'intersoccer_render_camps_report_tab',
+        ),
+        'sync-products' => array(
+            'label' => __('Sync Products to Events', 'intersoccer-player-management'),
+            'file' => 'admin-sync-products.php',
+            'render_function' => 'intersoccer_render_sync_products_tab',
+        ),
+        'event-rosters' => array(
+            'label' => __('Event Rosters', 'intersoccer-player-management'),
+            'file' => 'admin-event-rosters.php',
+            'render_function' => 'intersoccer_render_event_rosters_tab',
+        ),
+        'advanced' => array(
+            'label' => __('Advanced', 'intersoccer-player-management'),
+            'file' => 'admin-advanced.php',
+            'render_function' => 'intersoccer_render_advanced_tab',
+        ),
+    );
+
+    // Include tab files dynamically
+    foreach ($tabs as $tab_slug => $tab_data) {
+        $file_path = plugin_dir_path(__FILE__) . $tab_data['file'];
+        if (file_exists($file_path)) {
+            require_once $file_path;
+        } else {
+            error_log(sprintf('InterSoccer: Failed to include admin file: %s', $file_path));
+        }
+    }
+
+    // Determine the current tab, default to 'players'
     $current_tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : 'players';
 
-    // Include tab-specific files
-    $tabs = array(
-        'players' => 'admin-players-all.php',
-        'courses-report' => 'admin-courses-report.php',
-        'camps-report' => 'admin-camps-report.php',
-        'sync-products' => 'admin-sync-products.php',
-        'event-rosters' => 'admin-event-rosters.php',
-    );
-
-    // Validate the current tab
-    if (!array_key_exists($current_tab, $tabs)) {
+    // Validate the current tab exists, fallback to 'players' if invalid
+    if (!isset($tabs[$current_tab])) {
         $current_tab = 'players';
+    }
+
+    // Check if the render function exists for the current tab
+    if (!function_exists($tabs[$current_tab]['render_function'])) {
+        echo '<div class="error"><p>' . esc_html(sprintf(
+            __('Error: The render function for the "%s" tab is not defined.', 'intersoccer-player-management'),
+            $current_tab
+        )) . '</p></div>';
+        return;
     }
 
     ?>
     <div class="wrap">
-        <h1><?php _e('Player Management', 'intersoccer-player-management'); ?></h1>
+        <h1><?php echo esc_html(__('Player Management', 'intersoccer-player-management')); ?></h1>
 
-        <!-- Tabs -->
+        <!-- Dynamic Tab Navigation -->
         <h2 class="nav-tab-wrapper">
-            <a href="?page=intersoccer-players&tab=players" class="nav-tab <?php echo $current_tab === 'players' ? 'nav-tab-active' : ''; ?>"><?php _e('All Players', 'intersoccer-player-management'); ?></a>
-            <a href="?page=intersoccer-players&tab=courses-report" class="nav-tab <?php echo $current_tab === 'courses-report' ? 'nav-tab-active' : ''; ?>"><?php _e('Courses Report', 'intersoccer-player-management'); ?></a>
-            <a href="?page=intersoccer-players&tab=camps-report" class="nav-tab <?php echo $current_tab === 'camps-report' ? 'nav-tab-active' : ''; ?>"><?php _e('Camps Report', 'intersoccer-player-management'); ?></a>
-            <a href="?page=intersoccer-players&tab=sync-products" class="nav-tab <?php echo $current_tab === 'sync-products' ? 'nav-tab-active' : ''; ?>"><?php _e('Sync Products to Events', 'intersoccer-player-management'); ?></a>
-            <a href="?page=intersoccer-players&tab=event-rosters" class="nav-tab <?php echo $current_tab === 'event-rosters' ? 'nav-tab-active' : ''; ?>"><?php _e('Event Rosters', 'intersoccer-player-management'); ?></a>
+            <?php foreach ($tabs as $tab_slug => $tab_data) : ?>
+                <a href="<?php echo esc_url(add_query_arg('tab', $tab_slug, admin_url('admin.php?page=intersoccer-players'))); ?>"
+                   class="nav-tab <?php echo $current_tab === $tab_slug ? 'nav-tab-active' : ''; ?>">
+                    <?php echo esc_html($tab_data['label']); ?>
+                </a>
+            <?php endforeach; ?>
         </h2>
 
-        <?php
-        // Include the appropriate tab file
-        require_once plugin_dir_path(__FILE__) . $tabs[$current_tab];
-        ?>
+        <!-- Render the current tab content -->
+        <?php call_user_func($tabs[$current_tab]['render_function']); ?>
     </div>
     <?php
 }

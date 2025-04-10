@@ -1,255 +1,240 @@
 <?php
 /**
- * Admin Feature: All Players Tab with Zoho CRM Import
+ * Admin Feature: All Players Tab for Managing Player Data
  */
 
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use Dompdf\Dompdf;
+// Handle actions on admin_init
+add_action('admin_init', 'intersoccer_players_all_tab_init');
+function intersoccer_players_all_tab_init() {
+    // Handle player deletion
+    if (isset($_POST['delete_player']) && !empty($_POST['delete_player_nonce']) && wp_verify_nonce($_POST['delete_player_nonce'], 'delete_player_action')) {
+        $user_id = isset($_POST['user_id']) ? absint($_POST['user_id']) : 0;
+        $player_index = isset($_POST['player_index']) ? absint($_POST['player_index']) : -1;
 
-// Handle import from Zoho CRM
-if (isset($_POST['import_players']) && !empty($_POST['import_players_nonce']) && wp_verify_nonce($_POST['import_players_nonce'], 'import_players_action')) {
-    $module = sanitize_text_field($_POST['zoho_module'] ?? 'Contacts');
-    $field_mappings = array(
-        'First_Name' => 'first_name',
-        'Last_Name' => 'last_name',
-        'Date_of_Birth' => 'dob',
-        'Medical_Conditions' => 'medical_conditions',
-        'Consent_URL' => 'consent_url',
-    );
-
-    // Fetch data from Zoho CRM using WP Swings Zoho CRM Connect
-    if (function_exists('wpswings_zoho_crm_get_records')) {
-        $records = wpswings_zoho_crm_get_records($module);
-        if (is_array($records) && !empty($records)) {
-            foreach ($records as $record) {
-                // Map Zoho fields to player data
-                $player_data = array(
-                    'name' => trim(($record['First_Name'] ?? '') . ' ' . ($record['Last_Name'] ?? '')),
-                    'dob' => $record['Date_of_Birth'] ?? '',
-                    'medical_conditions' => $record['Medical_Conditions'] ?? 'No known medical conditions',
-                    'consent_url' => $record['Consent_URL'] ?? '',
-                );
-
-                // Skip if essential fields are missing
-                if (empty($player_data['name']) || empty($player_data['dob'])) {
-                    continue;
-                }
-
-                // Find user by email (assuming Zoho Contact has an Email field)
-                $email = $record['Email'] ?? '';
-                if (empty($email)) {
-                    continue;
-                }
-
-                $user = get_user_by('email', $email);
-                if (!$user) {
-                    // Optionally create a new user if not found
-                    $username = sanitize_user(str_replace(' ', '_', $player_data['name']));
-                    $password = wp_generate_password();
-                    $user_id = wp_create_user($username, $password, $email);
-                    if (is_wp_error($user_id)) {
-                        wc_add_notice(sprintf(__('Failed to create user for %s: %s', 'intersoccer-player-management'), $email, $user_id->get_error_message()), 'error');
-                        continue;
-                    }
-                    $user = get_user_by('id', $user_id);
-                }
-
-                // Update user meta with player data
-                $existing_players = get_user_meta($user->ID, 'intersoccer_players', true) ?: array();
-                $existing_players[] = $player_data;
-                update_user_meta($user->ID, 'intersoccer_players', $existing_players);
+        if ($user_id && $player_index >= 0) {
+            $players = get_user_meta($user_id, 'intersoccer_players', true) ?: array();
+            if (isset($players[$player_index])) {
+                unset($players[$player_index]);
+                $players = array_values($players); // Reindex array
+                update_user_meta($user_id, 'intersoccer_players', $players);
+                add_action('admin_notices', function() {
+                    echo '<div class="notice notice-success is-dismissible"><p>' . __('Player deleted successfully.', 'intersoccer-player-management') . '</p></div>';
+                });
             }
-            wc_add_notice(__('Players imported successfully from Zoho CRM!', 'intersoccer-player-management'), 'success');
-        } else {
-            wc_add_notice(__('No records found in Zoho CRM or an error occurred.', 'intersoccer-player-management'), 'error');
         }
-    } else {
-        wc_add_notice(__('WP Swings Zoho CRM Connect plugin is required for importing players.', 'intersoccer-player-management'), 'error');
     }
 }
-?>
 
-<!-- Import Form -->
-<h2><?php _e('Import Players from Zoho CRM', 'intersoccer-player-management'); ?></h2>
-<form method="post" action="">
-    <?php wp_nonce_field('import_players_action', 'import_players_nonce'); ?>
-    <table class="form-table">
-        <tr>
-            <th scope="row"><label for="zoho_module"><?php _e('Zoho Module', 'intersoccer-player-management'); ?></label></th>
-            <td>
-                <select name="zoho_module" id="zoho_module">
-                    <option value="Contacts"><?php _e('Contacts', 'intersoccer-player-management'); ?></option>
-                    <option value="Leads"><?php _e('Leads', 'intersoccer-player-management'); ?></option>
-                </select>
-                <p class="description"><?php _e('Select the Zoho CRM module to import players from.', 'intersoccer-player-management'); ?></p>
-            </td>
-        </tr>
-    </table>
-    <p class="submit">
-        <input type="submit" name="import_players" class="button button-primary" value="<?php _e('Import Players', 'intersoccer-player-management'); ?>" />
-    </p>
-</form>
+// Render the All Players tab content
+function intersoccer_render_players_all_tab() {
+    // Pagination and filtering parameters
+    $players_per_page = 20;
+    $current_page = isset($_GET['paged']) ? max(1, absint($_GET['paged'])) : 1;
+    $offset = ($current_page - 1) * $players_per_page;
 
-<!-- Players Table -->
-<h2><?php _e('All Players', 'intersoccer-player-management'); ?></h2>
-<table class="wp-list-table widefat fixed striped">
-    <thead>
-        <tr>
-            <th><?php _e('User', 'intersoccer-player-management'); ?></th>
-            <th><?php _e('Player Name', 'intersoccer-player-management'); ?></th>
-            <th><?php _e('DOB', 'intersoccer-player-management'); ?></th>
-            <th><?php _e('Medical Conditions', 'intersoccer-player-management'); ?></th>
-            <th><?php _e('Consent File', 'intersoccer-player-management'); ?></th>
-            <th><?php _e('Order ID', 'intersoccer-player-management'); ?></th>
-            <th><?php _e('Product', 'intersoccer-player-management'); ?></th>
-            <th><?php _e('Categories', 'intersoccer-player-management'); ?></th>
-            <th><?php _e('Variations & Attributes', 'intersoccer-player-management'); ?></th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php
-        // Get all users
-        $users = get_users();
-        foreach ($users as $user) {
-            $players = get_user_meta($user->ID, 'intersoccer_players', true) ?: array();
-            if (empty($players)) {
+    // Filter parameters
+    $filter_email = isset($_GET['email']) ? sanitize_email($_GET['email']) : '';
+    $filter_player_name = isset($_GET['player_name']) ? sanitize_text_field($_GET['player_name']) : '';
+    $filter_age_range = isset($_GET['age_range']) ? sanitize_text_field($_GET['age_range']) : '';
+
+    // Fetch all users with the 'customer' role
+    $args = array(
+        'role' => 'customer',
+        'number' => -1, // Fetch all users to filter and paginate
+    );
+    $users = get_users($args);
+
+    // Collect all players with filtering
+    $all_players = array();
+    foreach ($users as $user) {
+        $players = get_user_meta($user->ID, 'intersoccer_players', true);
+
+        // Ensure $players is an array
+        if (!is_array($players)) {
+            $players = array();
+        }
+
+        foreach ($players as $index => $player) {
+            // Ensure $player is an array and has required fields
+            if (!is_array($player) || !isset($player['name']) || !isset($player['dob'])) {
                 continue;
             }
 
-            // Get orders for this user
-            $orders = wc_get_orders(array(
-                'customer_id' => $user->ID,
-                'status' => array('wc-completed', 'wc-processing'),
-            ));
+            $player['user_id'] = $user->ID;
+            $player['user_email'] = $user->user_email;
+            $player['index'] = $index;
 
-            foreach ($players as $player) {
-                $player_row = array(
-                    'user' => esc_html($user->display_name . ' (' . $user->user_email . ')'),
-                    'player_name' => esc_html($player['name']),
-                    'dob' => esc_html($player['dob']),
-                    'medical_conditions' => esc_html($player['medical_conditions']),
-                    'consent_file' => !empty($player['consent_url']) ? '<a href="' . esc_url($player['consent_url']) . '" target="_blank">' . __('View Consent', 'intersoccer-player-management') . '</a>' : __('None', 'intersoccer-player-management'),
-                    'order_id' => __('N/A', 'intersoccer-player-management'),
-                    'product' => __('N/A', 'intersoccer-player-management'),
-                    'categories' => __('N/A', 'intersoccer-player-management'),
-                    'variations_attributes' => __('N/A', 'intersoccer-player-management'),
-                );
+            // Calculate age for filtering
+            $dob = $player['dob'];
+            $age = $dob ? date_diff(date_create($dob), date_create('today'))->y : 0;
+            $player['age'] = $age;
 
-                // Find orders associated with this player
-                $found_in_order = false;
-                foreach ($orders as $order) {
-                    foreach ($order->get_items() as $item) {
-                        $order_player = $item->get_meta('Player');
-                        if ($order_player === $player['name']) {
-                            $found_in_order = true;
-                            $product = $item->get_product();
-                            $product_id = $item->get_product_id();
-                            $variation_id = $item->get_variation_id();
+            // Apply filters
+            $matches_email = empty($filter_email) || stripos($user->user_email, $filter_email) !== false;
+            $matches_player_name = empty($filter_player_name) || stripos($player['name'], $filter_player_name) !== false;
+            $matches_age_range = true;
+            if (!empty($filter_age_range)) {
+                list($min_age, $max_age) = explode('-', $filter_age_range);
+                $min_age = (int) $min_age;
+                $max_age = (int) $max_age;
+                $matches_age_range = $age >= $min_age && $age <= $max_age;
+            }
 
-                            // Product categories
-                            $categories = get_the_terms($product_id, 'product_cat');
-                            $category_names = $categories ? wp_list_pluck($categories, 'name') : array();
-                            $category_list = !empty($category_names) ? implode(', ', $category_names) : __('N/A', 'intersoccer-player-management');
+            if ($matches_email && $matches_player_name && $matches_age_range) {
+                $all_players[] = $player;
+            }
+        }
+    }
 
-                            // Product variations and attributes
-                            $variation_attributes = array();
-                            if ($variation_id) {
-                                $variation = wc_get_product($variation_id);
-                                $variation_attributes = $variation->get_attributes();
-                            }
+    // Calculate pagination
+    $total_players = count($all_players);
+    $total_pages = ceil($total_players / $players_per_page);
 
-                            // Specified attributes
-                            $attributes_to_display = array(
-                                'pa_event-terms' => __('Event Terms', 'intersoccer-player-management'),
-                                'pa_intersoccer-venues' => __('InterSoccer Venues', 'intersoccer-player-management'),
-                                'pa_summer-camp-terms-2025' => __('Summer Camp Terms - 2025', 'intersoccer-player-management'),
-                                'pa_hot-lunch' => __('Hot Lunch', 'intersoccer-player-management'),
-                                'pa_camp-times' => __('Camp Times', 'intersoccer-player-management'),
-                                'pa_camp-holidays' => __('Camp Holidays', 'intersoccer-player-management'),
-                                'pa_booking-type' => __('Booking Type', 'intersoccer-player-management'),
-                                'pa_age-open' => __('Age Open', 'intersoccer-player-management'),
-                            );
+    // Slice the players array for the current page
+    $displayed_players = array_slice($all_players, $offset, $players_per_page);
+    ?>
 
-                            $attribute_list = array();
-                            foreach ($attributes_to_display as $attribute_key => $attribute_label) {
-                                $term = '';
-                                if ($variation_id && isset($variation_attributes[$attribute_key])) {
-                                    $term = $variation_attributes[$attribute_key];
-                                } else {
-                                    $terms = wc_get_product_terms($product_id, $attribute_key, array('fields' => 'names'));
-                                    $term = !empty($terms) ? $terms[0] : '';
-                                }
-                                if ($term) {
-                                    $attribute_list[] = "$attribute_label: $term";
-                                }
-                            }
-                            $attributes_display = !empty($attribute_list) ? implode('<br>', $attribute_list) : __('N/A', 'intersoccer-player-management');
+    <!-- All Players -->
+    <h2><?php _e('All Players', 'intersoccer-player-management'); ?></h2>
 
-                            // Output row with order details
-                            $player_row['order_id'] = $order->get_id();
-                            $player_row['product'] = esc_html($product->get_name());
-                            $player_row['categories'] = esc_html($category_list);
-                            $player_row['variations_attributes'] = $attributes_display;
+    <!-- Filters -->
+    <form method="get" action="">
+        <input type="hidden" name="page" value="intersoccer-players" />
+        <input type="hidden" name="tab" value="players" />
+        <p class="search-box">
+            <label for="email"><?php _e('User Email:', 'intersoccer-player-management'); ?></label>
+            <input type="email" id="email" name="email" value="<?php echo esc_attr($filter_email); ?>" placeholder="<?php _e('Enter user email', 'intersoccer-player-management'); ?>" />
 
-                            echo '<tr>';
-                            echo '<td>' . $player_row['user'] . '</td>';
-                            echo '<td>' . $player_row['player_name'] . '</td>';
-                            echo '<td>' . $player_row['dob'] . '</td>';
-                            echo '<td>' . $player_row['medical_conditions'] . '</td>';
-                            echo '<td>' . $player_row['consent_file'] . '</td>';
-                            echo '<td>' . $player_row['order_id'] . '</td>';
-                            echo '<td>' . $player_row['product'] . '</td>';
-                            echo '<td>' . $player_row['categories'] . '</td>';
-                            echo '<td>' . $player_row['variations_attributes'] . '</td>';
-                            echo '</tr>';
-                        }
+            <label for="player_name"><?php _e('Player Name:', 'intersoccer-player-management'); ?></label>
+            <input type="text" id="player_name" name="player_name" value="<?php echo esc_attr($filter_player_name); ?>" placeholder="<?php _e('Enter player name', 'intersoccer-player-management'); ?>" />
+
+            <label for="age_range"><?php _e('Age Range:', 'intersoccer-player-management'); ?></label>
+            <select id="age_range" name="age_range">
+                <option value=""><?php _e('All Ages', 'intersoccer-player-management'); ?></option>
+                <option value="3-5" <?php selected($filter_age_range, '3-5'); ?>><?php _e('3-5 (Mini-Half Day)', 'intersoccer-player-management'); ?></option>
+                <option value="5-13" <?php selected($filter_age_range, '5-13'); ?>><?php _e('5-13 (Full Day)', 'intersoccer-player-management'); ?></option>
+            </select>
+
+            <input type="submit" class="button" value="<?php _e('Filter', 'intersoccer-player-management'); ?>" />
+            <a href="?page=intersoccer-players&tab=players" class="button"><?php _e('Clear Filters', 'intersoccer-player-management'); ?></a>
+        </p>
+    </form>
+
+    <?php if (empty($users)): ?>
+        <p><?php _e('No users with the "customer" role found. Please ensure users are assigned the "customer" role.', 'intersoccer-player-management'); ?></p>
+    <?php elseif (empty($all_players)): ?>
+        <p><?php _e('No players found in user meta. Please ensure users have players added in their "intersoccer_players" meta. You can add players via user profiles or a custom form.', 'intersoccer-player-management'); ?></p>
+    <?php else: ?>
+        <!-- Pagination Info -->
+        <p>
+            <?php
+            $start = $offset + 1;
+            $end = min($offset + $players_per_page, $total_players);
+            printf(__('Showing %d-%d of %d players', 'intersoccer-player-management'), $start, $end, $total_players);
+            ?>
+        </p>
+
+        <table class="wp-list-table widefat fixed striped">
+            <thead>
+                <tr>
+                    <th><?php _e('User Email', 'intersoccer-player-management'); ?></th>
+                    <th><?php _e('Player Name', 'intersoccer-player-management'); ?></th>
+                    <th><?php _e('Date of Birth', 'intersoccer-player-management'); ?></th>
+                    <th><?php _e('Age', 'intersoccer-player-management'); ?></th>
+                    <th><?php _e('Medical Conditions', 'intersoccer-player-management'); ?></th>
+                    <th><?php _e('Consent File', 'intersoccer-player-management'); ?></th>
+                    <th><?php _e('Actions', 'intersoccer-player-management'); ?></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($displayed_players as $player): ?>
+                    <tr>
+                        <td><?php echo esc_html($player['user_email']); ?></td>
+                        <td><?php echo esc_html($player['name']); ?></td>
+                        <td><?php echo esc_html($player['dob']); ?></td>
+                        <td><?php echo esc_html($player['age']); ?></td>
+                        <td><?php echo esc_html($player['medical_conditions']); ?></td>
+                        <td>
+                            <?php if (!empty($player['consent_file'])): ?>
+                                <a href="<?php echo esc_url($player['consent_file']); ?>" target="_blank"><?php _e('View File', 'intersoccer-player-management'); ?></a>
+                            <?php else: ?>
+                                <?php _e('N/A', 'intersoccer-player-management'); ?>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <form method="post" action="" onsubmit="return confirm('<?php _e('Are you sure you want to delete this player?', 'intersoccer-player-management'); ?>');">
+                                <?php wp_nonce_field('delete_player_action', 'delete_player_nonce'); ?>
+                                <input type="hidden" name="user_id" value="<?php echo esc_attr($player['user_id']); ?>" />
+                                <input type="hidden" name="player_index" value="<?php echo esc_attr($player['index']); ?>" />
+                                <button type="submit" name="delete_player" class="button"><?php _e('Delete', 'intersoccer-player-management'); ?></button>
+                            </form>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+
+        <!-- Pagination Links -->
+        <div class="tablenav">
+            <div class="tablenav-pages">
+                <?php
+                $base_url = add_query_arg(array(
+                    'page' => 'intersoccer-players',
+                    'tab' => 'players',
+                    'email' => urlencode($filter_email),
+                    'player_name' => urlencode($filter_player_name),
+                    'age_range' => urlencode($filter_age_range),
+                ), admin_url('admin.php'));
+
+                // Previous page link
+                if ($current_page > 1) {
+                    $prev_page = $current_page - 1;
+                    echo '<a class="prev-page" href="' . esc_url(add_query_arg('paged', $prev_page, $base_url)) . '">« ' . __('Previous', 'intersoccer-player-management') . '</a> ';
+                }
+
+                // Page numbers
+                for ($i = 1; $i <= $total_pages; $i++) {
+                    if ($i == $current_page) {
+                        echo '<span class="current-page">' . esc_html($i) . '</span> ';
+                    } else {
+                        echo '<a class="page-number" href="' . esc_url(add_query_arg('paged', $i, $base_url)) . '">' . esc_html($i) . '</a> ';
                     }
                 }
 
-                // If player is not associated with any order, display a row without order details
-                if (!$found_in_order) {
-                    echo '<tr>';
-                    echo '<td>' . $player_row['user'] . '</td>';
-                    echo '<td>' . $player_row['player_name'] . '</td>';
-                    echo '<td>' . $player_row['dob'] . '</td>';
-                    echo '<td>' . $player_row['medical_conditions'] . '</td>';
-                    echo '<td>' . $player_row['consent_file'] . '</td>';
-                    echo '<td>' . $player_row['order_id'] . '</td>';
-                    echo '<td>' . $player_row['product'] . '</td>';
-                    echo '<td>' . $player_row['categories'] . '</td>';
-                    echo '<td>' . $player_row['variations_attributes'] . '</td>';
-                    echo '</tr>';
+                // Next page link
+                if ($current_page < $total_pages) {
+                    $next_page = $current_page + 1;
+                    echo '<a class="next-page" href="' . esc_url(add_query_arg('paged', $next_page, $base_url)) . '">' . __('Next', 'intersoccer-player-management') . ' »</a>';
                 }
-            }
-        }
-        ?>
-    </tbody>
-</table>
+                ?>
+            </div>
+        </div>
+    <?php endif; ?>
 
-<?php
-// Mock function to simulate WP Swings Zoho CRM Connect API (replace with actual implementation)
-if (!function_exists('wpswings_zoho_crm_get_records')) {
-    function wpswings_zoho_crm_get_records($module) {
-        return array(
-            array(
-                'First_Name' => 'Jessica',
-                'Last_Name' => 'Smith',
-                'Email' => 'jessica.smith@example.com',
-                'Date_of_Birth' => '2018-09-06',
-                'Medical_Conditions' => 'Asthma',
-                'Consent_URL' => 'https://example.com/consent.pdf',
-            ),
-            array(
-                'First_Name' => 'Alex',
-                'Last_Name' => 'Johnson',
-                'Email' => 'alex.johnson@example.com',
-                'Date_of_Birth' => '2015-05-20',
-                'Medical_Conditions' => 'No known medical conditions',
-                'Consent_URL' => '',
-            ),
-        );
-    }
+    <style>
+        .search-box {
+            margin-bottom: 20px;
+        }
+        .search-box label {
+            margin-right: 10px;
+        }
+        .search-box input[type="email"],
+        .search-box input[type="text"],
+        .search-box select {
+            margin-right: 10px;
+            padding: 5px;
+        }
+        .tablenav {
+            margin-top: 10px;
+        }
+        .tablenav .tablenav-pages a,
+        .tablenav .tablenav-pages span {
+            margin: 0 5px;
+        }
+        .tablenav .tablenav-pages .current-page {
+            font-weight: bold;
+        }
+    </style>
+    <?php
 }
 ?>
-

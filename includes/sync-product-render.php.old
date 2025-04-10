@@ -1,0 +1,160 @@
+<?php
+/**
+ * Rendering Logic for Sync Products to Events Tab
+ * Displays a table of WooCommerce products and variations for syncing with events.
+ *
+ * @package InterSoccer_Player_Management
+ */
+
+// Prevent direct access to this file
+defined('ABSPATH') or die('No script kiddies please!');
+
+// Check dependencies
+if (!class_exists('WooCommerce')) {
+    echo '<div class="error"><p>' . esc_html__('WooCommerce is required for this feature. Please install and activate it.', 'intersoccer-player-management') . '</p></div>';
+    return;
+}
+if (!function_exists('tribe_get_events')) {
+    echo '<div class="error"><p>' . esc_html__('The Events Calendar is required for this feature. Please install and activate it.', 'intersoccer-player-management') . '</p></div>';
+    return;
+}
+
+// Fetch all published WooCommerce products
+$all_products = wc_get_products(array(
+    'limit' => -1,
+    'status' => 'publish',
+));
+
+// Array to hold filtered products and variations
+$filtered_products = array();
+
+foreach ($all_products as $product) {
+    if ($product->is_type('simple')) {
+        // Check simple product attributes
+        $booking_type = $product->get_attribute('pa_booking-type');
+        if (in_array(strtolower($booking_type), array('week', 'full_term'))) {
+            $filtered_products[] = array(
+                'obj' => $product,
+                'is_variation' => false,
+            );
+        }
+    } elseif ($product->is_type('variable')) {
+        // Check variations for variable products
+        $variations = $product->get_available_variations();
+        foreach ($variations as $variation) {
+            $variation_obj = wc_get_product($variation['variation_id']);
+            $booking_type = $variation_obj->get_attribute('pa_booking-type');
+            if (in_array(strtolower($booking_type), array('week', 'full_term'))) {
+                $filtered_products[] = array(
+                    'obj' => $variation_obj,
+                    'is_variation' => true,
+                );
+            }
+        }
+    }
+}
+
+// Fetch all events from The Events Calendar
+$event_args = array(
+    'posts_per_page' => -1,
+    'post_status' => array('publish', 'draft', 'pending', 'private'),
+    'eventDisplay' => 'all',
+);
+$events = tribe_get_events($event_args);
+
+?>
+<div class="wrap">
+    <h1><?php echo esc_html__('Sync Products to Events', 'intersoccer-player-management'); ?></h1>
+    <?php if (empty($filtered_products)): ?>
+        <p><?php echo esc_html__('No products or variations found with booking type "week" or "full_term".', 'intersoccer-player-management'); ?></p>
+    <?php else: ?>
+        <form method="post" action="">
+            <?php wp_nonce_field('sync_products_action', 'sync_products_nonce'); ?>
+            <table class="wp-list-table widefat fixed striped">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;"><input type="checkbox" id="select-all-products" /></th>
+                        <th><?php echo esc_html__('Product/Variation', 'intersoccer-player-management'); ?></th>
+                        <th><?php echo esc_html__('Booking Type', 'intersoccer-player-management'); ?></th>
+                        <th><?php echo esc_html__('Select Event', 'intersoccer-player-management'); ?></th>
+                        <th><?php echo esc_html__('Action', 'intersoccer-player-management'); ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($filtered_products as $item): 
+                        $product = $item['obj'];
+                        $is_variation = $item['is_variation'];
+                        $item_id = $product->get_id();
+                    ?>
+                        <tr>
+                            <td><input type="checkbox" name="product_ids[]" value="<?php echo esc_attr($item_id); ?>" class="product-checkbox" /></td>
+                            <td><?php echo esc_html($product->get_name()); ?></td>
+                            <td><?php echo esc_html($product->get_attribute('pa_booking-type')); ?></td>
+                            <td>
+                                <select name="event_id[<?php echo esc_attr($item_id); ?>]" class="event-select">
+                                    <option value=""><?php echo esc_html__('Select an event', 'intersoccer-player-management'); ?></option>
+                                    <?php foreach ($events as $event): ?>
+                                        <option value="<?php echo esc_attr($event->ID); ?>">
+                                            <?php echo esc_html($event->post_title); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="hidden" name="is_variation[<?php echo esc_attr($item_id); ?>]" value="<?php echo $is_variation ? '1' : '0'; ?>">
+                                <button type="submit" name="sync_product" value="<?php echo esc_attr($item_id); ?>" class="button">
+                                    <?php echo esc_html__('Sync', 'intersoccer-player-management'); ?>
+                                </button>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+
+            <!-- Bulk Sync -->
+            <h3><?php echo esc_html__('Bulk Sync', 'intersoccer-player-management'); ?></h3>
+            <p>
+                <label for="bulk_event_ids"><?php echo esc_html__('Select Events for Bulk Sync:', 'intersoccer-player-management'); ?></label><br>
+                <select name="event_ids[]" id="bulk_event_ids" multiple required style="width: 400px; height: 150px;">
+                    <?php foreach ($events as $event): ?>
+                        <option value="<?php echo esc_attr($event->ID); ?>">
+                            <?php echo esc_html($event->post_title); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </p>
+            <p>
+                <input type="hidden" name="bulk_sync_nonce" value="<?php echo esc_attr(wp_create_nonce('bulk_sync_action')); ?>" />
+                <input type="submit" name="bulk_sync" class="button button-primary" value="<?php echo esc_attr__('Bulk Sync Selected Products to Events', 'intersoccer-player-management'); ?>" />
+            </p>
+        </form>
+    <?php endif; ?>
+</div>
+
+<script>
+    jQuery(document).ready(function($) {
+        // Select all products checkbox
+        $('#select-all-products').on('change', function() {
+            $('.product-checkbox').prop('checked', $(this).prop('checked'));
+        });
+    });
+</script>
+
+<style>
+    .wp-list-table th, .wp-list-table td {
+        padding: 10px;
+    }
+    .event-select {
+        width: 300px;
+    }
+    form h3 {
+        margin-top: 20px;
+    }
+    form p {
+        margin-bottom: 15px;
+    }
+</style>
+<?php
+// End of PHP file
+?>
+
