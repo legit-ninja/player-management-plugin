@@ -73,9 +73,6 @@ function register_course_start_end_dates_taxonomy() {
 // Include the player management functionality
 require_once plugin_dir_path(__FILE__) . 'includes/player-management.php';
 
-// Include the admin players management feature
-require_once plugin_dir_path(__FILE__) . 'includes/admin-players.php';
-
 // Include the checkout modifications
 require_once plugin_dir_path(__FILE__) . 'includes/checkout.php';
 
@@ -96,5 +93,19 @@ require_once plugin_dir_path(__FILE__) . 'includes/data-deletion.php';
 
 // Include the Mobile Check-In feature
 require_once plugin_dir_path(__FILE__) . 'includes/mobile-checkin.php';
+
+// Include the Player Achievements widget
+require_once plugin_dir_path(__FILE__) . 'includes/widget-player-achievements.php';
+
+// Include the admin players management feature (to register the menu)
+require_once plugin_dir_path(__FILE__) . 'includes/admin-players.php';
+
+// Include WooCommerce modifications
+require_once plugin_dir_path(__FILE__) . 'includes/woocommerce-modifications.php';
+
+// Register the Player Achievements widget
+add_action('widgets_init', function() {
+    register_widget('InterSoccer_Player_Achievements_Widget');
+});
 ?>
 

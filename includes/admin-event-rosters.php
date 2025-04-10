@@ -1,228 +1,162 @@
 <?php
 /**
- * Admin Feature: Event Rosters Tab for Generating Player Rosters
+ * Admin Feature: Event Rosters Tab for Viewing Event Attendees
  */
 
-// Handle export requests for event rosters
-if (isset($_GET['export-roster'])) {
-    $event_id = isset($_GET['event_id']) ? absint($_GET['event_id']) : 0;
-    if ($event_id) {
-        export_event_roster($event_id);
-        exit;
-    }
-}
-?>
+// Render the Event Rosters tab content
+function intersoccer_render_event_rosters_tab() {
+    // Filter parameters
+    $filter_event_title = isset($_GET['event_title']) ? sanitize_text_field($_GET['event_title']) : '';
+    $filter_date_range = isset($_GET['date_range']) ? sanitize_text_field($_GET['date_range']) : '';
+    $filter_venue = isset($_GET['venue']) ? sanitize_text_field($_GET['venue']) : '';
 
-<!-- Event Rosters -->
-<h2><?php _e('Event Rosters', 'intersoccer-player-management'); ?></h2>
-<?php
-// Fetch all Event Tickets events
-$events = tribe_get_events(array(
-    'posts_per_page' => -1,
-    'post_status' => 'publish',
-));
+    // Fetch all events
+    $event_args = array(
+        'posts_per_page' => -1,
+        'post_status' => array('publish', 'draft', 'pending', 'private'),
+        'eventDisplay' => 'all',
+    );
 
-if (empty($events)) {
-    echo '<p>' . __('No events found. Please create an event or generate events from variable products.', 'intersoccer-player-management') . '</p>';
-} else {
-    ?>
-    <table class="wp-list-table widefat fixed striped">
-        <thead>
-            <tr>
-                <th><?php _e('Event Name', 'intersoccer-player-management'); ?></th>
-                <th><?php _e('Registration End Date', 'intersoccer-player-management'); ?></th>
-                <th><?php _e('Status', 'intersoccer-player-management'); ?></th>
-                <th><?php _e('Actions', 'intersoccer-player-management'); ?></th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-            $current_date = current_time('Y-m-d');
-            foreach ($events as $event) {
-                $event_id = $event->ID;
-                $tickets = Tribe__Tickets__Tickets::get_event_tickets($event_id);
-                $registration_end_date = '';
-
-                // Get the latest ticket end date
-                foreach ($tickets as $ticket) {
-                    $end_date = get_post_meta($ticket->ID, '_ticket_end_date', true);
-                    if ($end_date && (!$registration_end_date || $end_date > $registration_end_date)) {
-                        $registration_end_date = $end_date;
-                    }
-                }
-
-                $registration_closed = $registration_end_date && strtotime($registration_end_date) < strtotime($current_date);
-                ?>
-                <tr>
-                    <td><?php echo esc_html($event->post_title); ?></td>
-                    <td><?php echo esc_html($registration_end_date ?: __('Not Set', 'intersoccer-player-management')); ?></td>
-                    <td><?php echo $registration_closed ? __('Closed', 'intersoccer-player-management') : __('Open', 'intersoccer-player-management'); ?></td>
-                    <td>
-                        <?php if ($registration_closed): ?>
-                            <a href="#roster-<?php echo esc_attr($event_id); ?>" class="button generate-roster"><?php _e('Generate Roster', 'intersoccer-player-management'); ?></a>
-                            <a href="<?php echo esc_url(home_url('/mobile-checkin/' . $event_id)); ?>" class="button"><?php _e('Mobile Check-In', 'intersoccer-player-management'); ?></a>
-                        <?php else: ?>
-                            <?php _e('Registration still open', 'intersoccer-player-management'); ?>
-                        <?php endif; ?>
-                    </td>
-                </tr>
-                <tr id="roster-<?php echo esc_attr($event_id); ?>" style="display: none;">
-                    <td colspan="4">
-                        <?php
-                        // Fetch attendees for this event
-                        $attendees = tribe_tickets_get_attendees($event_id);
-                        $roster = array();
-
-                        foreach ($attendees as $attendee) {
-                            $order_id = $attendee['order_id'];
-                            $player_name = get_post_meta($attendee['ID'], 'player_name', true);
-                            if (!$player_name) {
-                                continue;
-                            }
-
-                            $order = wc_get_order($order_id);
-                            if (!$order) {
-                                continue;
-                            }
-
-                            $user_id = $order->get_user_id();
-                            if (!$user_id) {
-                                continue;
-                            }
-
-                            $players = get_user_meta($user_id, 'intersoccer_players', true) ?: array();
-                            $player_data = null;
-                            foreach ($players as $player) {
-                                if ($player['name'] === $player_name) {
-                                    $player_data = $player;
-                                    break;
-                                }
-                            }
-
-                            if ($player_data) {
-                                $dob = $player_data['dob'];
-                                $age = $dob ? date_diff(date_create($dob), date_create('today'))->y : 'N/A';
-                                $roster[] = array(
-                                    'name' => $player_name,
-                                    'age' => $age,
-                                    'medical_conditions' => $player_data['medical_conditions'],
-                                );
-                            }
-                        }
-
-                        if (empty($roster)) {
-                            echo '<p>' . __('No players registered for this event.', 'intersoccer-player-management') . '</p>';
-                        } else {
-                            ?>
-                            <h3><?php _e('Roster for', 'intersoccer-player-management'); ?> <?php echo esc_html($event->post_title); ?></h3>
-                            <p><?php printf(__('Total Players: %d', 'intersoccer-player-management'), count($roster)); ?></p>
-                            <a href="?page=intersoccer-players&tab=event-rosters&export-roster=csv&event_id=<?php echo esc_attr($event_id); ?>" class="button"><?php _e('Download CSV', 'intersoccer-player-management'); ?></a>
-                            <table class="wp-list-table widefat fixed striped">
-                                <thead>
-                                    <tr>
-                                        <th><?php _e('Player Name', 'intersoccer-player-management'); ?></th>
-                                        <th><?php _e('Age', 'intersoccer-player-management'); ?></th>
-                                        <th><?php _e('Medical Conditions', 'intersoccer-player-management'); ?></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($roster as $player): ?>
-                                        <tr>
-                                            <td><?php echo esc_html($player['name']); ?></td>
-                                            <td><?php echo esc_html($player['age']); ?></td>
-                                            <td><?php echo esc_html($player['medical_conditions']); ?></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                            <?php
-                        }
-                        ?>
-                    </td>
-                </tr>
-                <?php
-            }
-            ?>
-        </tbody>
-    </table>
-    <script>
-        jQuery(document).ready(function($) {
-            $('.generate-roster').on('click', function(e) {
-                e.preventDefault();
-                var target = $(this).attr('href');
-                $(target).toggle();
-            });
-        });
-    </script>
-    <?php
-}
-
-// Export the event roster as CSV
-function export_event_roster($event_id) {
-    $event = tribe_get_event($event_id);
-    if (!$event) {
-        wp_die(__('Invalid event ID.', 'intersoccer-player-management'));
-    }
-
-    $attendees = tribe_tickets_get_attendees($event_id);
-    $roster = array();
-
-    foreach ($attendees as $attendee) {
-        $order_id = $attendee['order_id'];
-        $player_name = get_post_meta($attendee['ID'], 'player_name', true);
-        if (!$player_name) {
-            continue;
-        }
-
-        $order = wc_get_order($order_id);
-        if (!$order) {
-            continue;
-        }
-
-        $user_id = $order->get_user_id();
-        if (!$user_id) {
-            continue;
-        }
-
-        $players = get_user_meta($user_id, 'intersoccer_players', true) ?: array();
-        $player_data = null;
-        foreach ($players as $player) {
-            if ($player['name'] === $player_name) {
-                $player_data = $player;
-                break;
-            }
-        }
-
-        if ($player_data) {
-            $dob = $player_data['dob'];
-            $age = $dob ? date_diff(date_create($dob), date_create('today'))->y : 'N/A';
-            $roster[] = array(
-                'name' => $player_name,
-                'age' => $age,
-                'medical_conditions' => $player_data['medical_conditions'],
+    // Apply date range filter
+    if (!empty($filter_date_range)) {
+        $dates = explode(' to ', $filter_date_range);
+        if (count($dates) === 2) {
+            $start_date = sanitize_text_field($dates[0]);
+            $end_date = sanitize_text_field($dates[1]);
+            $event_args['meta_query'] = array(
+                array(
+                    'key' => '_EventStartDate',
+                    'value' => array($start_date . ' 00:00:00', $end_date . ' 23:59:59'),
+                    'compare' => 'BETWEEN',
+                    'type' => 'DATETIME',
+                ),
             );
         }
     }
 
-    header('Content-Type: text/csv; charset=utf-8');
-    header('Content-Disposition: attachment; filename=event-roster-' . sanitize_title($event->post_title) . '-' . date('Y-m-d') . '.csv');
+    $events = tribe_get_events($event_args);
 
-    $output = fopen('php://output', 'w');
-    fputcsv($output, array(
-        __('Player Name', 'intersoccer-player-management'),
-        __('Age', 'intersoccer-player-management'),
-        __('Medical Conditions', 'intersoccer-player-management'),
-    ));
-
-    foreach ($roster as $player) {
-        fputcsv($output, array(
-            $player['name'],
-            $player['age'],
-            $player['medical_conditions'],
-        ));
+    // Filter events by title
+    if (!empty($filter_event_title)) {
+        $events = array_filter($events, function($event) use ($filter_event_title) {
+            return stripos($event->post_title, $filter_event_title) !== false;
+        });
     }
 
-    fclose($output);
+    // Filter events by venue
+    if (!empty($filter_venue)) {
+        $events = array_filter($events, function($event) use ($filter_venue) {
+            $venue_id = get_post_meta($event->ID, '_EventVenueID', true);
+            $venue = $venue_id ? get_post($venue_id) : null;
+            return $venue && stripos($venue->post_title, $filter_venue) !== false;
+        });
+    }
+
+    // Get unique venues for filter dropdown
+    $venues = array();
+    foreach (tribe_get_events(array('posts_per_page' => -1)) as $event) {
+        $venue_id = get_post_meta($event->ID, '_EventVenueID', true);
+        if ($venue_id) {
+            $venue = get_post($venue_id);
+            if ($venue && !in_array($venue->post_title, $venues)) {
+                $venues[] = $venue->post_title;
+            }
+        }
+    }
+    sort($venues);
+
+    ?>
+    <h2><?php _e('Event Rosters', 'intersoccer-player-management'); ?></h2>
+
+    <!-- Filters -->
+    <form method="get" action="">
+        <input type="hidden" name="page" value="intersoccer-players" />
+        <input type="hidden" name="tab" value="event-rosters" />
+        <p class="search-box">
+            <label for="event_title"><?php _e('Event Title:', 'intersoccer-player-management'); ?></label>
+            <input type="text" id="event_title" name="event_title" value="<?php echo esc_attr($filter_event_title); ?>" placeholder="<?php _e('Enter event title', 'intersoccer-player-management'); ?>" />
+
+            <label for="date_range"><?php _e('Date Range:', 'intersoccer-player-management'); ?></label>
+            <input type="text" id="date_range" name="date_range" value="<?php echo esc_attr($filter_date_range); ?>" placeholder="<?php _e('YYYY-MM-DD to YYYY-MM-DD', 'intersoccer-player-management'); ?>" />
+
+            <label for="venue"><?php _e('Venue:', 'intersoccer-player-management'); ?></label>
+            <select id="venue" name="venue">
+                <option value=""><?php _e('All Venues', 'intersoccer-player-management'); ?></option>
+                <?php foreach ($venues as $venue): ?>
+                    <option value="<?php echo esc_attr($venue); ?>" <?php selected($filter_venue, $venue); ?>><?php echo esc_html($venue); ?></option>
+                <?php endforeach; ?>
+            </select>
+
+            <input type="submit" class="button" value="<?php _e('Filter', 'intersoccer-player-management'); ?>" />
+            <a href="?page=intersoccer-players&tab=event-rosters" class="button"><?php _e('Clear Filters', 'intersoccer-player-management'); ?></a>
+        </p>
+    </form>
+
+    <?php if (empty($events)): ?>
+        <p><?php _e('No events found.', 'intersoccer-player-management'); ?></p>
+    <?php else: ?>
+        <table class="wp-list-table widefat fixed striped">
+            <thead>
+                <tr>
+                    <th><?php _e('Event Title', 'intersoccer-player-management'); ?></th>
+                    <th><?php _e('Start Date', 'intersoccer-player-management'); ?></th>
+                    <th><?php _e('Venue', 'intersoccer-player-management'); ?></th>
+                    <th><?php _e('Attendees', 'intersoccer-player-management'); ?></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($events as $event): ?>
+                    <?php
+                    $attendees = tribe_tickets_get_attendees($event->ID);
+                    $venue_id = get_post_meta($event->ID, '_EventVenueID', true);
+                    $venue = $venue_id ? get_post($venue_id) : null;
+                    $start_date = get_post_meta($event->ID, '_EventStartDate', true);
+                    ?>
+                    <tr>
+                        <td><?php echo esc_html($event->post_title); ?></td>
+                        <td><?php echo esc_html($start_date ? date('Y-m-d H:i', strtotime($start_date)) : 'N/A'); ?></td>
+                        <td><?php echo esc_html($venue ? $venue->post_title : 'N/A'); ?></td>
+                        <td>
+                            <?php if (empty($attendees)): ?>
+                                <?php _e('No attendees.', 'intersoccer-player-management'); ?>
+                            <?php else: ?>
+                                <ul>
+                                    <?php foreach ($attendees as $attendee): ?>
+                                        <?php
+                                        $player_name = get_post_meta($attendee['ID'], 'player_name', true);
+                                        $order_id = $attendee['order_id'];
+                                        $order = wc_get_order($order_id);
+                                        $user_email = $order ? $order->get_billing_email() : 'N/A';
+                                        ?>
+                                        <li><?php echo esc_html($player_name ? $player_name : 'N/A'); ?> (<?php echo esc_html($user_email); ?>)</li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    <?php endif; ?>
+
+    <style>
+        .search-box {
+            margin-bottom: 20px;
+        }
+        .search-box label {
+            margin-right: 10px;
+        }
+        .search-box input[type="text"],
+        .search-box select {
+            margin-right: 10px;
+            padding: 5px;
+            width: 200px;
+        }
+        .wp-list-table ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+    </style>
+    <?php
 }
 ?>
-

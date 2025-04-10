@@ -1,244 +1,157 @@
 <?php
 /**
- * Admin Feature: Courses Report Tab for Generating Player Reports by Course
+ * Admin Feature: Courses Report Tab for Viewing Course Orders
  */
 
-// Handle export requests for courses report
-if (isset($_GET['export-courses-report'])) {
-    export_courses_report();
-    exit;
-}
+// Render the Courses Report tab content
+function intersoccer_render_courses_report_tab() {
+    // Filter parameters
+    $filter_course_name = isset($_GET['course_name']) ? sanitize_text_field($_GET['course_name']) : '';
+    $filter_date_range = isset($_GET['date_range']) ? sanitize_text_field($_GET['date_range']) : '';
+    $filter_venue = isset($_GET['venue']) ? sanitize_text_field($_GET['venue']) : '';
 
-// Function to export the courses report as PDF
-function export_courses_report() {
-    // Clean output buffer to prevent corruption
-    if (ob_get_length()) {
-        ob_end_clean();
+    // Fetch all orders with course products (products with pa_booking-type = 'full_term')
+    $args = array(
+        'limit' => -1,
+        'status' => array('completed', 'processing'),
+    );
+
+    // Apply date range filter
+    if (!empty($filter_date_range)) {
+        $dates = explode(' to ', $filter_date_range);
+        if (count($dates) === 2) {
+            $start_date = sanitize_text_field($dates[0]);
+            $end_date = sanitize_text_field($dates[1]);
+            $args['date_created'] = "$start_date...$end_date";
+        }
     }
 
-    // Increase memory limit to handle large datasets
-    ini_set('memory_limit', '256M');
+    $orders = wc_get_orders($args);
 
-    // Include TCPDF library
-    require_once plugin_dir_path(__FILE__) . '../vendor/tecnickcom/tcpdf/tcpdf.php';
-
-    // Create new PDF document
-    $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
-
-    // Set document information
-    $pdf->SetCreator(PDF_CREATOR);
-    $pdf->SetAuthor('InterSoccer Player Management');
-    $pdf->SetTitle('Courses Report');
-    $pdf->SetSubject('Player Registrations by Course');
-    $pdf->SetKeywords('InterSoccer, Courses, Players, Report');
-
-    // Set default header data
-    $pdf->SetHeaderData('', 0, 'InterSoccer Courses Report', 'Player Registrations by Course');
-
-    // Set header and footer fonts
-    $pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
-    $pdf->setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
-
-    // Set default monospaced font
-    $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
-
-    // Set margins
-    $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
-    $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
-    $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
-
-    // Set auto page breaks
-    $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
-
-    // Set image scale factor
-    $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
-
-    // Set font
-    $pdf->SetFont('helvetica', '', 10);
-
-    // Add a page
-    $pdf->AddPage();
-
-    // Fetch all Event Tickets events
-    $events = tribe_get_events(array(
-        'posts_per_page' => -1,
-        'post_status' => 'publish',
-    ));
-
-    $html = '<h1>' . __('Courses Report', 'intersoccer-player-management') . '</h1>';
-    $html .= '<table border="1" cellpadding="4">';
-    $html .= '<thead><tr style="background-color:#f0f0f0;">';
-    $html .= '<th>' . __('Course Name', 'intersoccer-player-management') . '</th>';
-    $html .= '<th>' . __('Player Name', 'intersoccer-player-management') . '</th>';
-    $html .= '<th>' . __('Age', 'intersoccer-player-management') . '</th>';
-    $html .= '<th>' . __('Medical Conditions', 'intersoccer-player-management') . '</th>';
-    $html .= '</tr></thead><tbody>';
-
-    foreach ($events as $event) {
-        $event_id = $event->ID;
-        $attendees = tribe_tickets_get_attendees($event_id);
-        $course_players = array();
-
-        foreach ($attendees as $attendee) {
-            $order_id = $attendee['order_id'];
-            $player_name = get_post_meta($attendee['ID'], 'player_name', true);
-            if (!$player_name) {
+    // Collect all courses with filtering
+    $all_courses = array();
+    foreach ($orders as $order) {
+        $items = $order->get_items();
+        foreach ($items as $item) {
+            $product = $item->get_product();
+            if (!$product) {
                 continue;
             }
 
-            $order = wc_get_order($order_id);
-            if (!$order) {
+            // Check if the product has pa_booking-type = 'full_term'
+            $booking_type = $product->get_attribute('pa_booking-type');
+            if ($booking_type !== 'full_term') {
                 continue;
             }
 
-            $user_id = $order->get_user_id();
-            if (!$user_id) {
-                continue;
+            // Get venue from pa_intersoccer-venues
+            $venue = $product->get_attribute('pa_intersoccer-venues');
+            if (empty($venue)) {
+                $venue_terms = wc_get_product_terms($product->get_id(), 'pa_intersoccer-venues', array('fields' => 'names'));
+                $venue = !empty($venue_terms) ? $venue_terms[0] : 'TBD';
             }
 
-            $players = get_user_meta($user_id, 'intersoccer_players', true) ?: array();
-            $player_data = null;
-            foreach ($players as $player) {
-                if ($player['name'] === $player_name) {
-                    $player_data = $player;
-                    break;
-                }
-            }
+            // Get start date (we'll use the order date as a fallback if no specific start date is available)
+            $start_date = get_post_meta($product->get_id(), '_start_date', true) ?: $order->get_date_created()->date('Y-m-d');
 
-            if ($player_data) {
-                $dob = $player_data['dob'];
-                $age = $dob ? date_diff(date_create($dob), date_create('today'))->y : 'N/A';
-                $course_players[] = array(
-                    'course_name' => $event->post_title,
-                    'player_name' => $player_name,
-                    'age' => $age,
-                    'medical_conditions' => $player_data['medical_conditions'],
+            // Apply filters
+            $matches_course_name = empty($filter_course_name) || stripos($product->get_name(), $filter_course_name) !== false;
+            $matches_venue = empty($filter_venue) || stripos($venue, $filter_venue) !== false;
+
+            if ($matches_course_name && $matches_venue) {
+                $all_courses[] = array(
+                    'order' => $order,
+                    'product' => $product,
+                    'venue' => $venue,
+                    'start_date' => $start_date,
                 );
             }
         }
+    }
 
-        foreach ($course_players as $player) {
-            // Ensure all data is UTF-8 encoded to prevent encoding issues
-            $course_name = mb_convert_encoding($player['course_name'], 'UTF-8', 'auto');
-            $player_name = mb_convert_encoding($player['player_name'], 'UTF-8', 'auto');
-            $age = mb_convert_encoding($player['age'], 'UTF-8', 'auto');
-            $medical_conditions = mb_convert_encoding($player['medical_conditions'], 'UTF-8', 'auto');
-
-            $html .= '<tr>';
-            $html .= '<td>' . htmlspecialchars($course_name, ENT_QUOTES, 'UTF-8') . '</td>';
-            $html .= '<td>' . htmlspecialchars($player_name, ENT_QUOTES, 'UTF-8') . '</td>';
-            $html .= '<td>' . htmlspecialchars($age, ENT_QUOTES, 'UTF-8') . '</td>';
-            $html .= '<td>' . htmlspecialchars($medical_conditions, ENT_QUOTES, 'UTF-8') . '</td>';
-            $html .= '</tr>';
+    // Get unique venues for filter dropdown
+    $venues = array();
+    foreach ($all_courses as $course_data) {
+        if ($course_data['venue'] && !in_array($course_data['venue'], $venues)) {
+            $venues[] = $course_data['venue'];
         }
     }
+    sort($venues);
 
-    $html .= '</tbody></table>';
-
-    // Write HTML content to PDF
-    try {
-        $pdf->writeHTML($html, true, false, true, false, '');
-    } catch (Exception $e) {
-        error_log('TCPDF Error: ' . $e->getMessage());
-        wp_die(__('An error occurred while generating the PDF: ', 'intersoccer-player-management') . $e->getMessage());
-    }
-
-    // Set proper headers for PDF download
-    header('Content-Type: application/pdf');
-    header('Content-Disposition: attachment; filename="courses-report-' . date('Y-m-d') . '.pdf"');
-    header('Cache-Control: private, must-revalidate, post-check=0, pre-check=0');
-    header('Pragma: public');
-    header('Expires: 0');
-
-    // Output PDF
-    $pdf->Output('courses-report-' . date('Y-m-d') . '.pdf', 'D');
-    exit;
-}
-?>
-
-<!-- Courses Report -->
-<h2><?php _e('Courses Report', 'intersoccer-player-management'); ?></h2>
-<?php
-// Fetch all Event Tickets events
-$events = tribe_get_events(array(
-    'posts_per_page' => -1,
-    'post_status' => 'publish',
-));
-
-if (empty($events)) {
-    echo '<p>' . __('No events found. Please create an event or generate events from variable products.', 'intersoccer-player-management') . '</p>';
-} else {
     ?>
-    <a href="?page=intersoccer-players&tab=courses-report&export-courses-report=pdf" class="button"><?php _e('Export as PDF', 'intersoccer-player-management'); ?></a>
-    <table class="wp-list-table widefat fixed striped">
-        <thead>
-            <tr>
-                <th><?php _e('Course Name', 'intersoccer-player-management'); ?></th>
-                <th><?php _e('Player Name', 'intersoccer-player-management'); ?></th>
-                <th><?php _e('Age', 'intersoccer-player-management'); ?></th>
-                <th><?php _e('Medical Conditions', 'intersoccer-player-management'); ?></th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-            foreach ($events as $event) {
-                $event_id = $event->ID;
-                $attendees = tribe_tickets_get_attendees($event_id);
-                $course_players = array();
+    <h2><?php _e('Courses Report', 'intersoccer-player-management'); ?></h2>
 
-                foreach ($attendees as $attendee) {
-                    $order_id = $attendee['order_id'];
-                    $player_name = get_post_meta($attendee['ID'], 'player_name', true);
-                    if (!$player_name) {
-                        continue;
-                    }
+    <!-- Filters -->
+    <form method="get" action="">
+        <input type="hidden" name="page" value="intersoccer-players" />
+        <input type="hidden" name="tab" value="courses-report" />
+        <p class="search-box">
+            <label for="course_name"><?php _e('Course Name:', 'intersoccer-player-management'); ?></label>
+            <input type="text" id="course_name" name="course_name" value="<?php echo esc_attr($filter_course_name); ?>" placeholder="<?php _e('Enter course name', 'intersoccer-player-management'); ?>" />
 
-                    $order = wc_get_order($order_id);
-                    if (!$order) {
-                        continue;
-                    }
+            <label for="date_range"><?php _e('Date Range:', 'intersoccer-player-management'); ?></label>
+            <input type="text" id="date_range" name="date_range" value="<?php echo esc_attr($filter_date_range); ?>" placeholder="<?php _e('YYYY-MM-DD to YYYY-MM-DD', 'intersoccer-player-management'); ?>" />
 
-                    $user_id = $order->get_user_id();
-                    if (!$user_id) {
-                        continue;
-                    }
+            <label for="venue"><?php _e('Venue:', 'intersoccer-player-management'); ?></label>
+            <select id="venue" name="venue">
+                <option value=""><?php _e('All Venues', 'intersoccer-player-management'); ?></option>
+                <?php foreach ($venues as $venue): ?>
+                    <option value="<?php echo esc_attr($venue); ?>" <?php selected($filter_venue, $venue); ?>><?php echo esc_html($venue); ?></option>
+                <?php endforeach; ?>
+            </select>
 
-                    $players = get_user_meta($user_id, 'intersoccer_players', true) ?: array();
-                    $player_data = null;
-                    foreach ($players as $player) {
-                        if ($player['name'] === $player_name) {
-                            $player_data = $player;
-                            break;
-                        }
-                    }
+            <input type="submit" class="button" value="<?php _e('Filter', 'intersoccer-player-management'); ?>" />
+            <a href="?page=intersoccer-players&tab=courses-report" class="button"><?php _e('Clear Filters', 'intersoccer-player-management'); ?></a>
+        </p>
+    </form>
 
-                    if ($player_data) {
-                        $dob = $player_data['dob'];
-                        $age = $dob ? date_diff(date_create($dob), date_create('today'))->y : 'N/A';
-                        $course_players[] = array(
-                            'course_name' => $event->post_title,
-                            'player_name' => $player_name,
-                            'age' => $age,
-                            'medical_conditions' => $player_data['medical_conditions'],
-                        );
-                    }
-                }
-
-                foreach ($course_players as $player) {
+    <?php if (empty($all_courses)): ?>
+        <p><?php _e('No course orders found.', 'intersoccer-player-management'); ?></p>
+    <?php else: ?>
+        <table class="wp-list-table widefat fixed striped">
+            <thead>
+                <tr>
+                    <th><?php _e('Order ID', 'intersoccer-player-management'); ?></th>
+                    <th><?php _e('Course Name', 'intersoccer-player-management'); ?></th>
+                    <th><?php _e('Start Date', 'intersoccer-player-management'); ?></th>
+                    <th><?php _e('Venue', 'intersoccer-player-management'); ?></th>
+                    <th><?php _e('Customer', 'intersoccer-player-management'); ?></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($all_courses as $course_data): ?>
+                    <?php
+                    $order = $course_data['order'];
+                    $product = $course_data['product'];
+                    $venue = $course_data['venue'];
+                    $start_date = $course_data['start_date'];
                     ?>
                     <tr>
-                        <td><?php echo esc_html($player['course_name']); ?></td>
-                        <td><?php echo esc_html($player['player_name']); ?></td>
-                        <td><?php echo esc_html($player['age']); ?></td>
-                        <td><?php echo esc_html($player['medical_conditions']); ?></td>
+                        <td><?php echo esc_html($order->get_id()); ?></td>
+                        <td><?php echo esc_html($product->get_name()); ?></td>
+                        <td><?php echo esc_html($start_date ? date('Y-m-d', strtotime($start_date)) : 'N/A'); ?></td>
+                        <td><?php echo esc_html($venue ?: 'N/A'); ?></td>
+                        <td><?php echo esc_html($order->get_billing_first_name() . ' ' . $order->get_billing_last_name()); ?> (<?php echo esc_html($order->get_billing_email()); ?>)</td>
                     </tr>
-                    <?php
-                }
-            }
-            ?>
-        </tbody>
-    </table>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    <?php endif; ?>
+
+    <style>
+        .search-box {
+            margin-bottom: 20px;
+        }
+        .search-box label {
+            margin-right: 10px;
+        }
+        .search-box input[type="text"],
+        .search-box select {
+            margin-right: 10px;
+            padding: 5px;
+            width: 200px;
+        }
+    </style>
     <?php
 }
 ?>
-
