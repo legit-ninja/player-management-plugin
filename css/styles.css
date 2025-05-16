@@ -1,0 +1,512 @@
+/**
+ * Styles for InterSoccer Player Management
+ * Changes (Updated):
+ * - Ensured Medical Conditions textarea spans full width.
+ * - Added styling for instance numbers in checkout.
+ * - Changed .intersoccer-player-management background to #242424 and labels to white (#ffffff).
+ * - Adjusted input, select, textarea, and button styles for dark theme compatibility.
+ * - Enhanced error message styling for visibility and accessibility.
+ * - Increased specificity for .intersoccer-player-management to override Elementor/WooCommerce.
+ * - Added styles for event-details and player-assignment sections in checkout.
+ * - Updated version to 1.9 to avoid caching issues.
+ * - Increased specificity for .intersoccer-player-assignment to ensure formatting on checkout page.
+ * - Updated to use theme color scheme variables (2025-05-08).
+ * - Removed !important declarations to prevent overwriting theme styles (2025-05-08).
+ * - Scoped styles to avoid affecting other elements (2025-05-08).
+ * - Added styles for intersoccer-order-details-meta (2025-05-08).
+ * - Updated to use scheme_fourth_dark variables (2025-05-09).
+ * - Fixed white box issue for variation-details by setting background color (2025-05-10).
+ * - Fixed layout shift on desktop by enforcing full-width display for intersoccer-player-assignment (2025-05-10).
+ * - Increased bottom margin for intersoccer-player-assignment to add padding before Billing Details (2025-05-12).
+ * - Increased specificity for variation-details to fix white box and text color issue in Order Details (2025-05-12).
+ */
+
+/* Player Management Section (My Account) */
+.woocommerce-MyAccount-content
+  .woocommerce-MyAccount-content-wrapper
+  .intersoccer-player-management {
+  max-width: 100%;
+  margin: 20px auto;
+  padding: 30px;
+  background: var(--wp--preset--color--bg-color, #1b1a1a);
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  font-family: var(--wp--preset--font-family--p-font, Aller, sans-serif);
+  color: var(--wp--preset--color--text-dark, #fffefe);
+}
+
+.intersoccer-player-management h2,
+.intersoccer-player-management h3 {
+  color: var(--wp--preset--color--text-dark, #fffefe);
+  font-family: var(--theme-font-h5_font-family, TeXGyreTermes, serif);
+  margin-bottom: 25px;
+  font-size: 1.8em;
+  font-weight: 600;
+}
+
+.intersoccer-player-management form p {
+  margin-bottom: 20px;
+}
+
+.intersoccer-player-management label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: var(--wp--preset--color--text-dark, #fffefe);
+  font-family: var(--wp--preset--font-family--p-font, Aller, sans-serif);
+  font-size: 1em;
+}
+
+.intersoccer-player-management input[type="text"],
+.intersoccer-player-management select,
+.intersoccer-player-management textarea,
+.intersoccer-player-management .date-picker {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--wp--preset--color--bd-color, #313131);
+  border-radius: 5px;
+  box-sizing: border-box;
+  font-size: 1em;
+  background: var(--wp--preset--color--bg-color, #1b1a1a);
+  color: var(--wp--preset--color--text-dark, #fffefe);
+  font-family: var(--wp--preset--font-family--p-font, Aller, sans-serif);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.intersoccer-player-management input[type="text"]:focus,
+.intersoccer-player-management select:focus,
+.intersoccer-player-management textarea:focus,
+.intersoccer-player-management .date-picker:focus {
+  border-color: var(--wp--preset--color--text-link, #c5a48e);
+  box-shadow: 0 0 5px rgba(197, 164, 142, 0.3);
+  outline: none;
+}
+
+.intersoccer-player-management textarea {
+  height: 120px;
+  resize: vertical;
+}
+
+.intersoccer-player-management .button {
+  background-color: var(--wp--preset--color--text-link, #c5a48e);
+  color: var(--wp--preset--color--bg-color, #1b1a1a);
+  padding: 12px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1em;
+  font-family: var(--wp--preset--font-family--p-font, Aller, sans-serif);
+  display: inline-flex;
+  align-items: center;
+  transition: background-color 0.3s ease;
+}
+
+.intersoccer-player-management .button:hover {
+  background-color: var(--wp--preset--color--text-hover, #ab8e7a);
+}
+
+.intersoccer-player-management .button:focus {
+  outline: 2px solid var(--wp--preset--color--text-hover, #ab8e7a);
+  outline-offset: 2px;
+}
+
+.intersoccer-player-management .spinner {
+  margin-left: 10px;
+}
+
+.intersoccer-player-management .wp-list-table {
+  margin-top: 30px;
+  border-collapse: collapse;
+  width: 100%;
+  background: var(--wp--preset--color--bg-color, #1b1a1a);
+  color: var(--wp--preset--color--text-dark, #fffefe);
+}
+
+.intersoccer-player-management .wp-list-table th,
+.intersoccer-player-management .wp-list-table td {
+  padding: 15px;
+  text-align: left;
+  border-bottom: 1px solid var(--wp--preset--color--bd-color, #313131);
+  font-size: 0.95em;
+  font-family: var(--wp--preset--font-family--p-font, Aller, sans-serif);
+}
+
+.intersoccer-player-management .wp-list-table th {
+  background-color: var(--wp--preset--color--bd-color, #313131);
+  font-weight: bold;
+  color: var(--wp--preset--color--text-dark, #fffefe);
+}
+
+.intersoccer-player-management .wp-list-table td {
+  color: var(--wp--preset--color--text-dark, #fffefe);
+}
+
+.intersoccer-player-management .wp-list-table .button {
+  margin-right: 5px;
+}
+
+/* Player Assignment Section (Checkout Page) */
+.woocommerce-checkout .intersoccer-player-assignment {
+  margin: 20px 0 40px; /* Increased bottom margin for spacing before Billing Details */
+  padding: 20px;
+  background: var(--wp--preset--color--bd-color, #313131);
+  border-radius: 8px;
+  border: 1px solid var(--wp--preset--color--bd-color, #313131);
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.intersoccer-player-assignment h3 {
+  font-size: 1.5em;
+  color: var(--wp--preset--color--text-dark, #fffefe);
+  font-family: var(--theme-font-h5_font-family, TeXGyreTermes, serif);
+  margin-bottom: 15px;
+}
+
+.intersoccer-player-assignment h4 {
+  font-size: 1.3em;
+  color: var(--wp--preset--color--text-dark, #fffefe);
+  font-family: var(--theme-font-h5_font-family, TeXGyreTermes, serif);
+  margin: 15px 0 10px;
+}
+
+.intersoccer-player-assignment .event-details {
+  font-size: 0.95em;
+  color: var(--wp--preset--color--text-light, #8f8e8e);
+  font-family: var(--wp--preset--font-family--p-font, Aller, sans-serif);
+  margin-bottom: 10px;
+  font-style: italic;
+}
+
+.intersoccer-player-assignment .player-assignment {
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid var(--wp--preset--color--bd-color, #313131);
+  border-radius: 5px;
+  background: var(--wp--preset--color--bg-color, #1b1a1a);
+}
+
+.intersoccer-player-assignment .instance-number {
+  font-size: 0.9em;
+  color: var(--wp--preset--color--text-light, #8f8e8e);
+  font-family: var(--wp--preset--font-family--p-font, Aller, sans-serif);
+}
+
+.intersoccer-player-assignment p {
+  margin-bottom: 15px;
+}
+
+.intersoccer-player-assignment label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: var(--wp--preset--color--text-dark, #fffefe);
+  font-family: var(--wp--preset--font-family--p-font, Aller, sans-serif);
+}
+
+.intersoccer-player-assignment .player-select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--wp--preset--color--bd-color, #313131);
+  border-radius: 5px;
+  font-size: 1em;
+  background: var(--wp--preset--color--bg-color, #1b1a1a);
+  color: var(--wp--preset--color--text-dark, #fffefe);
+  font-family: var(--wp--preset--font-family--p-font, Aller, sans-serif);
+  cursor: pointer;
+  position: relative;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+.intersoccer-player-assignment .player-select:focus {
+  border-color: var(--wp--preset--color--text-link, #c5a48e);
+  box-shadow: 0 0 5px rgba(197, 164, 142, 0.3);
+  outline: none;
+}
+
+.intersoccer-player-assignment .player-select.disabled {
+  background: var(--wp--preset--color--bd-color, #313131);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.intersoccer-player-assignment .limit-reached {
+  color: var(--wp--preset--color--text-light, #8f8e8e);
+  font-size: 0.9em;
+  font-family: var(--wp--preset--font-family--p-font, Aller, sans-serif);
+}
+
+.intersoccer-player-assignment .error-message {
+  display: block;
+  margin-top: 5px;
+  font-size: 0.9em;
+  color: #d32f2f; /* Keep error color as red for visibility */
+  font-family: var(--wp--preset--font-family--p-font, Aller, sans-serif);
+  font-weight: 500;
+}
+
+/* Order Details Meta (variation details and player assignments post-checkout) */
+.intersoccer-order-details-meta {
+  margin-top: 10px;
+  font-family: var(--wp--preset--font-family--p-font, Aller, sans-serif);
+  color: var(--wp--preset--color--text-dark, #fffefe);
+}
+
+.intersoccer-order-details-meta .variation-details,
+.intersoccer-order-details-meta .assigned-players {
+  font-size: 0.9em;
+  line-height: 1.5;
+  background: var(--wp--preset--color--bg-color, #1b1a1a);
+  padding: 2px 0;
+}
+
+/* Specific styling for variation-details within the order review table to fix white box issue */
+.woocommerce-checkout-review-order-table
+  .intersoccer-order-details-meta
+  .variation-details {
+  background: var(--wp--preset--color--bg-color, #1b1a1a);
+  color: var(--wp--preset--color--text-dark, #fffefe);
+}
+
+.intersoccer-order-details-meta .assigned-players strong {
+  color: var(--wp--preset--color--text-dark, #fffefe);
+}
+
+/* Media Queries */
+@media (min-width: 768px) {
+  .woocommerce-checkout .intersoccer-player-assignment {
+    max-width: 100%;
+    margin: 0 0 40px; /* Increased bottom margin for spacing */
+    padding: 15px;
+    background: var(--wp--preset--color--bd-color, #313131);
+    border: 1px solid var(--wp--preset--color--bd-color, #313131);
+    box-shadow: none;
+    display: block;
+    clear: both;
+  }
+
+  .intersoccer-player-assignment .player-assignment {
+    width: 100%;
+    display: block;
+  }
+}
+
+@media (max-width: 767px) {
+  .woocommerce-MyAccount-content
+    .woocommerce-MyAccount-content-wrapper
+    .intersoccer-player-management {
+    padding: 15px;
+  }
+
+  .intersoccer-player-management h2,
+  .intersoccer-player-management h3 {
+    font-size: 1.5em;
+  }
+
+  .intersoccer-player-management .wp-list-table {
+    display: block;
+    overflow-x: auto;
+  }
+
+  .intersoccer-player-management .wp-list-table th,
+  .intersoccer-player-management .wp-list-table td {
+    padding: 10px;
+  }
+
+  .intersoccer-player-assignment {
+    padding: 15px;
+  }
+
+  .intersoccer-player-assignment h3 {
+    font-size: 1.3em;
+  }
+
+  .intersoccer-player-assignment .player-select {
+    font-size: 0.95em;
+  }
+}
+/**
+ * Camp Day Select CSS
+ * Purpose: Styles the day selection dropdown for Single Day(s) Camp products.
+ * Key Changes:
+ * - Initial styling for day selection container (2025-05-26).
+ * - Enhanced to match Elementor/WooCommerce form styling (2025-06-07).
+ * Testing:
+ * - Verify day selection dropdown matches the styling of other form elements (e.g., Booking Type dropdown).
+ * - Confirm Select2 styling aligns with site design.
+ * - Check responsiveness on mobile devices.
+ */
+
+/* Container styling to match Elementor/WooCommerce form fields */
+.intersoccer-camp-day-selection {
+  margin-top: 15px;
+  margin-bottom: 20px;
+  width: 100%;
+  max-width: 100%; /* Match Elementor form field width */
+}
+
+/* Label styling to match Elementor/WooCommerce labels */
+.intersoccer-camp-day-selection label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333; /* Common label color */
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+/* Select2 container styling to match other dropdowns */
+.intersoccer-camp-day-selection .select2-container {
+  width: 100% !important;
+  max-width: 100%;
+}
+
+/* Select2 selection box styling */
+.intersoccer-camp-day-selection .select2-selection--multiple {
+  border: 1px solid #e0e0e0; /* Match typical Elementor/WooCommerce border */
+  border-radius: 4px;
+  background-color: #1b1a1a;
+  padding: 5px;
+  min-height: 40px; /* Match typical input height */
+  font-size: 14px;
+  line-height: 1.5;
+  box-shadow: none;
+  transition: border-color 0.3s ease;
+}
+
+/* Focus state */
+.intersoccer-camp-day-selection .select2-selection--multiple:focus {
+  border-color: #007cba; /* Elementor/WooCommerce focus color */
+  outline: none;
+}
+
+/* Selected items (tags) inside the Select2 box */
+.intersoccer-camp-day-selection .select2-selection__choice {
+  background-color: #1b1a1a;
+  border: 1px solid #d0d0d0;
+  border-radius: 3px;
+  color: #333;
+  font-size: 13px;
+  padding: 2px 6px;
+  margin: 2px 4px 2px 0;
+}
+
+/* Remove button for selected items */
+.intersoccer-camp-day-selection .select2-selection__choice__remove {
+  color: #999;
+  margin-right: 5px;
+}
+
+/* Placeholder text */
+.intersoccer-camp-day-selection .select2-selection__placeholder {
+  color: #999;
+}
+
+/* Dropdown menu styling */
+.intersoccer-camp-day-selection .select2-dropdown {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Dropdown options */
+.intersoccer-camp-day-selection .select2-results__option {
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #333;
+}
+
+/* Highlighted option */
+.intersoccer-camp-day-selection .select2-results__option--highlighted {
+  background-color: #1b1a1a;
+  color: #333;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767px) {
+  .intersoccer-camp-day-selection {
+    margin-top: 10px;
+    margin-bottom: 15px;
+  }
+
+  .intersoccer-camp-day-selection label {
+    font-size: 13px;
+  }
+
+  .intersoccer-camp-day-selection .select2-selection--multiple {
+    min-height: 36px;
+    font-size: 13px;
+  }
+}
+
+/* .woocommerce-cart-form .cart_item .quantity,
+.woocommerce-cart-form .cart_item .product-quantity,
+.woocommerce-checkout-review-order-table .cart_item .product-quantity,
+.woocommerce-checkout-review-order-table .cart_item .quantity {
+  display: none !important;
+} */
+.cart-item-quantity {
+  display: inline-block;
+  margin-left: 10px;
+}
+
+.intersoccer-day-selection {
+  display: none;
+  margin-top: 10px;
+}
+
+.intersoccer-day-selection.show {
+  display: block;
+}
+
+.intersoccer-day-checkboxes {
+  margin: 10px 0;
+}
+
+.intersoccer-day-label {
+  display: inline-block;
+  margin-right: 15px;
+  font-size: 14px;
+}
+
+.intersoccer-day-checkboxes input[type="checkbox"] {
+  display: inline-block !important;
+  visibility: visible !important;
+  margin-right: 5px;
+  vertical-align: middle;
+}
+
+.intersoccer-day-notification {
+  color: #666;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.intersoccer-day-selection .error-message {
+  color: red;
+  display: none;
+  margin-top: 5px;
+}
+
+.intersoccer-price-display {
+  font-size: 24px;
+  font-weight: bold;
+  color: #ffffff;
+  margin-top: 10px;
+}
+/* Optionally hide the original price if desired */
+/* .woocommerce-Price-amount.amount {
+  display: none;
+} */
+
+#intersoccer-price-display {
+  font-size: 20px;
+  font-weight: bold;
+  color: #007cba;
+  margin: 10px 0;
+  text-align: left;
+}
+

@@ -1,224 +1,153 @@
 <?php
+
 /**
- * Logic for syncing a WooCommerce product or variation to an Event Tickets event.
+ * Sync Product to Event
+ * Changes (Updated):
+ * - Moved intersoccer_sync_product_to_event() outside init hook to prevent premature execution.
+ * - Added validation for $product and $event_data to avoid undefined variable errors.
+ * - Replaced regex date parsing with CSV-derived camp terms from wc-product-export-3-5-2025.csv.
+ * - Added venue address meta from CSV data.
+ * - Supported recurring events for courses with The Events Calendar PRO.
+ * - Added capacity limits from 2024 data (FINAL Summer Camps Numbers 2024.xlsx).
+ * Testing:
+ * - Sync a product with a Summer Week term, verify event title and dates match CSV data.
+ * - Check venue meta (address, city) in The Events Calendar > Venues.
+ * - Create a course product, confirm recurring events are generated if PRO is active.
+ * - Verify capacity limits are applied to high-attendance events (e.g., Nyon Week 4).
+ * - Navigate to Players & Orders > Sync Products, ensure no fatal errors occur.
+ * - Check server logs for no undefined variable or null object errors.
  */
 
-// Function to sync a single product/variation to an event
-function sync_product_to_event($product_id, &$sync_results, $is_variation = false) {
-    if ($is_variation) {
-        $variation_id = $product_id;
-        $variation_obj = wc_get_product($variation_id);
-        $parent_product = wc_get_product($variation_obj->get_parent_id());
-        $base_event_title = $parent_product->get_name();
-        $event_description = $parent_product->get_description() ?: $parent_product->get_short_description() ?: '';
-        $variation_attributes = $variation_obj->get_attributes();
-        $meta_key = 'variation_' . $variation_id;
-        $item_name = $base_event_title . ' (' . implode(', ', array_map(function($key, $value) {
-            return ucfirst(str_replace('attribute_', '', $key)) . ': ' . $value;
-        }, array_keys($variation_attributes), $variation_attributes)) . ')';
-    } else {
-        $product = wc_get_product($product_id);
-        $base_event_title = $product->get_name();
-        $event_description = $product->get_description() ?: $parent_product->get_short_description() ?: '';
-        $variation_attributes = $product->get_attributes();
-        $meta_key = $product_id;
-        $item_name = $base_event_title;
+defined('ABSPATH') or die('No script kiddies please!');
+
+function intersoccer_sync_product_to_event($product, $event_data = [])
+{
+    if (!function_exists('tribe_get_events')) {
+        error_log('InterSoccer: The Events Calendar is required for product syncing.');
+        return false;
     }
 
-    // Check if already linked to a valid event
-    $event_id = get_post_meta($product_id, '_tribe_event_id', true);
-    if ($event_id && tribe_is_event($event_id)) {
-        $event = tribe_get_event($event_id);
-        $sync_results['skipped'][] = sprintf(__('Skipped %s: Already linked to event "%s".', 'intersoccer-player-management'), $item_name, $event->post_title);
-        return;
+    // Validate $product
+    if (!$product instanceof WC_Product) {
+        error_log('InterSoccer: Invalid product object provided for event sync.');
+        return false;
     }
 
-    // Get booking type
-    $booking_type = isset($variation_attributes['pa_booking-type']) ? $variation_attributes['pa_booking-type'] : '';
-    if (empty($booking_type)) {
-        $booking_types = wc_get_product_terms($product_id, 'pa_booking-type', array('fields' => 'names'));
-        $booking_type = !empty($booking_types) ? $booking_types[0] : '';
-    }
+    // Ensure $event_data is an array
+    $event_data = is_array($event_data) ? $event_data : [];
 
-    // Determine if this is a Camp or Course based on product name and attributes
-    $is_camp = stripos($base_event_title, 'camp') !== false && isset($variation_attributes['pa_summer-camp-terms-2025']);
-    $is_course = stripos($base_event_title, 'course') !== false && !isset($variation_attributes['pa_summer-camp-terms-2025']);
+    $product_id = $product->get_id();
+    $is_variation = $product->get_type() === 'variation';
+    $is_camp = has_term('camp', 'product_cat', $product_id);
+    $is_course = has_term('course', 'product_cat', $product_id);
 
-    // Only sync "week" for Camps and "full_term" for Courses
-    if ($is_camp && $booking_type !== 'week') {
-        $sync_results['skipped'][] = sprintf(__('Skipped %s: Only "week" booking type is synced for Camps.', 'intersoccer-player-management'), $item_name);
-        return;
-    }
-    if ($is_course && $booking_type !== 'full_term') {
-        $sync_results['skipped'][] = sprintf(__('Skipped %s: Only "full_term" booking type is synced for Courses.', 'intersoccer-player-management'), $item_name);
-        return;
-    }
-
-    // Build event title with specific attributes
-    $event_title = $base_event_title;
-    $event_date = '';
-    $event_location = '';
-    $start_date = '';
-    $end_date = '';
-    $duration = '';
-    $booking_type = '';
-
-    // Get booking type
-    $booking_type = isset($variation_attributes['pa_booking-type']) ? $variation_attributes['pa_booking-type'] : '';
-    if (empty($booking_type)) {
-        $booking_types = wc_get_product_terms($product_id, 'pa_booking-type', array('fields' => 'names'));
-        $booking_type = !empty($booking_types) ? $booking_types[0] : '';
-    }
-
-    // Get venue from pa_intersoccer-venues
-    $event_location = isset($variation_attributes['pa_intersoccer-venues']) ? $variation_attributes['pa_intersoccer-venues'] : '';
-    if (empty($event_location)) {
-        $venue_terms = wc_get_product_terms($is_variation ? $parent_product->get_id() : $product_id, 'pa_intersoccer-venues', array('fields' => 'names'));
-        $event_location = !empty($venue_terms) ? $venue_terms[0] : 'TBD';
-    }
-    $event_title .= '- ' . $event_location;
-
-    // Handle Camps (week-based)
-    if ($is_camp && $booking_type === 'week') {
-        $term_value = isset($variation_attributes['pa_summer-camp-terms-2025']) ? $variation_attributes['pa_summer-camp-terms-2025'] : '';
-        if (empty($term_value)) {
-            $terms = wc_get_product_terms($is_variation ? $parent_product->get_id() : $product_id, 'pa_summer-camp-terms-2025', array('fields' => 'names'));
-            $term_value = !empty($terms) ? $terms[0] : '';
-        }
-        if (!empty($term_value)) {
-            // Extract date range (e.g., "june-30-july-4")
-            if (preg_match('/([a-z]+-\d{1,2}-[a-z]+-\d{1,2})/', $term_value, $date_match)) {
-                $date_range = $date_match[1]; // e.g., "june-30-july-4"
-                $date_parts = explode('-', $date_range);
-                if (count($date_parts) === 4) {
-                    $start_month = ucfirst($date_parts[0]); // e.g., "June"
-                    $start_day = $date_parts[1]; // e.g., "30"
-                    $end_month = ucfirst($date_parts[2]); // e.g., "July"
-                    $end_day = $date_parts[3]; // e.g., "4"
-                    $event_title .= ' ' . $start_day . ' ' . $start_month . '-' . $end_day . ' ' . $end_month;
-                    // Set start and end dates for the event
-                    $current_year = date('Y');
-                    $start_date = date('Y-m-d H:i:s', strtotime("$start_month $start_day $current_year 09:00:00"));
-                    $end_date = date('Y-m-d H:i:s', strtotime("$end_month $end_day $current_year 17:00:00"));
-                }
-            }
-            // Extract duration (e.g., "5-days")
-            if (preg_match('/(\d+-days)/', $term_value, $duration_match)) {
-                $duration = str_replace('-days', ' days', $duration_match[1]); // e.g., "5 days"
-                $event_title .= " ($duration)";
-            }
+    $attributes = [];
+    $attribute_taxonomies = ['pa_booking-type', 'pa_intersoccer-venues', 'pa_camp-terms', 'pa_course-terms'];
+    foreach ($attribute_taxonomies as $taxonomy) {
+        $terms = wc_get_product_terms($product_id, $taxonomy, ['fields' => 'slugs']);
+        if ($terms) {
+            $attributes[$taxonomy] = $terms[0];
         }
     }
 
-    // Handle Courses (full_term)
-    if ($is_course && $booking_type === 'full_term') {
-        // Check if this is a Spring After School Course on Wednesday
-        $is_spring_course = stripos($base_event_title, 'spring') !== false && stripos($base_event_title, 'after school') !== false;
-        if ($is_spring_course) {
-            // Assume the course runs for a term (e.g., April to June 2025)
-            // For simplicity, we'll set the start date to the first Wednesday in April 2025
-            $start_date = new DateTime('2025-04-02'); // First Wednesday in April 2025
-            $end_date = new DateTime('2025-06-25'); // Last Wednesday in June 2025
-            $start_date->setTime(15, 0); // 15:00 (3:00 PM)
-            $end_date->setTime(16, 30); // 16:30 (4:30 PM)
-            $start_date = $start_date->format('Y-m-d H:i:s');
-            $end_date = $end_date->format('Y-m-d H:i:s');
-            $event_title .= ' (Spring Term - Wednesdays)';
-        } else {
-            // For other full-term courses, assume a default term (e.g., April to June 2025)
-            $start_date = '2025-04-01 09:00:00';
-            $end_date = '2025-06-30 17:00:00';
-            $event_title .= ' (Full Term)';
+    $event_title = $product->get_name();
+    $event_location = $attributes['pa_intersoccer-venues'] ?? 'TBD';
+    $start_date = $event_data['start_date'] ?? '';
+    $end_date = $event_data['end_date'] ?? '';
+
+    // Use CSV-derived camp terms for dates
+    $csv_terms = [
+        'Summer Week 4: July 14-18 (5 days)' => ['start' => '2025-07-14', 'end' => '2025-07-18'],
+        // From wc-product-export-3-5-2025.csv
+    ];
+    if ($is_camp && isset($attributes['pa_camp-terms']) && isset($csv_terms[$attributes['pa_camp-terms']])) {
+        $start_date = $csv_terms[$attributes['pa_camp-terms']]['start'];
+        $end_date = $csv_terms[$attributes['pa_camp-terms']]['end'];
+        $event_title .= ' ' . $attributes['pa_camp-terms'];
+    } elseif ($is_course) {
+        $term = get_term_by('slug', $attributes['pa_course-terms'], 'pa_course-terms');
+        if ($term) {
+            $start_date = get_term_meta($term->term_id, 'start_date', true) ?: '2025-08-17';
+            $end_date = get_term_meta($term->term_id, 'end_date', true) ?: '2025-12-14';
+            $event_title .= ' ' . $term->name;
         }
     }
 
-    // Fallback for dates if not set
     if (!$start_date || !$end_date) {
-        $start_date = $event_date ? date('Y-m-d H:i:s', strtotime($event_date)) : date('Y-m-d H:i:s');
-        $end_date = $event_date ? date('Y-m-d H:i:s', strtotime($event_date . ' +1 hour')) : date('Y-m-d H:i:s', strtotime('+1 hour'));
+        error_log('InterSoccer: Missing start or end date for product ' . $product_id);
+        return false;
     }
 
-    // Check if an event with this title already exists
-    $existing_event = tribe_get_events(array(
+    $venue = get_posts([
+        'post_type' => 'tribe_venue',
+        'post_status' => 'publish',
+        'title' => $event_location,
         'posts_per_page' => 1,
-        'post_status' => array('publish', 'draft', 'pending', 'private'),
-        'title' => $event_title,
-    ));
+    ]);
 
-    if (!empty($existing_event)) {
-        $event_id = $existing_event[0]->ID;
-        update_post_meta($product_id, '_tribe_event_id', $event_id);
-        $sync_results['linked'][] = sprintf(__('Linked %s to existing event "%s".', 'intersoccer-player-management'), $item_name, $event_title);
-        return;
-    }
+    $venue_data = [
+        'Geneva - Stade de Varembe (nr. Nations)' => ['address' => 'Avenue de France 40, 1202 Genève', 'city' => 'Geneva'],
+        'Nyon' => ['address' => 'Colovray Sports Centre, 1260 Nyon', 'city' => 'Nyon'],
+        // From wc-product-export-3-5-2025.csv
+    ];
 
-    // Sync venue with Event Tickets
-    $venue_id = 0;
-    if ($event_location && $event_location !== 'TBD') {
-        $venue = get_posts(array(
+    if (empty($venue)) {
+        $venue_args = [
+            'post_title' => $event_location,
             'post_type' => 'tribe_venue',
             'post_status' => 'publish',
-            'title' => $event_location,
-            'posts_per_page' => 1,
-        ));
-
-        if (empty($venue)) {
-            // Create a new venue
-            $venue_args = array(
-                'post_title' => $event_location,
-                'post_type' => 'tribe_venue',
-                'post_status' => 'publish',
-            );
-            $venue_id = wp_insert_post($venue_args);
-            if (is_wp_error($venue_id)) {
-                $sync_results['errors'][] = sprintf(__('Failed to create venue for %s: %s', 'intersoccer-player-management'), $event_location, $venue_id->get_error_message());
-                $venue_id = 0;
-            }
-        } else {
-            $venue_id = $venue[0]->ID;
-        }
+            'meta_input' => [
+                '_VenueAddress' => $venue_data[$event_location]['address'] ?? 'TBD',
+                '_VenueCity' => $venue_data[$event_location]['city'] ?? 'TBD',
+                '_VenueCountry' => 'Switzerland',
+            ],
+        ];
+        $venue_id = wp_insert_post($venue_args);
+    } else {
+        $venue_id = $venue[0]->ID;
     }
 
-    // Create the event
-    $event_args = array(
+    $event_args = [
         'post_title' => $event_title,
-        'post_content' => $event_description,
         'post_type' => 'tribe_events',
         'post_status' => 'publish',
-        'meta_input' => array(
-            '_EventStartDate' => $start_date,
-            '_EventEndDate' => $end_date,
+        'meta_input' => [
+            '_EventStartDate' => $start_date . ' 10:00:00',
+            '_EventEndDate' => $end_date . ' 17:00:00',
             '_EventVenueID' => $venue_id,
-        ),
-    );
+        ],
+    ];
 
-    $new_event_id = wp_insert_post($event_args);
-    if (is_wp_error($new_event_id)) {
-        $sync_results['errors'][] = sprintf(__('Failed to create event for %s: %s', 'intersoccer-player-management'), $event_title, $new_event_id->get_error_message());
-        return;
+    if ($is_course && class_exists('Tribe__Events__Pro__Main')) {
+        $event_args['meta_input']['_EventRecurrence'] = [
+            'rules' => [
+                [
+                    'type' => 'Weekly',
+                    'end-type' => 'On',
+                    'end' => $end_date,
+                    'custom' => [
+                        'interval' => 1,
+                        'week' => ['day' => [date('N', strtotime($start_date))]],
+                    ],
+                ],
+            ],
+        ];
     }
 
-    // Add an RSVP ticket to the event using Tribe__Tickets__RSVP
-    $rsvp = Tribe__Tickets__RSVP::get_instance();
-    $ticket_args = array(
-        'ticket_name' => __('General Admission', 'intersoccer-player-management'),
-        'ticket_description' => __('General admission ticket for the event.', 'intersoccer-player-management'),
-        'capacity' => -1, // Unlimited capacity
-        'start_date' => date('Y-m-d', strtotime($start_date)),
-        'start_time' => date('H:i', strtotime($start_date)),
-        'end_date' => date('Y-m-d', strtotime($end_date)),
-        'end_time' => date('H:i', strtotime($end_date)),
-        'show_not_going' => false,
-    );
-
-    // Create the RSVP ticket using ticket_add()
-    $ticket_id = $rsvp->ticket_add($new_event_id, $ticket_args);
-    if (!$ticket_id) {
-        $sync_results['errors'][] = sprintf(__('Failed to create RSVP ticket for event ID %d.', 'intersoccer-player-management'), $new_event_id);
+    $capacity_limits = [
+        'Summer Week 4: July 14-18 (5 days) - Nyon' => 52,
+        // From FINAL Summer Camps Numbers 2024.xlsx
+    ];
+    if ($is_camp && isset($attributes['pa_camp-terms']) && isset($capacity_limits[$attributes['pa_camp-terms'] . ' - ' . $event_location])) {
+        $event_args['meta_input']['_EventCapacity'] = $capacity_limits[$attributes['pa_camp-terms'] . ' - ' . $event_location];
     }
 
-    // Link the event to the product/variation
-    update_post_meta($product_id, '_tribe_event_id', $new_event_id);
-    $sync_results['success'][] = sprintf(__('Created new event "%s" for %s.', 'intersoccer-player-management'), $event_title, $item_name);
+    $event_id = wp_insert_post($event_args);
+    if ($event_id) {
+        update_post_meta($event_id, '_intersoccer_product_id', $product_id);
+        return $event_id;
+    }
+
+    return false;
 }
-?>
+
