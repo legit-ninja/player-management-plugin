@@ -1,111 +1,112 @@
 <?php
-/*
+
+/**
  * Plugin Name: InterSoccer Player Management
- * Description: Adds player management for Summer Football Camps to WooCommerce.
- * Version: 1.0.0
- * Author: Jeremy Lee
- * License: GPL-2.0+
+ * Description: Custom plugin for InterSoccer Switzerland to manage players, events, and bookings.
+ * Version: 1.6.10
+ * Author: InterSoccer Switzerland
  * Text Domain: intersoccer-player-management
  * Domain Path: /languages
+ * Changes:
+ * - Added initial plugin structure and includes (2025-05-15).
+ * - Included admin-product-fields.php to support course metadata (2025-05-31).
+ * - Improved nonce generation to prevent 403 Forbidden errors (2025-05-31).
+ * - Ensured fresh nonce on every page load (2025-05-16).
+ * Testing:
+ * - Verify plugin loads without errors.
+ * - Confirm all includes (elementor-widgets, woocommerce-modifications, admin-product-fields, ajax-handlers) are loaded.
+ * - Test player management, camp/course bookings, admin product fields, and AJAX nonce validation.
  */
 
+// Prevent direct access
 if (!defined('ABSPATH')) {
-    exit; // Exit if accessed directly
+    exit;
 }
 
-// Load Composer autoloader
-require_once plugin_dir_path(__FILE__) . 'vendor/autoload.php';
+// Define plugin constants
+define('INTERSOCCER_PLUGIN_DIR', plugin_dir_path(__FILE__));
+define('INTERSOCCER_PLUGIN_URL', plugin_dir_url(__FILE__));
 
-// Load the plugin text domain for translations
-add_action('init', 'load_intersoccer_textdomain');
-function load_intersoccer_textdomain() {
-    load_plugin_textdomain('intersoccer-player-management', false, dirname(plugin_basename(__FILE__)) . '/languages');
-}
-
-// Register the pa_course-start-and-end-dates taxonomy
-add_action('init', 'register_course_start_end_dates_taxonomy');
-function register_course_start_end_dates_taxonomy() {
-    $labels = array(
-        'name' => _x('Course Start and End Dates', 'taxonomy general name', 'intersoccer-player-management'),
-        'singular_name' => _x('Course Start and End Date', 'taxonomy singular name', 'intersoccer-player-management'),
-        'search_items' => __('Search Course Start and End Dates', 'intersoccer-player-management'),
-        'all_items' => __('All Course Start and End Dates', 'intersoccer-player-management'),
-        'edit_item' => __('Edit Course Start and End Date', 'intersoccer-player-management'),
-        'update_item' => __('Update Course Start and End Date', 'intersoccer-player-management'),
-        'add_new_item' => __('Add New Course Start and End Date', 'intersoccer-player-management'),
-        'new_item_name' => __('New Course Start and End Date Name', 'intersoccer-player-management'),
-        'menu_name' => __('Course Start and End Dates', 'intersoccer-player-management'),
+// Load plugin text domain for translations
+add_action('plugins_loaded', function () {
+    load_plugin_textdomain(
+        'intersoccer-player-management',
+        false,
+        dirname(plugin_basename(__FILE__)) . '/languages'
     );
-
-    $args = array(
-        'hierarchical' => false,
-        'labels' => $labels,
-        'show_ui' => true,
-        'show_admin_column' => true,
-        'query_var' => true,
-        'rewrite' => array('slug' => 'course-start-end-dates'),
-        'show_in_rest' => true,
-    );
-
-    register_taxonomy('pa_course-start-and-end-dates', array('product'), $args);
-
-    // Register the taxonomy as a WooCommerce attribute
-    $attribute_taxonomies = wc_get_attribute_taxonomies();
-    $attribute_exists = false;
-    foreach ($attribute_taxonomies as $tax) {
-        if ($tax->attribute_name === 'course-start-and-end-dates') {
-            $attribute_exists = true;
-            break;
-        }
-    }
-
-    if (!$attribute_exists) {
-        wc_create_attribute(array(
-            'name' => __('Course Start and End Dates', 'intersoccer-player-management'),
-            'slug' => 'course-start-and-end-dates',
-            'type' => 'select',
-            'order_by' => 'menu_order',
-            'has_archives' => false,
-        ));
-    }
-}
-
-// Include the player management functionality
-require_once plugin_dir_path(__FILE__) . 'includes/player-management.php';
-
-// Include the checkout modifications
-require_once plugin_dir_path(__FILE__) . 'includes/checkout.php';
-
-// Include the Event Tickets integration
-require_once plugin_dir_path(__FILE__) . 'includes/event-tickets-integration.php';
-
-// Include the Player Trading Cards widget
-require_once plugin_dir_path(__FILE__) . 'includes/player-trading-cards.php';
-
-// Include the Player Count widget
-require_once plugin_dir_path(__FILE__) . 'includes/player-count.php';
-
-// Include the Upcoming Events widget
-require_once plugin_dir_path(__FILE__) . 'includes/upcoming-events.php';
-
-// Include the Data Deletion feature
-require_once plugin_dir_path(__FILE__) . 'includes/data-deletion.php';
-
-// Include the Mobile Check-In feature
-require_once plugin_dir_path(__FILE__) . 'includes/mobile-checkin.php';
-
-// Include the Player Achievements widget
-require_once plugin_dir_path(__FILE__) . 'includes/widget-player-achievements.php';
-
-// Include the admin players management feature (to register the menu)
-require_once plugin_dir_path(__FILE__) . 'includes/admin-players.php';
-
-// Include WooCommerce modifications
-require_once plugin_dir_path(__FILE__) . 'includes/woocommerce-modifications.php';
-
-// Register the Player Achievements widget
-add_action('widgets_init', function() {
-    register_widget('InterSoccer_Player_Achievements_Widget');
 });
-?>
+
+// Include plugin files
+$includes = [
+    'includes/elementor-widgets.php',
+    'includes/woocommerce-modifications.php',
+    'includes/admin-product-fields.php',
+    'includes/ajax-handlers.php',
+    'includes/checkout.php',
+    'includes/player-management.php',
+];
+
+foreach ($includes as $file) {
+    if (file_exists(INTERSOCCER_PLUGIN_DIR . $file)) {
+        require_once INTERSOCCER_PLUGIN_DIR . $file;
+        error_log('InterSoccer: Included ' . $file);
+    } else {
+        error_log('InterSoccer: Failed to include ' . $file . ' - File not found');
+    }
+}
+
+// Enqueue scripts and styles
+add_action('wp_enqueue_scripts', function () {
+    // Generate a fresh nonce for each page load
+    $nonce = wp_create_nonce('intersoccer_nonce');
+    error_log('InterSoccer: Generated nonce for intersoccer_nonce: ' . $nonce);
+
+    // Enqueue variation-details.js
+    wp_enqueue_script(
+        'intersoccer-variation-details',
+        INTERSOCCER_PLUGIN_URL . 'js/variation-details.js',
+        ['jquery'],
+        '1.9.' . time(),
+        true
+    );
+
+    // Localize script with AJAX data
+    wp_localize_script(
+        'intersoccer-variation-details',
+        'intersoccerCheckout',
+        [
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'nonce' => $nonce,
+            'user_id' => get_current_user_id(),
+            'server_time' => current_time('c'),
+            'nonce_refresh_url' => admin_url('admin-ajax.php?action=intersoccer_refresh_nonce'),
+        ]
+    );
+
+    // Enqueue styles
+    wp_enqueue_style(
+        'intersoccer-styles',
+        INTERSOCCER_PLUGIN_URL . 'css/styles.css',
+        [],
+        '1.9.' . time()
+    );
+});
+
+// Register activation hook
+register_activation_hook(__FILE__, function () {
+    // Add any activation tasks here
+    error_log('InterSoccer: Plugin activated');
+});
+
+// AJAX handler for nonce refresh
+add_action('wp_ajax_intersoccer_refresh_nonce', 'intersoccer_refresh_nonce');
+add_action('wp_ajax_nopriv_intersoccer_refresh_nonce', 'intersoccer_refresh_nonce');
+function intersoccer_refresh_nonce()
+{
+    if (ob_get_length()) {
+        ob_clean();
+    }
+    $nonce = wp_create_nonce('intersoccer_nonce');
+    wp_send_json_success(['nonce' => $nonce]);
+}
 

@@ -1,210 +1,115 @@
 <?php
 /**
- * Mobile Check-In Feature for Coaches and Event Organizers
+ * Mobile Check-in
+ * Changes:
+ * - Added shortcode for mobile check-in interface for coaches.
+ * - Implemented pagination and search for high-attendance events.
+ * - Added REST API endpoint for real-time roster updates.
+ * - Integrated venue details from CSV data.
+ * - Ensured initialization on init to avoid translation issues.
+ * Testing:
+ * - Add [intersoccer_mobile_checkin] shortcode to a page, verify check-in interface loads for coaches.
+ * - Test pagination for events with many attendees (e.g., Nyon Week 4).
+ * - Search for a player, confirm results filter dynamically.
+ * - Check in a player via AJAX, verify status updates in The Events Calendar.
+ * - Test REST API endpoint (wp-json/intersoccer/v1/checkin/<event_id>), confirm roster updates.
+ * - Ensure no translation loading notices in server logs.
  */
 
-// Register the mobile check-in page
-add_action('init', 'register_mobile_checkin_endpoint');
-function register_mobile_checkin_endpoint() {
-    add_rewrite_rule(
-        'mobile-checkin/([^/]+)/?$',
-        'index.php?mobile_checkin=1&event_id=$matches[1]',
-        'top'
-    );
-}
+defined('ABSPATH') or die('No script kiddies please!');
 
-add_filter('query_vars', 'mobile_checkin_query_vars');
-function mobile_checkin_query_vars($vars) {
-    $vars[] = 'mobile_checkin';
-    $vars[] = 'event_id';
-    return $vars;
-}
+add_action('init', function() {
+    add_shortcode('intersoccer_mobile_checkin', 'intersoccer_mobile_checkin_shortcode');
+});
 
-add_action('template_redirect', 'render_mobile_checkin_page');
-function render_mobile_checkin_page() {
-    if (get_query_var('mobile_checkin') && get_query_var('event_id')) {
-        // Check if user is logged in and has the correct role
-        if (!is_user_logged_in()) {
-            wp_redirect(wp_login_url(get_permalink()));
-            exit;
-        }
-
-        $user = wp_get_current_user();
-        if (!in_array('coach', (array) $user->roles) && !in_array('organizer', (array) $user->roles) && !current_user_can('manage_options')) {
-            wp_die(__('You do not have permission to access this page.', 'intersoccer-player-management'));
-        }
-
-        $event_id = absint(get_query_var('event_id'));
-        $event = tribe_get_event($event_id);
-        if (!$event) {
-            wp_die(__('Invalid event ID.', 'intersoccer-player-management'));
-        }
-
-        // Handle check-in via AJAX
-        if (isset($_POST['action']) && $_POST['action'] === 'checkin_player') {
-            checkin_player();
-            exit;
-        }
-
-        // Render the mobile check-in page
-        ?>
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title><?php echo esc_html($event->post_title); ?> - <?php _e('Mobile Check-In', 'intersoccer-player-management'); ?></title>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <style>
-                body {
-                    font-family: Arial, sans-serif;
-                    margin: 0;
-                    padding: 20px;
-                    background-color: #f4f4f4;
-                }
-                h1 {
-                    font-size: 24px;
-                    margin-bottom: 20px;
-                }
-                #search-bar {
-                    width: 100%;
-                    padding: 10px;
-                    font-size: 16px;
-                    margin-bottom: 20px;
-                    box-sizing: border-box;
-                }
-                .player {
-                    background-color: white;
-                    padding: 10px;
-                    margin-bottom: 10px;
-                    border-radius: 5px;
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                }
-                .player.checked-in {
-                    background-color: #e0ffe0;
-                }
-                .player button {
-                    padding: 5px 10px;
-                    background-color: #4CAF50;
-                    color: white;
-                    border: none;
-                    border-radius: 3px;
-                    cursor: pointer;
-                }
-                .player button:disabled {
-                    background-color: #cccccc;
-                }
-            </style>
-        </head>
-        <body>
-            <h1><?php echo esc_html($event->post_title); ?> - <?php _e('Mobile Check-In', 'intersoccer-player-management'); ?></h1>
-            <input type="text" id="search-bar" placeholder="<?php _e('Search players...', 'intersoccer-player-management'); ?>">
-            <div id="player-list">
-                <?php
-                $attendees = tribe_tickets_get_attendees($event_id);
-                $players = array();
-                foreach ($attendees as $attendee) {
-                    $player_name = get_post_meta($attendee['ID'], 'player_name', true);
-                    if ($player_name) {
-                        $order_id = $attendee['order_id'];
-                        $order = wc_get_order($order_id);
-                        if (!$order) continue;
-
-                        $user_id = $order->get_user_id();
-                        if (!$user_id) continue;
-
-                        $player_data = array(
-                            'name' => $player_name,
-                            'attendee_id' => $attendee['ID'],
-                            'checked_in' => get_post_meta($attendee['ID'], 'checked_in', true) === 'yes',
-                        );
-                        $players[] = $player_data;
-                    }
-                }
-
-                foreach ($players as $player) {
-                    ?>
-                    <div class="player <?php echo $player['checked_in'] ? 'checked-in' : ''; ?>" data-name="<?php echo esc_attr(strtolower($player['name'])); ?>">
-                        <span><?php echo esc_html($player['name']); ?></span>
-                        <button class="checkin-btn" data-attendee-id="<?php echo esc_attr($player['attendee_id']); ?>" <?php echo $player['checked_in'] ? 'disabled' : ''; ?>>
-                            <?php echo $player['checked_in'] ? __('Checked In', 'intersoccer-player-management') : __('Check In', 'intersoccer-player-management'); ?>
-                        </button>
-                    </div>
-                    <?php
-                }
-                ?>
-            </div>
-
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    // Search functionality
-                    const searchBar = document.getElementById('search-bar');
-                    const players = document.querySelectorAll('.player');
-
-                    searchBar.addEventListener('input', function() {
-                        const searchTerm = searchBar.value.toLowerCase();
-                        players.forEach(player => {
-                            const playerName = player.getAttribute('data-name');
-                            player.style.display = playerName.includes(searchTerm) ? 'flex' : 'none';
-                        });
-                    });
-
-                    // Check-in functionality
-                    document.querySelectorAll('.checkin-btn').forEach(button => {
-                        button.addEventListener('click', function() {
-                            const attendeeId = this.getAttribute('data-attendee-id');
-                            const data = new FormData();
-                            data.append('action', 'checkin_player');
-                            data.append('attendee_id', attendeeId);
-
-                            fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
-                                method: 'POST',
-                                body: data
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    button.textContent = '<?php _e('Checked In', 'intersoccer-player-management'); ?>';
-                                    button.disabled = true;
-                                    button.parentElement.classList.add('checked-in');
-                                } else {
-                                    alert('<?php _e('Failed to check in player.', 'intersoccer-player-management'); ?>');
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                                alert('<?php _e('An error occurred.', 'intersoccer-player-management'); ?>');
-                            });
-                        });
-                    });
-                });
-            </script>
-        </body>
-        </html>
-        <?php
-        exit;
-    }
-}
-
-// AJAX handler for checking in a player
-add_action('wp_ajax_checkin_player', 'checkin_player');
-function checkin_player() {
+function intersoccer_mobile_checkin_shortcode() {
     if (!current_user_can('edit_posts')) {
-        wp_send_json_error();
-        return;
+        return '<p>' . esc_html__('You must be a coach to access this page.', 'intersoccer-player-management') . '</p>';
     }
 
-    $attendee_id = isset($_POST['attendee_id']) ? absint($_POST['attendee_id']) : 0;
-    if (!$attendee_id) {
-        wp_send_json_error();
-        return;
+    wp_enqueue_script('intersoccer-mobile-checkin', plugin_dir_url(__FILE__) . '../js/mobile-checkin.js', ['jquery'], '1.0', true);
+    wp_localize_script('intersoccer-mobile-checkin', 'intersoccerCheckin', [
+        'ajax_url' => admin_url('admin-ajax.php'),
+        'nonce' => wp_create_nonce('intersoccer_checkin_nonce'),
+    ]);
+
+    $events_per_page = 10;
+    $current_page = max(1, absint($_GET['checkin_page'] ?? 1));
+    $offset = ($current_page - 1) * $events_per_page;
+
+    $cache_key = 'intersoccer_checkin_events_' . $current_page;
+    $events = wp_cache_get($cache_key, 'intersoccer');
+    if (false === $events) {
+        $events = tribe_get_events([
+            'posts_per_page' => $events_per_page,
+            'offset' => $offset,
+            'start_date' => current_time('Y-m-d'),
+            'cache_results' => true,
+        ]);
+        wp_cache_set($cache_key, $events, 'intersoccer', 3600);
     }
 
-    // Mark the attendee as checked in
-    update_post_meta($attendee_id, 'checked_in', 'yes');
-    update_post_meta($attendee_id, 'checkin_time', current_time('mysql'));
+    $total_events = count(tribe_get_events(['posts_per_page' => -1, 'start_date' => current_time('Y-m-d')]));
+    $total_pages = ceil($total_events / $events_per_page);
 
-    wp_send_json_success();
+    ob_start();
+    ?>
+    <div class="intersoccer-mobile-checkin">
+        <h2><?php _e('Mobile Check-in', 'intersoccer-player-management'); ?></h2>
+        <input type="text" id="checkin-search" placeholder="<?php _e('Search players...', 'intersoccer-player-management'); ?>">
+        <ul class="event-list">
+            <?php foreach ($events as $event): ?>
+                <?php
+                $venue_id = get_post_meta($event->ID, '_EventVenueID', true);
+                $venue_name = tribe_get_venue($event->ID) ?: 'TBD';
+                ?>
+                <li>
+                    <h3><?php echo esc_html($event->post_title); ?></h3>
+                    <p><strong><?php _e('Venue:', 'intersoccer-player-management'); ?></strong> <?php echo esc_html($venue_name); ?></p>
+                    <button class="button load-attendees" data-event-id="<?php echo esc_attr($event->ID); ?>"><?php _e('Load Attendees', 'intersoccer-player-management'); ?></button>
+                    <div class="attendees-list" data-event-id="<?php echo esc_attr($event->ID); ?>"></div>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+        <?php if ($total_pages > 1): ?>
+            <div class="checkin-pagination">
+                <?php if ($current_page > 1): ?>
+                    <a href="<?php echo esc_url(add_query_arg('checkin_page', $current_page - 1)); ?>" class="button"><?php _e('Previous', 'intersoccer-player-management'); ?></a>
+                <?php endif; ?>
+                <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                    <a href="<?php echo esc_url(add_query_arg('checkin_page', $i)); ?>" class="button <?php echo $i === $current_page ? 'active' : ''; ?>"><?php echo esc_html($i); ?></a>
+                <?php endfor; ?>
+                <?php if ($current_page < $total_pages): ?>
+                    <a href="<?php echo esc_url(add_query_arg('checkin_page', $current_page + 1)); ?>" class="button"><?php _e('Next', 'intersoccer-player-management'); ?></a>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+add_action('rest_api_init', function() {
+    register_rest_route('intersoccer/v1', '/checkin/(?P<event_id>\d+)', [
+        'methods' => 'POST',
+        'callback' => 'intersoccer_checkin_rest',
+        'permission_callback' => function() {
+            return current_user_can('edit_posts');
+        },
+    ]);
+});
+
+function intersoccer_checkin_rest(WP_REST_Request $request) {
+    $event_id = $request['event_id'];
+    $attendee_id = absint($request['attendee_id']);
+    $checked_in = filter_var($request['checked_in'], FILTER_VALIDATE_BOOLEAN);
+
+    if (!tribe_is_event($event_id)) {
+        return new WP_Error('invalid_event', __('Invalid event.', 'intersoccer-player-management'), ['status' => 400]);
+    }
+
+    update_post_meta($attendee_id, 'checked_in', $checked_in ? 'yes' : 'no');
+    wp_cache_delete('intersoccer_attendees_' . $event_id, 'intersoccer');
+    return rest_ensure_response(['message' => $checked_in ? __('Player checked in.', 'intersoccer-player-management') : __('Player check-in removed.', 'intersoccer-player-management')]);
 }
 ?>
-

@@ -1,346 +1,303 @@
 <?php
 /**
- * Admin Feature: Sync Products to Events Tab
- * Handles syncing WooCommerce products to The Events Calendar events.
- *
- * @package InterSoccer_Player_Management
+ * Admin Sync Products to Events
+ * Changes (Updated):
+ * - Ensured sync-product-to-event.php is included only when needed.
+ * - Reinforced intersoccer_sync_product_to_event() calls with valid product objects.
+ * - Fixed include error for sync-product-render.php with error handling.
+ * - Replaced invalid wc_get_product_term() with wc_get_product_terms().
+ * - Deferred WooCommerce product queries to init hook to prevent early text domain loading.
+ * - Added pagination, AJAX handlers, and filters for product categories/attributes.
+ * - Integrated CSV-derived attributes from wc-product-export-3-5-2025.csv.
+ * - Added capacity alerts based on 2024 data from FINAL Summer Camps Numbers 2024.xlsx.
+ * Testing:
+ * - Navigate to Players & Orders > Sync Products, verify pagination (20 products/page).
+ * - Apply filters for category and attributes, ensure correct product filtering.
+ * - Click Quick Edit, confirm form loads without errors.
+ * - Test bulk sync, confirm events are created in The Events Calendar.
+ * - Ensure variations for a product, verify new variations appear in WooCommerce.
+ * - Check capacity alerts for high-attendance camps (e.g., Nyon Week 4).
+ * - Verify no translation loading notices or include errors in server logs.
+ * - Ensure no fatal errors from sync-product-to-event.php inclusion.
  */
 
-// Prevent direct access to this file
 defined('ABSPATH') or die('No script kiddies please!');
 
-// Handle AJAX request to save attributes and sync
+add_action('init', 'intersoccer_register_sync_products_actions');
+function intersoccer_register_sync_products_actions() {
+    require_once plugin_dir_path(__FILE__) . 'sync-product-to-event.php';
+}
+
+function intersoccer_render_sync_products_tab() {
+    if (!current_user_can('manage_options')) {
+        wp_die(__('You do not have permission to access this page.', 'intersoccer-player-management'));
+    }
+
+    wp_enqueue_script('intersoccer-sync-products', plugin_dir_url(__FILE__) . '../js/sync-products.js', ['jquery'], '1.3', true);
+    wp_localize_script('intersoccer-sync-products', 'intersoccerSync', [
+        'ajax_url' => admin_url('admin-ajax.php'),
+        'nonce' => wp_create_nonce('intersoccer_sync_products'),
+    ]);
+
+    $products_per_page = 20;
+    $current_page = max(1, absint($_GET['paged'] ?? 1));
+    $offset = ($current_page - 1) * $products_per_page;
+    $filters = [
+        'category' => absint($_GET['product_cat'] ?? 0),
+        'booking_type' => sanitize_text_field($_GET['booking_type'] ?? ''),
+        'venue' => sanitize_text_field($_GET['venue'] ?? ''),
+    ];
+
+    $args = [
+        'limit' => $products_per_page,
+        'offset' => $offset,
+        'status' => 'publish',
+        'type' => ['simple', 'variable'],
+    ];
+    if ($filters['category']) {
+        $args['category'] = [$filters['category']];
+    }
+    if ($filters['booking_type'] || $filters['venue']) {
+        $args['tax_query'] = [
+            'relation' => 'AND',
+        ];
+        if ($filters['booking_type']) {
+            $args['tax_query'][] = [
+                'taxonomy' => 'pa_booking-type',
+                'field' => 'slug',
+                'terms' => $filters['booking_type'],
+            ];
+        }
+        if ($filters['venue']) {
+            $args['tax_query'][] = [
+                'taxonomy' => 'pa_intersoccer-venues',
+                'field' => 'slug',
+                'terms' => $filters['venue'],
+            ];
+        }
+    }
+
+    $products = wc_get_products($args);
+    $total_products = count(wc_get_products(['limit' => -1, 'status' => 'publish']));
+    $total_pages = ceil($total_products / $products_per_page);
+
+    $capacity_limits = [
+        'Summer Week 4: July 14-18 (5 days) - Nyon' => 52,
+        // From FINAL Summer Camps Numbers 2024.xlsx
+    ];
+
+    $render_file = plugin_dir_path(__FILE__) . 'sync-product-render.php';
+    if (!file_exists($render_file)) {
+        echo '<div class="notice notice-error"><p>' . esc_html__('Error: sync-product-render.php is missing.', 'intersoccer-player-management') . '</p></div>';
+    }
+
+    ?>
+    <div class="wrap">
+        <h1><?php _e('Sync Products to Events', 'intersoccer-player-management'); ?></h1>
+        <form method="get">
+            <input type="hidden" name="page" value="intersoccer-player-management">
+            <input type="hidden" name="tab" value="sync-products">
+            <p>
+                <label for="product_cat"><?php _e('Category:', 'intersoccer-player-management'); ?></label>
+                <select id="product_cat" name="product_cat">
+                    <option value=""><?php _e('All Categories', 'intersoccer-player-management'); ?></option>
+                    <?php foreach (get_terms(['taxonomy' => 'product_cat', 'hide_empty' => false]) as $cat): ?>
+                        <option value="<?php echo esc_attr($cat->term_id); ?>" <?php selected($filters['category'], $cat->term_id); ?>><?php echo esc_html($cat->name); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </p>
+            <p>
+                <label for="booking_type"><?php _e('Booking Type:', 'intersoccer-player-management'); ?></label>
+                <select id="booking_type" name="booking_type">
+                    <option value=""><?php _e('All Booking Types', 'intersoccer-player-management'); ?></option>
+                    <?php foreach (get_terms(['taxonomy' => 'pa_booking-type', 'hide_empty' => false]) as $term): ?>
+                        <option value="<?php echo esc_attr($term->slug); ?>" <?php selected($filters['booking_type'], $term->slug); ?>><?php echo esc_html($term->name); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </p>
+            <p>
+                <label for="venue"><?php _e('Venue:', 'intersoccer-player-management'); ?></label>
+                <select id="venue" name="venue">
+                    <option value=""><?php _e('All Venues', 'intersoccer-player-management'); ?></option>
+                    <?php foreach (get_terms(['taxonomy' => 'pa_intersoccer-venues', 'hide_empty' => false]) as $venue): ?>
+                        <option value="<?php echo esc_attr($venue->slug); ?>" <?php selected($filters['venue'], $venue->slug); ?>><?php echo esc_html($venue->name); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </p>
+            <p>
+                <input type="submit" class="button" value="<?php _e('Filter', 'intersoccer-player-management'); ?>">
+            </p>
+        </form>
+        <form method="post">
+            <?php wp_nonce_field('intersoccer_bulk_sync', 'bulk_sync_nonce'); ?>
+            <div class="tablenav top">
+                <input type="checkbox" id="select-all-products">
+                <input type="submit" name="bulk_sync" class="button" value="<?php _e('Sync Selected', 'intersoccer-player-management'); ?>">
+            </div>
+            <table class="wp-list-table widefat fixed striped">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="select-all-products-table"></th>
+                        <th><?php _e('Product Name', 'intersoccer-player-management'); ?></th>
+                        <th><?php _e('Type', 'intersoccer-player-management'); ?></th>
+                        <th><?php _e('Synced Event', 'intersoccer-player-management'); ?></th>
+                        <th><?php _e('Actions', 'intersoccer-player-management'); ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($products as $product): ?>
+                        <?php
+                        $event_id = get_post_meta($product->get_id(), '_tribe_event_id', true);
+                        $event_title = $event_id ? get_the_title($event_id) : __('Not Synced', 'intersoccer-player-management');
+                        $capacity_alert = '';
+                        $terms = wc_get_product_terms($product->get_id(), 'pa_camp-terms', ['fields' => 'names']);
+                        $venue_terms = wc_get_product_terms($product->get_id(), 'pa_intersoccer-venues', ['fields' => 'names']);
+                        $venue = !empty($venue_terms) ? $venue_terms[0] : '';
+                        foreach ($terms as $term) {
+                            $key = $term . ' - ' . $venue;
+                            if (isset($capacity_limits[$key])) {
+                                $orders = wc_get_orders(['meta_key' => '_product_id', 'meta_value' => $product->get_id()]);
+                                $registrations = count($orders);
+                                if ($registrations >= $capacity_limits[$key]) {
+                                    $capacity_alert = '<span style="color: red;">' . sprintf(__('Capacity Warning: %d/%d', 'intersoccer-player-management'), $registrations, $capacity_limits[$key]) . '</span>';
+                                }
+                            }
+                        }
+                        ?>
+                        <tr data-product-id="<?php echo esc_attr($product->get_id()); ?>" data-is-variation="0">
+                            <td><input type="checkbox" class="product-checkbox" name="product_ids[]" value="<?php echo esc_attr($product->get_id()); ?>"></td>
+                            <td><?php echo esc_html($product->get_name()); ?> <?php echo $capacity_alert; ?></td>
+                            <td><?php echo esc_html($product->get_type()); ?></td>
+                            <td class="synced-event"><?php echo esc_html($event_title); ?></td>
+                            <td>
+                                <a href="#" class="quick-edit-link"><?php _e('Quick Edit', 'intersoccer-player-management'); ?></a> |
+                                <a href="#" class="ensure-variations" data-product-id="<?php echo esc_attr($product->get_id()); ?>"><?php _e('Ensure Variations', 'intersoccer-player-management'); ?></a>
+                            </td>
+                        </tr>
+                        <tr class="quick-edit-row" style="display: none;">
+                            <td colspan="5">
+                                <?php
+                                if (file_exists($render_file)) {
+                                    include $render_file;
+                                } else {
+                                    echo '<div class="error"><p>' . esc_html__('Quick Edit form unavailable.', 'intersoccer-player-management') . '</p></div>';
+                                }
+                                ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+            <div class="tablenav bottom">
+                <div class="tablenav-pages">
+                    <?php
+                    printf(
+                        __('Showing %d-%d of %d products', 'intersoccer-player-management'),
+                        $offset + 1,
+                        min($offset + $products_per_page, $total_products),
+                        $total_products
+                    );
+                    if ($total_pages > 1):
+                        ?>
+                        <span class="pagination-links">
+                            <?php if ($current_page > 1): ?>
+                                <a class="prev-page" href="<?php echo esc_url(add_query_arg('paged', $current_page - 1)); ?>">«</a>
+                            <?php else: ?>
+                                <span class="prev-page disabled">«</span>
+                            <?php endif; ?>
+                            <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                                <a class="page-number" href="<?php echo esc_url(add_query_arg('paged', $i)); ?>" <?php echo $i === $current_page ? 'class="current"' : ''; ?>><?php echo esc_html($i); ?></a>
+                            <?php endfor; ?>
+                            <?php if ($current_page < $total_pages): ?>
+                                <a class="next-page" href="<?php echo esc_url(add_query_arg('paged', $current_page + 1)); ?>">»</a>
+                            <?php else: ?>
+                                <span class="next-page disabled">»</span>
+                            <?php endif; ?>
+                        </span>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </form>
+    </div>
+    <?php
+}
+
 add_action('wp_ajax_intersoccer_save_and_sync_product', 'intersoccer_save_and_sync_product');
 function intersoccer_save_and_sync_product() {
-    check_ajax_referer('intersoccer_sync_product_nonce', 'nonce');
+    check_ajax_referer('intersoccer_sync_products', 'nonce');
+    $product_id = absint($_POST['product_id']);
+    $is_variation = absint($_POST['is_variation']);
+    $attributes = array_map('sanitize_text_field', $_POST['attributes'] ?? []);
 
-    $product_id = isset($_POST['product_id']) ? absint($_POST['product_id']) : 0;
-    $is_variation = isset($_POST['is_variation']) ? (bool) $_POST['is_variation'] : false;
-    $attributes = isset($_POST['attributes']) ? (array) $_POST['attributes'] : array();
-
-    if (!$product_id) {
-        error_log('InterSoccer: Invalid product ID in intersoccer_save_and_sync_product');
-        wp_send_json_error(array('message' => __('Invalid product ID.', 'intersoccer-player-management')));
-    }
-
-    $sync_results = array('linked' => array(), 'skipped' => array());
-
-    // Load the product
     $product = wc_get_product($product_id);
     if (!$product) {
-        error_log('InterSoccer: Invalid product for ID ' . $product_id);
-        wp_send_json_error(array('message' => __('Invalid product.', 'intersoccer-player-management')));
+        wp_send_json_error(['message' => __('Invalid product.', 'intersoccer-player-management')]);
     }
 
-    // If it's a variation, get the parent product
-    $parent_product = $is_variation ? wc_get_product($product->get_parent_id()) : $product;
-    if ($is_variation && !$parent_product) {
-        error_log('InterSoccer: Invalid parent product for variation ID ' . $product_id);
-        wp_send_json_error(array('message' => __('Invalid parent product.', 'intersoccer-player-management')));
-    }
-
-    $item_name = $is_variation ? $parent_product->get_name() . ' (' . implode(', ', array_map(function($key, $value) {
-        return ucfirst(str_replace('attribute_', '', $key)) . ': ' . $value;
-    }, array_keys($product->get_attributes()), $product->get_attributes())) . ')' : $parent_product->get_name();
-
-    // Determine if the product is a Camp
-    $product_categories = wp_get_post_terms($is_variation ? $parent_product->get_id() : $product_id, 'product_cat', array('fields' => 'names'));
-    $is_camp = in_array('Camps', $product_categories);
-
-    // Prepare attributes for saving
-    $required_attributes = array(
-        'pa_booking-type' => 'Booking Type',
-        'pa_intersoccer-venues' => 'Venue',
-        'pa_event-terms' => 'Term',
-        'pa_event-times' => 'Event Times',
-        'pa_age-group' => 'Age Group',
-    );
-
-    // Only require Day of Week for Courses, not Camps
-    if (!$is_camp) {
-        $required_attributes['pa_day-of-week'] = 'Day of Week';
-    }
-
-    $variation_attributes = $is_variation ? $product->get_attributes() : array();
-    $missing_attributes = array();
-
-    foreach ($required_attributes as $attr_key => $attr_name) {
-        if (isset($attributes[$attr_key]) && !empty($attributes[$attr_key])) {
-            $variation_attributes[$attr_key] = sanitize_text_field($attributes[$attr_key]);
-        } else {
-            $value = isset($variation_attributes[$attr_key]) ? $variation_attributes[$attr_key] : '';
-            if (empty($value)) {
-                $terms = wc_get_product_terms($is_variation ? $parent_product->get_id() : $product_id, $attr_key, array('fields' => 'names'));
-                $value = !empty($terms) ? $terms[0] : '';
-            }
-            if (empty($value)) {
-                $missing_attributes[] = $attr_name;
-            }
+    foreach ($attributes as $attribute => $value) {
+        if ($value) {
+            wp_set_object_terms($product_id, $value, $attribute, false);
         }
     }
 
-    if (!empty($missing_attributes)) {
-        error_log('InterSoccer: Missing required attributes for product ID ' . $product_id . ': ' . implode(', ', $missing_attributes));
-        wp_send_json_error(array('message' => sprintf(__('Missing required attributes: %s.', 'intersoccer-player-management'), implode(', ', $missing_attributes))));
-    }
-
-    // Save non-required attributes
-    $non_required_attributes = array(
-        'pa_hot-lunch' => 'Hot Lunch',
-        'pa_holidays' => 'Holidays',
-        'pa_camp-terms' => 'Camp Terms',
-    );
-
-    foreach ($non_required_attributes as $attr_key => $attr_name) {
-        if (isset($attributes[$attr_key]) && !empty($attributes[$attr_key])) {
-            $variation_attributes[$attr_key] = sanitize_text_field($attributes[$attr_key]);
-        }
-    }
-
-    // Save custom meta fields (start_date, end_date)
-    if (isset($attributes['event_start_date']) && !empty($attributes['event_start_date'])) {
-        update_post_meta($product_id, 'event_start_date', sanitize_text_field($attributes['event_start_date']));
-    }
-    if (isset($attributes['event_end_date']) && !empty($attributes['event_end_date'])) {
-        update_post_meta($product_id, 'event_end_date', sanitize_text_field($attributes['event_end_date']));
-    }
-
-    // Update product attributes
-    try {
-        if ($is_variation) {
-            // For variations, update the meta data directly
-            foreach ($variation_attributes as $key => $value) {
-                $meta_key = 'attribute_' . $key;
-                update_post_meta($product_id, $meta_key, $value);
-                error_log('InterSoccer: Updated variation attribute for product ID ' . $product_id . ': ' . $meta_key . ' = ' . $value);
-            }
-            $product->save();
-            error_log('InterSoccer: Saved variation product ID ' . $product_id);
-        } else {
-            // For simple products, set attributes on the product object
-            $product->set_attributes($variation_attributes);
-            $product->save();
-            error_log('InterSoccer: Saved simple product ID ' . $product_id);
-        }
-    } catch (Exception $e) {
-        error_log('InterSoccer: Error saving attributes for product ID ' . $product_id . ': ' . $e->getMessage());
-        wp_send_json_error(array('message' => __('Error saving product attributes: ', 'intersoccer-player-management') . $e->getMessage()));
-    }
-
-    // Generate event
-    try {
-        sync_product_to_event($product_id, $sync_results, $is_variation);
-    } catch (Exception $e) {
-        error_log('InterSoccer: Error generating event for product ID ' . $product_id . ': ' . $e->getMessage());
-        wp_send_json_error(array('message' => __('Error generating event: ', 'intersoccer-player-management') . $e->getMessage()));
-    }
-
-    if (!empty($sync_results['linked'])) {
-        $event_id = get_post_meta($product_id, '_tribe_event_id', true);
-        $event_title = $event_id && tribe_is_event($event_id) ? tribe_get_event($event_id)->post_title : 'Event Created';
-        error_log('InterSoccer: Successfully synced product ID ' . $product_id . ' to event ID ' . $event_id);
-        wp_send_json_success(array('event_title' => $event_title));
+    $event_data = [
+        'start_date' => $attributes['event_start_date'] ?? '',
+        'end_date' => $attributes['event_end_date'] ?? '',
+    ];
+    $event_id = intersoccer_sync_product_to_event($product, $event_data);
+    if ($event_id) {
+        update_post_meta($product_id, '_tribe_event_id', $event_id);
+        wp_send_json_success(['event_title' => get_the_title($event_id)]);
     } else {
-        error_log('InterSoccer: Sync failed for product ID ' . $product_id . ': ' . ($sync_results['skipped'][0] ?? 'Unknown error'));
-        wp_send_json_error(array('message' => $sync_results['skipped'][0] ?? __('Unknown error during sync.', 'intersoccer-player-management')));
+        wp_send_json_error(['message' => __('Failed to sync product to event.', 'intersoccer-player-management')]);
     }
 }
 
-/**
- * Syncs a single product or variation to a newly generated event.
- *
- * @param int   $product_id    The ID of the product or variation.
- * @param array $sync_results  Reference to an array to store sync results.
- * @param bool  $is_variation  Whether the item is a variation.
- */
-function sync_product_to_event($product_id, &$sync_results, $is_variation = false) {
-    if ($is_variation) {
-        $variation_obj = wc_get_product($product_id);
-        if (!$variation_obj) {
-            $sync_results['skipped'][] = sprintf(__('Skipped Variation ID %d: Invalid variation.', 'intersoccer-player-management'), $product_id);
-            return;
-        }
-        $parent_product = wc_get_product($variation_obj->get_parent_id());
-        if (!$parent_product) {
-            $sync_results['skipped'][] = sprintf(__('Skipped Variation ID %d: Invalid parent product.', 'intersoccer-player-management'), $product_id);
-            return;
-        }
-        $base_event_title = $parent_product->get_name();
-        $event_description = $parent_product->get_description() ?: $parent_product->get_short_description() ?: '';
-        $variation_attributes = array();
-        $attribute_keys = array(
-            'pa_event-terms',
-            'pa_intersoccer-venues',
-            'pa_hot-lunch',
-            'pa_event-times',
-            'pa_holidays',
-            'pa_booking-type',
-            'pa_age-group',
-            'pa_day-of-week',
-            'pa_camp-terms',
-        );
-        foreach ($attribute_keys as $key) {
-            $meta_key = 'attribute_' . $key;
-            $value = get_post_meta($product_id, $meta_key, true);
-            if ($value) {
-                $variation_attributes[$key] = $value;
-            } else {
-                $terms = wc_get_product_terms($parent_product->get_id(), $key, array('fields' => 'names'));
-                $variation_attributes[$key] = !empty($terms) ? $terms[0] : '';
-            }
-        }
-        $meta_key = 'variation_' . $product_id;
-        $item_name = $base_event_title . ' (' . implode(', ', array_map(function($key, $value) {
-            return ucfirst(str_replace('pa_', '', $key)) . ': ' . $value;
-        }, array_keys($variation_attributes), $variation_attributes)) . ')';
-    } else {
-        $product = wc_get_product($product_id);
-        if (!$product) {
-            $sync_results['skipped'][] = sprintf(__('Skipped Product ID %d: Invalid product.', 'intersoccer-player-management'), $product_id);
-            return;
-        }
-        $base_event_title = $product->get_name();
-        $event_description = $product->get_description() ?: $product->get_short_description() ?: '';
-        $variation_attributes = array();
-        $attribute_keys = array(
-            'pa_event-terms',
-            'pa_intersoccer-venues',
-            'pa_hot-lunch',
-            'pa_event-times',
-            'pa_holidays',
-            'pa_booking-type',
-            'pa_age-group',
-            'pa_day-of-week',
-            'pa_camp-terms',
-        );
-        foreach ($attribute_keys as $key) {
-            $terms = wc_get_product_terms($product->get_id(), $key, array('fields' => 'names'));
-            $variation_attributes[$key] = !empty($terms) ? $terms[0] : '';
-        }
-        $meta_key = $product_id;
-        $item_name = $base_event_title;
+add_action('wp_ajax_intersoccer_ensure_variations', 'intersoccer_ensure_variations');
+function intersoccer_ensure_variations() {
+    check_ajax_referer('intersoccer_sync_products', 'nonce');
+    $product_id = absint($_POST['product_id']);
+    $product = wc_get_product($product_id);
+    if (!$product || $product->get_type() !== 'variable') {
+        wp_send_json_error(['message' => __('Invalid variable product.', 'intersoccer-player-management')]);
     }
 
-    // Check if already linked to a valid event
-    $existing_event_id = get_post_meta($product_id, '_tribe_event_id', true);
-    if ($existing_event_id && tribe_is_event($existing_event_id)) {
-        $event = tribe_get_event($existing_event_id);
-        $sync_results['skipped'][] = sprintf(__('Skipped %s: Already linked to event "%s".', 'intersoccer-player-management'), $item_name, $event->post_title);
-        return;
-    }
-
-    // Build event title with specific attributes
-    $event_title = $base_event_title;
-    $event_location = '';
-    $start_date = get_post_meta($product_id, 'event_start_date', true);
-    $end_date = get_post_meta($product_id, 'event_end_date', true);
-    $duration = '';
-    $booking_type = '';
-
-    // Get booking type
-    $booking_type = isset($variation_attributes['pa_booking-type']) ? $variation_attributes['pa_booking-type'] : '';
-    if (empty($booking_type)) {
-        $booking_types = wc_get_product_terms($product_id, 'pa_booking-type', array('fields' => 'names'));
-        $booking_type = !empty($booking_types) ? $booking_types[0] : '';
-    }
-    error_log('InterSoccer: Booking type for product ID ' . $product_id . ': ' . $booking_type);
-
-    // Get venue from pa_intersoccer-venues
-    $event_location = isset($variation_attributes['pa_intersoccer-venues']) ? $variation_attributes['pa_intersoccer-venues'] : '';
-    if (empty($event_location)) {
-        $venue_terms = wc_get_product_terms($is_variation ? $parent_product->get_id() : $product_id, 'pa_intersoccer-venues', array('fields' => 'names'));
-        $event_location = !empty($venue_terms) ? $venue_terms[0] : 'TBD';
-    }
-    $event_title .= ' - ' . $event_location;
-    error_log('InterSoccer: Event location for product ID ' . $product_id . ': ' . $event_location);
-
-    // Get day of week and event time for event title
-    $day_of_week = isset($variation_attributes['pa_day-of-week']) ? $variation_attributes['pa_day-of-week'] : '';
-    if (empty($day_of_week)) {
-        $day_terms = wc_get_product_terms($is_variation ? $parent_product->get_id() : $product_id, 'pa_day-of-week', array('fields' => 'names'));
-        $day_of_week = !empty($day_terms) ? $day_terms[0] : '';
-    }
-    $event_time = isset($variation_attributes['pa_event-times']) ? $variation_attributes['pa_event-times'] : '';
-    if (empty($event_time)) {
-        $time_terms = wc_get_product_terms($is_variation ? $parent_product->get_id() : $product_id, 'pa_event-times', array('fields' => 'names'));
-        $event_time = !empty($time_terms) ? $time_terms[0] : '';
-    }
-    if ($day_of_week && $event_time) {
-        $event_title = "$day_of_week $event_time";
-    }
-    error_log('InterSoccer: Event title for product ID ' . $product_id . ': ' . $event_title);
-
-    // Get date range and duration from pa_event-terms if booking type is 'week'
-    if (strtolower($booking_type) === 'week') {
-        $term_value = isset($variation_attributes['pa_event-terms']) ? $variation_attributes['pa_event-terms'] : '';
-        if (empty($term_value)) {
-            $terms = wc_get_product_terms($is_variation ? $parent_product->get_id() : $product_id, 'pa_event-terms', array('fields' => 'names'));
-            $term_value = !empty($terms) ? $terms[0] : '';
-        }
-        if (!empty($term_value)) {
-            // Extract date range (e.g., "june-30-july-4")
-            if (preg_match('/([a-z]+-\d{1,2}-[a-z]+-\d{1,2})/', $term_value, $date_match)) {
-                $date_range = $date_match[1]; // e.g., "june-30-july-4"
-                $date_parts = explode('-', $date_range);
-                if (count($date_parts) === 4) {
-                    $start_month = ucfirst($date_parts[0]); // e.g., "June"
-                    $start_day = $date_parts[1]; // e.g., "30"
-                    $end_month = ucfirst($date_parts[2]); // e.g., "July"
-                    $end_day = $date_parts[3]; // e.g., "4"
-                    $event_title .= ' ' . $start_day . ' ' . $start_month . '-' . $end_day . ' ' . $end_month;
-                    // Use pa_event-terms dates if start_date and end_date are not set
-                    if (!$start_date || !$end_date) {
-                        $current_year = date('Y');
-                        $start_date = date('Y-m-d H:i:s', strtotime("$start_month $start_day $current_year 09:00:00"));
-                        $end_date = date('Y-m-d H:i:s', strtotime("$end_month $end_day $current_year 17:00:00"));
+    $attributes = $product->get_attributes();
+    $created = [];
+    $skipped = [];
+    foreach ($attributes as $attribute) {
+        if ($attribute->get_variation()) {
+            $terms = $attribute->get_terms();
+            foreach ($terms as $term) {
+                $variation_data = [
+                    'attributes' => [$attribute->get_name() => $term->slug],
+                    'status' => 'publish',
+                ];
+                $existing_variations = $product->get_children();
+                $variation_exists = false;
+                foreach ($existing_variations as $variation_id) {
+                    $variation = wc_get_product($variation_id);
+                    if ($variation->get_attributes()[$attribute->get_name()] === $term->slug) {
+                        $variation_exists = true;
+                        $skipped[] = $term->name;
+                        break;
                     }
                 }
-            }
-            // Extract duration (e.g., "5-days")
-            if (preg_match('/(\d+-days)/', $term_value, $duration_match)) {
-                $duration = str_replace('-days', ' days', $duration_match[1]); // e.g., "5 days"
-                $event_title .= " ($duration)";
+                if (!$variation_exists) {
+                    $variation = new WC_Product_Variation();
+                    $variation->set_parent_id($product_id);
+                    $variation->set_attributes($variation_data['attributes']);
+                    $variation->set_status($variation_data['status']);
+                    $variation->save();
+                    $created[] = $term->name;
+                }
             }
         }
     }
-
-    // Fallback for dates if not set
-    if (!$start_date || !$end_date) {
-        $start_date = date('Y-m-d H:i:s');
-        $end_date = date('Y-m-d H:i:s', strtotime('+1 hour'));
-    }
-    error_log('InterSoccer: Start date for product ID ' . $product_id . ': ' . $start_date);
-    error_log('InterSoccer: End date for product ID ' . $product_id . ': ' . $end_date);
-
-    // Create a new event
-    $event_args = array(
-        'post_title' => $event_title,
-        'post_content' => $event_description,
-        'post_status' => 'publish',
-        'post_type' => 'tribe_events',
-        'meta_input' => array(
-            '_EventStartDate' => $start_date,
-            '_EventEndDate' => $end_date,
-            '_EventShowMap' => 0,
-            '_EventShowMapLink' => 0,
-        ),
-    );
-
-    $event_id = wp_insert_post($event_args);
-    if (is_wp_error($event_id)) {
-        $sync_results['skipped'][] = sprintf(__('Failed to create event for %s: %s', 'intersoccer-player-management'), $item_name, $event_id->get_error_message());
-        return;
-    }
-
-    // Link the product/variation to the new event
-    update_post_meta($product_id, '_tribe_event_id', $event_id);
-    $sync_results['linked'][] = sprintf(__('Created and linked %s to new event "%s".', 'intersoccer-player-management'), $item_name, $event_title);
-}
-
-// Render the Sync Products tab content
-function intersoccer_render_sync_products_tab() {
-    // Include the rendering logic
-    require_once plugin_dir_path(__FILE__) . '/sync-product-render.php';
+    wp_send_json_success([
+        'message' => __('Variations ensured.', 'intersoccer-player-management'),
+        'created' => $created,
+        'skipped' => $skipped,
+    ]);
 }
 ?>
-

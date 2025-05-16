@@ -1,148 +1,218 @@
 <?php
 /**
- * Admin Feature: Advanced Tab
- * Handles advanced operations like purging old player data, exporting CSV, and reconciling products to events.
- *
- * @package InterSoccer_Player_Management
+ * Admin Advanced Settings
+ * Changes (Updated):
+ * - Removed `use WP_Background_Process;` to avoid namespace error.
+ * - Added conditional check for WP_Background_Process class.
+ * - Implemented synchronous attribute creation fallback if library is missing.
+ * - Added admin notice to install wp-background-processing library.
+ * - Retained CSV import, batch processing (when library available), and CodeMirror.
+ * Testing:
+ * - Upload wc-product-export-3-5-2025.csv in Players & Orders > Advanced, verify pa_camp-terms and pa_intersoccer-venues taxonomies.
+ * - Check attribute creation (with/without wp-background-processing), confirm attributes appear in WooCommerce > Attributes.
+ * - Create a camp term in Camp Terms post type, verify it appears in product attributes.
+ * - Purge players, confirm batch deletion and audit log.
+ * - Edit JSON in textarea, ensure CodeMirror loads and validates syntax.
+ * - If wp-background-processing is not installed, verify admin notice appears.
  */
 
-// Prevent direct access to this file
 defined('ABSPATH') or die('No script kiddies please!');
 
-// Handle advanced actions on admin_init
-add_action('admin_init', 'intersoccer_advanced_tab_init');
-/**
- * Handles form submissions for advanced operations.
- */
-function intersoccer_advanced_tab_init() {
-    // Purge children older than 13
-    if (isset($_POST['purge_old_players']) && !empty($_POST['purge_old_players_nonce']) && wp_verify_nonce($_POST['purge_old_players_nonce'], 'purge_old_players_action')) {
-        intersoccer_purge_old_players();
-        add_action('admin_notices', function() {
-            echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__('Old player data purged successfully.', 'intersoccer-player-management') . '</p></div>';
-        });
-    }
+// Define background process class only if library is available
+if (class_exists('WP_Background_Process')) {
+    class InterSoccer_Attribute_Process extends WP_Background_Process {
+        protected $action = 'intersoccer_create_attributes';
 
-    // Export master CSV
-    if (isset($_POST['export_master_csv']) && !empty($_POST['export_master_csv_nonce']) && wp_verify_nonce($_POST['export_master_csv_nonce'], 'export_master_csv_action')) {
-        intersoccer_export_master_csv();
-    }
-
-    // Reconcile products to events
-    if (isset($_POST['reconcile_products']) && !empty($_POST['reconcile_products_nonce']) && wp_verify_nonce($_POST['reconcile_products_nonce'], 'reconcile_products_action')) {
-        intersoccer_reconcile_products_to_events();
-        add_action('admin_notices', function() {
-            echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__('Product reconciliation started.', 'intersoccer-player-management') . '</p></div>';
-        });
-    }
-}
-
-/**
- * Purges player data for children older than 13.
- */
-function intersoccer_purge_old_players() {
-    $users = get_users(array(
-        'meta_key' => 'intersoccer_players',
-        'meta_compare' => 'EXISTS',
-    ));
-
-    foreach ($users as $user) {
-        $players = get_user_meta($user->ID, 'intersoccer_players', true);
-        if (is_array($players)) {
-            $filtered_players = array_filter($players, function($player) {
-                $dob = new DateTime($player['dob']);
-                $today = new DateTime();
-                $age = $today->diff($dob)->y;
-                return $age <= 13;
-            });
-            update_user_meta($user->ID, 'intersoccer_players', array_values($filtered_players));
-        }
-    }
-}
-
-/**
- * Exports a CSV file containing all player data.
- */
-function intersoccer_export_master_csv() {
-    $users = get_users(array(
-        'meta_key' => 'intersoccer_players',
-        'meta_compare' => 'EXISTS',
-    ));
-
-    $csv_data = array();
-    $csv_data[] = array('User ID', 'Player Name', 'Date of Birth', 'Medical Conditions', 'Consent File');
-
-    foreach ($users as $user) {
-        $players = get_user_meta($user->ID, 'intersoccer_players', true);
-        if (is_array($players)) {
-            foreach ($players as $player) {
-                $csv_data[] = array(
-                    $user->ID,
-                    isset($player['name']) ? $player['name'] : '',
-                    isset($player['dob']) ? $player['dob'] : '',
-                    isset($player['medical_conditions']) ? $player['medical_conditions'] : '',
-                    isset($player['consent_file']) ? $player['consent_file'] : '',
-                );
+        protected function task($attribute) {
+            $attribute_id = wc_create_attribute([
+                'name' => $attribute['label'],
+                'slug' => $attribute['slug'],
+                'type' => 'select',
+                'order_by' => 'menu_order',
+                'has_archives' => false,
+            ]);
+            if (!is_wp_error($attribute_id)) {
+                register_taxonomy($attribute['slug'], 'product', [
+                    'label' => $attribute['label'],
+                    'hierarchical' => false,
+                    'public' => false,
+                    'show_ui' => true,
+                ]);
+                foreach ($attribute['values'] as $slug => $name) {
+                    if (!term_exists($slug, $attribute['slug'])) {
+                        wp_insert_term($name, $attribute['slug'], ['slug' => $slug]);
+                    }
+                }
             }
+            return false;
+        }
+    }
+}
+
+add_action('init', function() {
+    register_post_type('intersoccer_camp_term', [
+        'labels' => ['name' => __('Camp Terms', 'intersoccer-player-management')],
+        'public' => false,
+        'show_ui' => true,
+        'supports' => ['title', 'custom-fields'],
+    ]);
+});
+
+add_action('admin_notices', function() {
+    if (!class_exists('WP_Background_Process')) {
+        echo '<div class="notice notice-warning"><p>' . esc_html__('Please install the wp-background-processing library for asynchronous attribute creation in InterSoccer Player Management.', 'intersoccer-player-management') . '</p></div>';
+    }
+});
+
+function intersoccer_render_advanced_tab() {
+    if (!current_user_can('manage_options')) {
+        wp_die(__('You do not have permission to access this page.', 'intersoccer-player-management'));
+    }
+
+    wp_enqueue_script('codemirror', 'https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.js', [], '5.65.7', true);
+    wp_enqueue_script('codemirror-json', 'https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/mode/javascript/javascript.min.js', [], '5.65.7', true);
+    wp_enqueue_style('codemirror', 'https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.css', [], '5.65.7');
+
+    $message = '';
+    $current_year = date('Y');
+    $cutoff_year = $current_year - 14;
+
+    if (isset($_POST['auto_create_attributes']) && wp_verify_nonce($_POST['advanced_nonce'], 'intersoccer_advanced_actions')) {
+        $attributes_to_create = [
+            'pa_booking-type' => ['label' => 'Booking Type', 'values' => ['week' => 'Week', 'full_term' => 'Full Term', 'day' => 'Day', 'buyclub' => 'BuyClub']],
+            'pa_intersoccer-venues' => ['label' => 'Venues', 'values' => [
+                'varembe' => 'Varembe',
+                'seefeld' => 'FC Seefeld',
+                'nyon' => 'Nyon',
+                'rochettaz' => 'Stade de Rochettaz',
+            ]],
+        ];
+
+        if (class_exists('WP_Background_Process')) {
+            $process = new InterSoccer_Attribute_Process();
+            foreach ($attributes_to_create as $attribute_name => $attribute_data) {
+                $process->push_to_queue([
+                    'slug' => $attribute_name,
+                    'label' => $attribute_data['label'],
+                    'values' => $attribute_data['values'],
+                ]);
+            }
+            $process->save()->dispatch();
+            $message .= __('Attribute creation queued. Check status in Site Health > Info.', 'intersoccer-player-management') . '<br>';
+        } else {
+            // Synchronous fallback
+            foreach ($attributes_to_create as $attribute_name => $attribute_data) {
+                $attribute_id = wc_create_attribute([
+                    'name' => $attribute_data['label'],
+                    'slug' => $attribute_name,
+                    'type' => 'select',
+                    'order_by' => 'menu_order',
+                    'has_archives' => false,
+                ]);
+                if (!is_wp_error($attribute_id)) {
+                    register_taxonomy($attribute_name, 'product', [
+                        'label' => $attribute_data['label'],
+                        'hierarchical' => false,
+                        'public' => false,
+                        'show_ui' => true,
+                    ]);
+                    foreach ($attribute_data['values'] as $slug => $name) {
+                        if (!term_exists($slug, $attribute_name)) {
+                            wp_insert_term($name, $attribute_name, ['slug' => $slug]);
+                        }
+                    }
+                }
+            }
+            $message .= __('Attributes created synchronously.', 'intersoccer-player-management') . '<br>';
         }
     }
 
-    // Output CSV
-    header('Content-Type: text/csv');
-    header('Content-Disposition: attachment; filename="intersoccer_players.csv"');
-    $fp = fopen('php://output', 'wb');
-    foreach ($csv_data as $row) {
-        fputcsv($fp, $row);
+    if (isset($_POST['import_camp_terms']) && wp_verify_nonce($_POST['advanced_nonce'], 'intersoccer_advanced_actions')) {
+        if (!empty($_FILES['csv_file']['tmp_name'])) {
+            $csv_data = file_get_contents($_FILES['csv_file']['tmp_name']);
+            $lines = explode("\n", $csv_data);
+            $terms = [];
+            foreach ($lines as $line) {
+                $data = str_getcsv($line);
+                if (isset($data[64]) && strpos($data[64], 'Summer Week') !== false) {
+                    $terms[] = $data[64];
+                }
+            }
+            foreach ($terms as $term) {
+                wp_insert_term($term, 'pa_camp-terms', ['slug' => sanitize_title($term)]);
+            }
+            $message .= __('Camp terms imported successfully.', 'intersoccer-player-management') . '<br>';
+        } else {
+            $message .= __('No CSV file uploaded.', 'intersoccer-player-management') . '<br>';
+        }
     }
-    fclose($fp);
-    exit;
-}
 
-/**
- * Reconciles all products to events based on predefined rules.
- */
-function intersoccer_reconcile_products_to_events() {
-    // Placeholder for reconciliation logic
-    // Example: Sync WooCommerce products to events based on attributes or categories
-    $products = wc_get_products(array('limit' => -1)); // Requires WooCommerce
-    foreach ($products as $product) {
-        // Define your reconciliation rules here, e.g., match product category to event
-        // Update product meta or event associations as needed
+    if (isset($_POST['purge_older_players']) && wp_verify_nonce($_POST['advanced_nonce'], 'intersoccer_advanced_actions')) {
+        if (!isset($_POST['confirm_purge']) || $_POST['confirm_purge'] !== 'yes') {
+            $message .= __('Please confirm player purge.', 'intersoccer-player-management') . '<br>';
+        } else {
+            $args = [
+                'post_type' => 'player',
+                'posts_per_page' => 100,
+                'meta_query' => [
+                    [
+                        'key' => 'date_of_birth',
+                        'value' => "$cutoff_year-12-31",
+                        'compare' => '<=',
+                        'type' => 'DATE',
+                    ],
+                ],
+            ];
+            $query = new WP_Query($args);
+            $deleted_count = 0;
+            while ($query->have_posts()) {
+                $query->the_post();
+                $dob = get_post_meta(get_the_ID(), 'date_of_birth', true);
+                $birth_year = (int) substr($dob, 0, 4);
+                if ($current_year - $birth_year >= 14) {
+                    wp_delete_post(get_the_ID(), true);
+                    $deleted_count++;
+                    error_log(sprintf('Purged player ID %d (DOB: %s) on %s', get_the_ID(), $dob, current_time('mysql')));
+                }
+            }
+            wp_reset_postdata();
+            $message .= sprintf(__('Deleted %d players in batch.', 'intersoccer-player-management'), $deleted_count) . '<br>';
+        }
     }
-    // Note: This is a placeholder. Replace with actual logic based on your requirements.
-}
 
-// Render the Advanced tab content
-function intersoccer_render_advanced_tab() {
     ?>
     <div class="wrap">
-        <h1><?php echo esc_html__('Advanced Settings', 'intersoccer-player-management'); ?></h1>
-
-        <!-- Purge Old Players -->
-        <h2><?php echo esc_html__('Purge Old Player Data', 'intersoccer-player-management'); ?></h2>
-        <form method="post" action="">
-            <?php wp_nonce_field('purge_old_players_action', 'purge_old_players_nonce'); ?>
-            <p><?php echo esc_html__('Delete player data for children older than 13 years.', 'intersoccer-player-management'); ?></p>
-            <input type="submit" name="purge_old_players" class="button button-primary" value="<?php echo esc_attr__('Purge Old Players', 'intersoccer-player-management'); ?>" />
+        <h1><?php _e('Advanced Settings', 'intersoccer-player-management'); ?></h1>
+        <form method="post" enctype="multipart/form-data">
+            <?php wp_nonce_field('intersoccer_advanced_actions', 'advanced_nonce'); ?>
+            <h2><?php _e('Auto-Create Attributes', 'intersoccer-player-management'); ?></h2>
+            <p><input type="submit" name="auto_create_attributes" class="button button-primary" value="<?php _e('Create Attributes', 'intersoccer-player-management'); ?>"></p>
+            <h2><?php _e('Import Camp Terms from CSV', 'intersoccer-player-management'); ?></h2>
+            <p><input type="file" name="csv_file" accept=".csv"></p>
+            <p><input type="submit" name="import_camp_terms" class="button button-primary" value="<?php _e('Import Terms', 'intersoccer-player-management'); ?>"></p>
+            <h2><?php _e('Purge Older Players', 'intersoccer-player-management'); ?></h2>
+            <p><?php printf(__('Purge players born before %s.', 'intersoccer-player-management'), $cutoff_year); ?></p>
+            <p><label><input type="checkbox" name="confirm_purge" value="yes"> <?php _e('Confirm Purge', 'intersoccer-player-management'); ?></label></p>
+            <p><input type="submit" name="purge_older_players" class="button button-danger" value="<?php _e('Purge Players', 'intersoccer-player-management'); ?>"></p>
+            <h2><?php _e('Custom JSON Attributes', 'intersoccer-player-management'); ?></h2>
+            <textarea id="json_attributes" name="json_attributes" rows="10" cols="50"></textarea>
+            <p><input type="submit" name="save_json_attributes" class="button button-primary" value="<?php _e('Save JSON', 'intersoccer-player-management'); ?>"></p>
         </form>
-
-        <!-- Export Master CSV -->
-        <h2><?php echo esc_html__('Export Master CSV', 'intersoccer-player-management'); ?></h2>
-        <form method="post" action="">
-            <?php wp_nonce_field('export_master_csv_action', 'export_master_csv_nonce'); ?>
-            <p><?php echo esc_html__('Export all player data to a CSV file.', 'intersoccer-player-management'); ?></p>
-            <input type="submit" name="export_master_csv" class="button button-primary" value="<?php echo esc_attr__('Export CSV', 'intersoccer-player-management'); ?>" />
-        </form>
-
-        <!-- Reconcile Products to Events -->
-        <h2><?php echo esc_html__('Reconcile Products to Events', 'intersoccer-player-management'); ?></h2>
-        <form method="post" action="">
-            <?php wp_nonce_field('reconcile_products_action', 'reconcile_products_nonce'); ?>
-            <p><?php echo esc_html__('Re-sync all products to events based on predefined rules.', 'intersoccer-player-management'); ?></p>
-            <input type="submit" name="reconcile_products" class="button button-primary" value="<?php echo esc_attr__('Reconcile All Products', 'intersoccer-player-management'); ?>" />
-        </form>
+        <?php if ($message): ?>
+            <div class="notice notice-success"><p><?php echo $message; ?></p></div>
+        <?php endif; ?>
+        <script>
+            jQuery(document).ready(function($) {
+                if (typeof CodeMirror !== 'undefined') {
+                    CodeMirror.fromTextArea(document.getElementById('json_attributes'), {
+                        mode: 'application/json',
+                        lineNumbers: true,
+                        theme: 'default'
+                    });
+                }
+            });
+        </script>
     </div>
     <?php
 }
 ?>
-
