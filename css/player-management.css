@@ -1,0 +1,231 @@
+.intersoccer-table-wrapper {
+  overflow-x: auto;
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
+.intersoccer-player-management table {
+  table-layout: auto;
+  width: 100%;
+  border-collapse: collapse;
+  position: relative;
+}
+
+.intersoccer-player-management th,
+.intersoccer-player-management td {
+  min-width: 70px;
+  padding: 6px;
+  vertical-align: top;
+}
+
+.intersoccer-player-management th.actions,
+.intersoccer-player-management td.actions {
+  width: 90px;
+  min-width: 90px;
+}
+
+.intersoccer-player-management th.display-user-id,
+.intersoccer-player-management td.display-user-id {
+  width: 40px;
+  min-width: 40px;
+}
+
+.intersoccer-player-management th.display-medical-conditions,
+.intersoccer-player-management td.display-medical-conditions {
+  min-width: 100px;
+}
+
+.intersoccer-player-management th.display-creation-date,
+.intersoccer-player-management td.display-creation-date {
+  min-width: 80px;
+}
+
+.intersoccer-player-management th {
+  position: sticky;
+  top: 0;
+  background: #7ab55c; /* Green to match "Book Now" button */
+  color: transparent; /* White text for contrast */
+  z-index: 10;
+}
+
+.intersoccer-player-management textarea {
+  max-width: 100%;
+  width: 100%;
+  resize: vertical;
+  min-height: 50px;
+}
+
+.intersoccer-player-management .medical-row textarea,
+.intersoccer-player-management .add-player-medical textarea {
+  max-width: 100%;
+  width: 100%;
+  min-height: 50px;
+}
+
+.intersoccer-player-management input,
+.intersoccer-player-management select {
+  max-width: 100px;
+  width: 100%;
+  font-size: 14px;
+  padding: 4px;
+}
+
+.intersoccer-player-management input[name="player_avs_number"] {
+  max-width: 130px;
+}
+
+.intersoccer-player-management input[name="player_user_id"] {
+  max-width: 80px;
+}
+
+.intersoccer-player-management .error-message {
+  color: red;
+  font-size: 0.75em;
+  display: block;
+  margin-top: 2px;
+}
+
+.intersoccer-player-management .add-player-section {
+  display: none;
+}
+
+.intersoccer-player-management .add-player-section.active {
+  display: table-row;
+}
+
+.intersoccer-player-management .medical-row {
+  display: none;
+}
+
+.intersoccer-player-management .medical-row.active {
+  display: table-row;
+}
+
+.intersoccer-player-management a {
+  cursor: pointer;
+  touch-action: manipulation;
+  padding: 4px 8px;
+  display: inline-block;
+}
+
+.intersoccer-filters {
+  margin-bottom: 15px;
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.intersoccer-filters label {
+  margin-right: 5px;
+  font-weight: bold;
+}
+
+.intersoccer-filters select {
+  padding: 5px;
+  font-size: 14px;
+}
+
+@media screen and (max-width: 600px) {
+  .intersoccer-player-management th,
+  .intersoccer-player-management td {
+    min-width: 50px;
+    padding: 4px;
+    font-size: 12px;
+  }
+
+  .intersoccer-player-management th.display-user-id,
+  .intersoccer-player-management td.display-user-id {
+    width: 30px;
+    min-width: 30px;
+  }
+
+  .intersoccer-player-management th.display-medical-conditions,
+  .intersoccer-player-management td.display-medical-conditions {
+    min-width: 80px;
+  }
+
+  .intersoccer-player-management th.display-creation-date,
+  .intersoccer-player-management td.display-creation-date {
+    min-width: 60px;
+  }
+
+  .intersoccer-player-management input,
+  .intersoccer-player-management select {
+    max-width: 80px;
+    font-size: 12px;
+    padding: 3px;
+  }
+
+  .intersoccer-player-management input[name="player_avs_number"] {
+    max-width: 100px;
+  }
+
+  .intersoccer-player-management input[name="player_user_id"] {
+    max-width: 60px;
+  }
+
+  .intersoccer-player-management textarea {
+    max-width: 100%;
+    font-size: 12px;
+  }
+
+  .intersoccer-player-management th.actions,
+  .intersoccer-player-management td.actions {
+    width: 70px;
+    min-width: 70px;
+  }
+
+  .intersoccer-player-management a {
+    padding: 3px 6px;
+    font-size: 12px;
+  }
+
+  .intersoccer-filters {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .intersoccer-player-management th,
+  .intersoccer-player-management td {
+    min-width: 40px;
+    padding: 3px;
+    font-size: 11px;
+  }
+
+  .intersoccer-player-management th.display-user-id,
+  .intersoccer-player-management td.display-user-id {
+    width: 25px;
+    min-width: 25px;
+  }
+
+  .intersoccer-player-management th.display-medical-conditions,
+  .intersoccer-player-management td.display-medical-conditions {
+    min-width: 60px;
+  }
+
+  .intersoccer-player-management th.display-creation-date,
+  .intersoccer-player-management td.display-creation-date {
+    min-width: 50px;
+  }
+
+  .intersoccer-player-management input,
+  .intersoccer-player-management select {
+    max-width: 60px;
+    font-size: 11px;
+    padding: 2px;
+  }
+
+  .intersoccer-player-management input[name="player_avs_number"] {
+    max-width: 90px;
+  }
+
+  .intersoccer-player-management input[name="player_user_id"] {
+    max-width: 50px;
+  }
+
+  .intersoccer-player-management .error-message {
+    font-size: 0.7em;
+  }
+}

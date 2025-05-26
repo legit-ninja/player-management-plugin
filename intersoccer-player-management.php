@@ -2,111 +2,123 @@
 
 /**
  * Plugin Name: InterSoccer Player Management
- * Description: Custom plugin for InterSoccer Switzerland to manage players, events, and bookings.
- * Version: 1.6.10
- * Author: InterSoccer Switzerland
+ * Description: Manages players for InterSoccer events, integrating with WooCommerce My Account page and providing an admin dashboard.
+ * Version: 1.0.0
+ * Author: Jeremy Lee
  * Text Domain: intersoccer-player-management
- * Domain Path: /languages
- * Changes:
- * - Added initial plugin structure and includes (2025-05-15).
- * - Included admin-product-fields.php to support course metadata (2025-05-31).
- * - Improved nonce generation to prevent 403 Forbidden errors (2025-05-31).
- * - Ensured fresh nonce on every page load (2025-05-16).
- * Testing:
- * - Verify plugin loads without errors.
- * - Confirm all includes (elementor-widgets, woocommerce-modifications, admin-product-fields, ajax-handlers) are loaded.
- * - Test player management, camp/course bookings, admin product fields, and AJAX nonce validation.
+ * Dependencies: WooCommerce, Elementor (optional for widgets)
  */
 
-// Prevent direct access
 if (!defined('ABSPATH')) {
-    exit;
+    exit; // Exit if accessed directly
 }
 
 // Define plugin constants
-define('INTERSOCCER_PLUGIN_DIR', plugin_dir_path(__FILE__));
-define('INTERSOCCER_PLUGIN_URL', plugin_dir_url(__FILE__));
+define('INTERSOCCER_PLAYER_MANAGEMENT_PATH', plugin_dir_path(__FILE__));
 
-// Load plugin text domain for translations
+// Load translation
+add_action('init', function () {
+    load_plugin_textdomain('intersoccer-player-management', false, dirname(plugin_basename(__FILE__)) . '/languages/');
+});
+
+// Check if WooCommerce is active (required dependency)
+if (!function_exists('is_plugin_active')) {
+    include_once ABSPATH . 'wp-admin/includes/plugin.php';
+}
+
+if (!is_plugin_active('woocommerce/woocommerce.php')) {
+    add_action('admin_notices', function () {
+?>
+        <div class="notice notice-error">
+            <p><?php esc_html_e('InterSoccer Player Management requires WooCommerce to be installed and active.', 'intersoccer-player-management'); ?></p>
+        </div>
+        <?php
+    });
+    return; // Exit if WooCommerce is not active
+}
+
+// Include core files
+require_once INTERSOCCER_PLAYER_MANAGEMENT_PATH . 'includes/player-management.php';
+require_once INTERSOCCER_PLAYER_MANAGEMENT_PATH . 'includes/ajax-handlers.php';
+
+// Include Elementor widget only if Elementor is active
 add_action('plugins_loaded', function () {
-    load_plugin_textdomain(
-        'intersoccer-player-management',
-        false,
-        dirname(plugin_basename(__FILE__)) . '/languages'
-    );
-});
-
-// Include plugin files
-$includes = [
-    'includes/elementor-widgets.php',
-    'includes/woocommerce-modifications.php',
-    'includes/admin-product-fields.php',
-    'includes/ajax-handlers.php',
-    'includes/checkout.php',
-    'includes/player-management.php',
-];
-
-foreach ($includes as $file) {
-    if (file_exists(INTERSOCCER_PLUGIN_DIR . $file)) {
-        require_once INTERSOCCER_PLUGIN_DIR . $file;
-        error_log('InterSoccer: Included ' . $file);
+    if (is_plugin_active('elementor/elementor.php')) {
+        require_once INTERSOCCER_PLAYER_MANAGEMENT_PATH . 'includes/elementor-widgets.php';
     } else {
-        error_log('InterSoccer: Failed to include ' . $file . ' - File not found');
+        add_action('admin_notices', function () {
+            if (current_user_can('activate_plugins')) {
+        ?>
+                <div class="notice notice-warning">
+                    <p><?php esc_html_e('InterSoccer Player Management: Elementor is not active. The Attendee Management widget will not be available. Please activate Elementor to use this feature.', 'intersoccer-player-management'); ?></p>
+                </div>
+<?php
+            }
+        });
     }
-}
-
-// Enqueue scripts and styles
-add_action('wp_enqueue_scripts', function () {
-    // Generate a fresh nonce for each page load
-    $nonce = wp_create_nonce('intersoccer_nonce');
-    error_log('InterSoccer: Generated nonce for intersoccer_nonce: ' . $nonce);
-
-    // Enqueue variation-details.js
-    wp_enqueue_script(
-        'intersoccer-variation-details',
-        INTERSOCCER_PLUGIN_URL . 'js/variation-details.js',
-        ['jquery'],
-        '1.9.' . time(),
-        true
-    );
-
-    // Localize script with AJAX data
-    wp_localize_script(
-        'intersoccer-variation-details',
-        'intersoccerCheckout',
-        [
-            'ajax_url' => admin_url('admin-ajax.php'),
-            'nonce' => $nonce,
-            'user_id' => get_current_user_id(),
-            'server_time' => current_time('c'),
-            'nonce_refresh_url' => admin_url('admin-ajax.php?action=intersoccer_refresh_nonce'),
-        ]
-    );
-
-    // Enqueue styles
-    wp_enqueue_style(
-        'intersoccer-styles',
-        INTERSOCCER_PLUGIN_URL . 'css/styles.css',
-        [],
-        '1.9.' . time()
-    );
 });
 
-// Register activation hook
+// Add endpoint for manage-players
+add_action('init', function () {
+    add_rewrite_endpoint('manage-players', EP_ROOT | EP_PAGES);
+});
+
+// Flush rewrite rules on activation
 register_activation_hook(__FILE__, function () {
-    // Add any activation tasks here
-    error_log('InterSoccer: Plugin activated');
+    add_rewrite_endpoint('manage-players', EP_ROOT | EP_PAGES);
+    flush_rewrite_rules();
 });
 
-// AJAX handler for nonce refresh
-add_action('wp_ajax_intersoccer_refresh_nonce', 'intersoccer_refresh_nonce');
-add_action('wp_ajax_nopriv_intersoccer_refresh_nonce', 'intersoccer_refresh_nonce');
-function intersoccer_refresh_nonce()
-{
-    if (ob_get_length()) {
-        ob_clean();
-    }
-    $nonce = wp_create_nonce('intersoccer_nonce');
-    wp_send_json_success(['nonce' => $nonce]);
-}
+// Flush rewrite rules on deactivation
+register_deactivation_hook(__FILE__, function () {
+    flush_rewrite_rules();
+});
 
+// Add manage-players to My Account menu
+add_filter('woocommerce_account_menu_items', function ($items) {
+    $items['manage-players'] = __('Manage Attendees', 'intersoccer-player-management');
+    return $items;
+});
+
+// Add custom roles
+add_action('init', function () {
+    add_role('coach', __('Coach', 'intersoccer-player-management'), array('read' => true, 'edit_posts' => true));
+    add_role('organizer', __('Organizer', 'intersoccer-player-management'), array('read' => true, 'edit_posts' => true));
+});
+
+// Register endpoint
+add_action('init', function () {
+    add_rewrite_endpoint('manage-players', EP_ROOT | EP_PAGES);
+});
+
+// Add menu item with high priority (after Dashboard)
+add_filter('woocommerce_account_menu_items', function ($items) {
+    $new_items = [];
+    $inserted = false;
+    foreach ($items as $key => $label) {
+        $new_items[$key] = $label;
+        if ($key === 'dashboard' && !$inserted) {
+            $new_items['manage-players'] = __('Manage Players', 'intersoccer-player-management');
+            $inserted = true;
+        }
+    }
+    if (!$inserted) {
+        $new_items['manage-players'] = __('Manage Players', 'intersoccer-player-management');
+    }
+    return $new_items;
+}, 10);
+
+// Ensure endpoint is recognized by Elementor
+add_filter('woocommerce_get_query_vars', function ($query_vars) {
+    $query_vars['manage-players'] = 'manage-players';
+    return $query_vars;
+});
+
+// Flush permalinks on activation
+add_action('init', function () {
+    if (get_option('intersoccer_flush_permalinks')) {
+        flush_rewrite_rules();
+        delete_option('intersoccer_flush_permalinks');
+    }
+});
+?>
