@@ -2,29 +2,7 @@
  * File: variation-details.js
  * Description: Manages day selection and dynamic price updates for camps, and pro-rated pricing for courses on WooCommerce product pages. Player selection is handled server-side in elementor-widgets.php.
  * Dependencies: jQuery
- * Changes:
- * - Simplified to focus on day selection and pricing (2025-05-15).
- * - Updated fetchDaysOfWeek to use variation ID (2025-05-15).
- * - Synced pro-rated pricing with server time (2025-05-15).
- * - Added AJAX error handling with user feedback (2025-05-15).
- * - Added day selection validation and table compatibility (2025-05-15).
- * - Fixed camp page rendering with explicit visibility (2025-05-15).
- * - Updated to handle bottom table placement and Buy Now data (2025-05-15).
- * - Added dynamic price update for Single Day(s) camps (2025-05-15).
- * - Unified functionality for player assignment, day selection, and pro-rated pricing (2025-05-15).
- * - Fixed checkbox disappearance, price flickering, and button toggling with isCheckboxUpdate flag (2025-05-16).
- * - Restricted pro-rated pricing to courses and ensured selected days in cart (2025-05-16).
- * - Added nonce refresh and DOM retry logic for checkbox rendering (2025-05-16).
- * - Fixed checkbox disabling after selection and removed hardcoded price fallback (2025-05-16).
- * - Fixed syntax error in fetchDaysOfWeek (2025-05-16).
- * - Fixed checkboxes disappearing by re-rendering after DOM refresh (2025-05-16).
- * - Fixed quantity for single-day camps to 1 and used variation attributes for course pricing (2025-05-16).
- * - Fixed duplicate camp_days in cart and used post metadata for course pricing (2025-05-16).
- * - Updated course pro-rated pricing formula to Base-Price - (_course_weekly_discount * weeks_passed) (2025-05-16).
- * - Added visual discount display for courses with strikethrough original price (2025-05-16).
- * - Fixed typo in handleVariation course block (oscope to metadata) for correct form data logging (2025-05-16).
- * - Added custom price container for single-day camps and discounted courses below default price (2025-05-16).
- * - Updated course pro-rated pricing to remainingWeeks * weeklyDiscount, capped at basePrice (2025-05-16).
+ *
  * Testing:
  * - Select Single Day(s) camp (ID 29975), verify custom price container shows "Base Price: CHF 60.00 per day, Total: CHF 180.00 for 3 days" below default price.
  * - Select a course mid-term (ID 25295, variation ID 28965), confirm custom price container shows "Base Price: CHF 480.00, Discounted: CHF 320.00, You saved CHF 160.00" for 10 weeks remaining at 32 CHF/week, cart shows "Discount: 10 Weeks remaining".
@@ -279,19 +257,10 @@ jQuery(document).ready(function ($) {
   // Add inline CSS for custom price container
   $form.append(`
     <style>
-      .intersoccer-custom-price {
+      .intersoccer-custom-price .total-price{
         margin-top: 10px;
         font-size: 0.9em;
-        color: #333;
-      }
-      .intersoccer-custom-price .base-price {
-        color: #888;
-        margin-right: 10px;
-      }
-      .intersoccer-custom-price .total-price,
-      .intersoccer-custom-price .discounted-price {
-        color: #e74c3c;
-        font-weight: bold;
+        color: #eec432;
       }
       .intersoccer-custom-price .savings {
         color: #27ae60;
@@ -408,9 +377,6 @@ jQuery(document).ready(function ($) {
             $customPrice = $priceDisplay.siblings(".intersoccer-custom-price");
           }
           $customPrice.html(`
-            <span class="base-price">Base Price: CHF ${variationPrice.toFixed(
-              2
-            )} per day</span>
             <span class="total-price">Total: CHF ${totalPrice.toFixed(2)} for ${
             selectedDays.length
           } day${selectedDays.length !== 1 ? "s" : ""}</span>
@@ -620,9 +586,7 @@ jQuery(document).ready(function ($) {
                   );
                 }
                 $customPrice.html(`
-                  <span class="base-price">Base Price: CHF ${originalPrice.toFixed(
-                    2
-                  )}</span>
+                  
                   <span class="discounted-price">Discounted: CHF ${totalPrice.toFixed(
                     2
                   )}</span>
@@ -755,4 +719,3 @@ jQuery(document).ready(function ($) {
   $form.trigger("check_variations");
   console.log("InterSoccer: Triggered check_variations on form load");
 });
-

@@ -70,7 +70,7 @@ function intersoccer_add_course_variation_fields($loop, $variation_data, $variat
 
     woocommerce_wp_text_input([
         'id' => '_course_start_date[' . $loop . ']',
-        'label' => __('Course Start Date (MM-DD-YYYY)', 'intersoccer-player-management'),
+        'label' => __('Course Start Date (MM-DD-YYYY) used for pro-rated, not visible by customer', 'intersoccer-player-management'),
         'value' => get_post_meta($variation_id, '_course_start_date', true),
         'wrapper_class' => 'form-row form-row-full',
         'type' => 'date',
@@ -153,4 +153,3 @@ function intersoccer_save_course_variation_fields($variation_id, $loop)
         update_post_meta($variation_id, '_course_weekly_discount', $weekly_discount);
     }
 }
-
