@@ -219,10 +219,10 @@
         isValid = false;
       }
     }
-    if (!avsNumber || !/^756\.\d{4}\.\d{4}\.\d{2}$/.test(avsNumber)) {
+    if (avsNumber.length < 6 ) {
       $avsNumber
         .next(".error-message")
-        .text("Valid AVS number required (e.g., 756.1234.5678.90).")
+        .text("Valid AVS number required.")
         .show();
       console.log("InterSoccer: AVS number validation failed:", avsNumber);
       isValid = false;

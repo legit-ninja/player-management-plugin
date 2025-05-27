@@ -456,7 +456,7 @@ function intersoccer_render_players_form($is_admin = false, $settings = [])
                             <?php endif; ?>
                             <?php if ($show_avs_number) : ?>
                                 <td>
-                                    <input type="text" id="player_avs_number" name="player_avs_number" required aria-required="true" maxlength="16" pattern="756\.\d{4}\.\d{4}\.\d{2}">
+                                    <input type="text" id="player_avs_number" name="player_avs_number" required aria-required="true" maxlength="16">
                                     <span class="error-message" style="display: none;"></span>
                                 </td>
                             <?php endif; ?>
