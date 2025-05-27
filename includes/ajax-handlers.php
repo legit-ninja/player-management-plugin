@@ -166,11 +166,11 @@ add_action('wp_ajax_intersoccer_add_player', function () {
     }
 
     // Validate AVS number (756.XXXX.XXXX.XX)
-    if (!preg_match('/^756\.\d{4}\.\d{4}\.\d{2}$/', $avs_number)) {
-        error_log('InterSoccer: Invalid AVS number format for intersoccer_add_player: ' . $avs_number);
-        wp_send_json_error(['message' => 'Invalid AVS number format (e.g., 756.1234.5678.90)']);
-        return;
-    }
+    // if (!preg_match('/^756\.\d{4}\.\d{4}\.\d{2}$/', $avs_number)) {
+    //     error_log('InterSoccer: Invalid AVS number format for intersoccer_add_player: ' . $avs_number);
+    //     wp_send_json_error(['message' => 'Invalid AVS number format (e.g., 756.1234.5678.90)']);
+    //     return;
+    // }
 
     // Validate DOB format (YYYY-MM-DD) and age (2-13)
     if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $dob)) {
@@ -282,11 +282,11 @@ add_action('wp_ajax_intersoccer_edit_player', function () {
     }
 
     // Validate AVS number
-    if (!preg_match('/^756\.\d{4}\.\d{4}\.\d{2}$/', $avs_number)) {
-        error_log('InterSoccer: Invalid AVS number format for intersoccer_edit_player: ' . $avs_number);
-        wp_send_json_error(['message' => 'Invalid AVS number format (e.g., 756.1234.5678.90)']);
-        return;
-    }
+    // if (!preg_match('/^756\.\d{4}\.\d{4}\.\d{2}$/', $avs_number)) {
+    //     error_log('InterSoccer: Invalid AVS number format for intersoccer_edit_player: ' . $avs_number);
+    //     wp_send_json_error(['message' => 'Invalid AVS number format (e.g., 756.1234.5678.90)']);
+    //     return;
+    // }
 
     // Validate DOB if provided
     if (!empty($dob)) {
