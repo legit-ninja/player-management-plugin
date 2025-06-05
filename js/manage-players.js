@@ -333,3 +333,21 @@ jQuery(document).ready(function ($) {
   fetchUserPlayers();
 });
 
+jQuery(document).ready(function($) {
+    if ($('#intersoccer-first-login').length) {
+        $('#player-modal').show();
+        $('#add-player-form').submit(function(e) {
+            e.preventDefault();
+            $.post(intersoccerCheckout.ajax_url, {
+                action: 'intersoccer_add_player',
+                nonce: intersoccerCheckout.nonce,
+                first_name: $('#player-first-name').val(),
+                last_name: $('#player-last-name').val()
+            }, function(response) {
+                if (response.success) {
+                    window.location.reload();
+                }
+            });
+        });
+    }
+});

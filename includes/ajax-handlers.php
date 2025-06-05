@@ -513,4 +513,19 @@ add_action('woocommerce_checkout_create_order_line_item', function ($item, $cart
         $item->add_meta_data('intersoccer_player_index', $player_index, true);
     }
 }, 10, 4);
+
+// add_action('wp_ajax_intersoccer_add_new_player', 'intersoccer_add_player');
+// function intersoccer_add_player() {
+//     check_ajax_referer('intersoccer_nonce', 'nonce');
+//     $user_id = get_current_user_id();
+//     $players = get_user_meta($user_id, 'intersoccer_players', true) ?: [];
+//     $players[] = [
+//         'first_name' => sanitize_text_field($_POST['first_name']),
+//         'last_name' => sanitize_text_field($_POST['last_name'])
+//     ];
+//     update_user_meta($user_id, 'intersoccer_players', $players);
+//     update_user_meta($user_id, 'intersoccer_default_player', count($players) - 1);
+//     wp_send_json_success();
+// }
+
 ?>
