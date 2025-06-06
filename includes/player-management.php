@@ -1,49 +1,8 @@
 <?php
-
 /**
  * File: player-management.php
- * Description: Renders the player management form on the WooCommerce My Account page at /my-account/manage-players/ and admin dashboard at /wp-admin/admin.php?page=intersoccer-players. Displays players in a spreadsheet-like table with a hidden 'Add Attendee' section toggled by an 'Add' button. New players span two rows. Uses Day/Month/Year dropdowns, narrow Actions column, responsive, independent. Includes AVS number field, Events count, and admin filters.
- * Dependencies: None (self-contained, checks for jQuery)
- * Changes:
- * - Added data-first-name, data-last-name, data-dob, data-gender attributes to player rows (2025-05-18).
- * - Updated Medical Conditions textarea to span full row width (2025-05-18).
- * - Added admin dashboard menu for all players (2025-05-21).
- * - Added AVS number field with validation (2025-05-21).
- * - Changed admin menu icon to dashicons-groups and label to "Players" (2025-05-21).
- * - Enhanced mobile responsiveness with scrollable table and touch-friendly inputs (2025-05-21).
- * - Added Events column to show count of assigned WooComm products (2025-05-21).
- * - Removed duplicate intersoccer_get_player_event_count function, using version from ajax-handlers.php (2025-05-21).
- * - Fixed white header on My Account page by adding intersoccer-form-title class and removing conflicting styles (2025-05-21).
- * - Added Elementor widget customization support for columns, headings, and styling (2025-05-21).
- * - Adjusted User ID column width and added profile link (2025-05-21).
- * - Added Region, Medical Conditions, and Creation Date columns to admin dashboard (2025-05-21).
- * - Added dropdown filters for Region, Gender, and Age Range in admin view (2025-05-21).
- * - Updated table header background to match theme's "Book Now" button green (2025-05-21).
- * - Moved all CSS to css/player-management.css and enqueued it (2025-05-21).
- * - Added deduplication logic for players to prevent duplicate rendering (2025-05-21).
- * - Added logging to debug player data (2025-05-21).
- * - Fixed AVS number display in admin view (2025-05-21).
- * - Improved customer region retrieval with fallback to product attributes (2025-05-21).
- * - Updated admin filters to use product attributes (Region, Age-Group, Venue) (2025-05-21).
- * - Added Past Events column to admin view (2025-05-21).
- * Testing:
- * - Verify table fits, Actions column narrow, no overflow, mobile-friendly.
- * - Confirm 'Add' button toggles two-row 'Add Attendee'.
- * - Test DOB dropdowns, AVS validation, Add/Edit/Delete AJAX for all roles.
- * - Check admin dashboard menu, data attributes, Medical Conditions width, and Events count accuracy.
- * - Verify no redeclaration errors for intersoccer_get_player_event_count.
- * - Confirm My Account page header matches theme styling.
- * - Test Elementor widget customization options and default "off" state.
- * - Verify User ID column width and profile link in admin view.
- * - Test new admin columns (Region, Medical Conditions, Creation Date) and filters (Region, Gender, Age Range).
- * - Confirm table header background matches the theme's "Book Now" button green.
- * - Verify all styles are applied correctly after moving to css/player-management.css.
- * - Confirm no duplicate players are rendered on /my-account/manage-players/.
- * - Check debug logs to ensure all players are loaded correctly.
- * - Verify AVS numbers display correctly in admin view.
- * - Confirm customer regions are retrieved correctly in admin view.
- * - Test admin filters pull from product attributes (Region, Age-Group, Venue).
- * - Verify Past Events column shows event name, date, and venue for each player.
+ * Description: Renders the player management form on the WooCommerce My Account page and admin dashboard. Displays players in a table with add/edit/delete functionality, includes admin filters, and supports Elementor widget customization.
+ * Author: Jeremy Lee
  */
 
 // Prevent direct access
@@ -54,7 +13,9 @@ if (!defined('ABSPATH')) {
 // Render player management form
 function intersoccer_render_players_form($is_admin = false, $settings = [])
 {
-    error_log('InterSoccer: Rendering player management form, is_admin: ' . ($is_admin ? 'true' : 'false') . ', settings: ' . json_encode($settings));
+    if (defined('WP_DEBUG') && WP_DEBUG) {
+        error_log('InterSoccer: Rendering player management form, is_admin: ' . ($is_admin ? 'true' : 'false'));
+    }
 
     if (!is_user_logged_in()) {
         return '<p>' . esc_html__('Please log in to manage your Attendee(s).', 'intersoccer-player-management') . ' <a href="' . esc_url(wp_login_url(get_permalink())) . '">Log in</a> or <a href="' . esc_url(wp_registration_url()) . '">register</a>.</p>';
@@ -62,7 +23,9 @@ function intersoccer_render_players_form($is_admin = false, $settings = [])
 
     $user_id = $is_admin ? null : get_current_user_id();
     if (!$user_id && !$is_admin) {
-        error_log('InterSoccer: No user ID found for player management');
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('InterSoccer: No user ID found for player management');
+        }
         return '<p>' . esc_html__('Error: Unable to load user data.', 'intersoccer-player-management') . '</p>';
     }
 
@@ -84,6 +47,7 @@ function intersoccer_render_players_form($is_admin = false, $settings = [])
     $events_heading = !empty($settings['events_heading']) ? $settings['events_heading'] : __('Events', 'intersoccer-player-management');
     $actions_heading = !empty($settings['actions_heading']) ? $settings['actions_heading'] : __('Actions', 'intersoccer-player-management');
     $form_title_text = !empty($settings['form_title_text']) ? $settings['form_title_text'] : ($is_admin ? __('Manage All Players', 'intersoccer-player-management') : __('Manage Your Attendees', 'intersoccer-player-management'));
+    $total_players = isset($settings['total_players']) ? (int)$settings['total_players'] : 0;
 
     // Styling settings for Elementor widget
     $container_background = !empty($settings['container_background']) ? $settings['container_background'] : '';
@@ -93,61 +57,36 @@ function intersoccer_render_players_form($is_admin = false, $settings = [])
     $header_background = !empty($settings['header_background']) ? $settings['header_background'] : '#7ab55c'; // Green to match "Book Now" button
 
     $players = [];
-    $regions = $is_admin ? intersoccer_get_product_attribute_values('pa_region') : [];
-    $age_groups = $is_admin ? intersoccer_get_product_attribute_values('pa_age-group') : [];
-    $venues = $is_admin ? intersoccer_get_product_attribute_values('pa_venue') : [];
+    $cantons = $settings['cantons'] ?? []; // Populated by admin-players.php
+    $age_groups = $settings['age_groups'] ?? [];
+    $event_types = $settings['event_types'] ?? [];
 
     if ($is_admin) {
         $users = get_users(['role__in' => ['customer', 'subscriber']]);
         foreach ($users as $user) {
             $user_players = get_user_meta($user->ID, 'intersoccer_players', true) ?: [];
-            $region = get_user_meta($user->ID, 'intersoccer_region', true) ?: 'Unknown';
-            error_log('InterSoccer: User ' . $user->ID . ' region: ' . $region);
+            $billing_state = get_user_meta($user->ID, 'billing_state', true) ?: '';
+            $billing_city = get_user_meta($user->ID, 'billing_city', true) ?: '';
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('InterSoccer: User ' . $user->ID . ' canton: ' . $billing_state . ', city: ' . $billing_city);
+            }
             foreach ($user_players as $index => $player) {
                 $event_count = intersoccer_get_player_event_count($user->ID, $index);
                 $creation_date = !empty($player['creation_timestamp']) ? date('Y-m-d', $player['creation_timestamp']) : 'N/A';
                 $medical_conditions = !empty($player['medical_conditions']) ? substr($player['medical_conditions'], 0, 20) . (strlen($player['medical_conditions']) > 20 ? '...' : '') : '';
                 $past_events = intersoccer_get_player_past_events($user->ID, $index);
-                $player_regions = [];
-                $player_age_groups = [];
-                $player_venues = [];
-                foreach ($past_events as $event) {
-                    $event_id = get_page_by_title($event['name'], OBJECT, 'tribe_events');
-                    if ($event_id) {
-                        $product_id = get_posts([
-                            'post_type' => 'product',
-                            'meta_key' => '_tribe_wooticket_event',
-                            'meta_value' => $event_id->ID,
-                            'fields' => 'ids',
-                        ]);
-                        if (!empty($product_id)) {
-                            $product = wc_get_product($product_id[0]);
-                            $player_regions[] = $product->get_attribute('pa_region') ?: '';
-                            $player_age_groups[] = $product->get_attribute('pa_age-group') ?: '';
-                            $player_venues[] = $product->get_attribute('pa_venue') ?: '';
-                        }
-                    }
-                }
-                $player_regions = array_unique(array_filter($player_regions));
-                $player_age_groups = array_unique(array_filter($player_age_groups));
-                $player_venues = array_unique(array_filter($player_venues));
                 $players[] = array_merge($player, [
                     'user_id' => $user->ID,
                     'player_index' => $index,
                     'event_count' => $event_count,
-                    'region' => $region,
+                    'canton' => $billing_state,
+                    'city' => $billing_city,
                     'creation_date' => $creation_date,
                     'medical_conditions_display' => $medical_conditions,
                     'past_events' => $past_events,
-                    'event_regions' => $player_regions,
-                    'event_age_groups' => $player_age_groups,
-                    'event_venues' => $player_venues,
                 ]);
             }
         }
-        sort($regions);
-        sort($age_groups);
-        sort($venues);
     } else {
         $cache_key = 'intersoccer_players_' . $user_id;
         $players = wp_cache_get($cache_key, 'intersoccer');
@@ -155,9 +94,6 @@ function intersoccer_render_players_form($is_admin = false, $settings = [])
             $players = get_user_meta($user_id, 'intersoccer_players', true) ?: [];
             wp_cache_set($cache_key, $players, 'intersoccer', 3600);
         }
-
-        // Log the raw players data for debugging
-        error_log('InterSoccer: Raw players data for user ' . $user_id . ': ' . json_encode($players));
 
         // Deduplicate players based on first_name, last_name, and dob
         $unique_players = [];
@@ -171,26 +107,45 @@ function intersoccer_render_players_form($is_admin = false, $settings = [])
                 $player['medical_conditions_display'] = !empty($player['medical_conditions']) ? substr($player['medical_conditions'], 0, 20) . (strlen($player['medical_conditions']) > 20 ? '...' : '') : '';
                 $unique_players[] = $player;
             } else {
-                error_log('InterSoccer: Removed duplicate player for user ' . $user_id . ': ' . $key);
+                if (defined('WP_DEBUG') && WP_DEBUG) {
+                    error_log('InterSoccer: Removed duplicate player for user ' . $user_id . ': ' . $key);
+                }
             }
         }
         $players = $unique_players;
-
-        // Log the deduplicated players
-        error_log('InterSoccer: Deduplicated players for user ' . $user_id . ': ' . json_encode($players));
     }
 
     // Enqueue scripts
-    error_log('InterSoccer: Enqueuing player-management.js');
     wp_enqueue_script(
-        'intersoccer-player-management',
-        plugin_dir_url(__FILE__) . '../js/player-management.js',
+        'intersoccer-player-management-core',
+        plugin_dir_url(__FILE__) . '../js/player-management-core.js',
         ['jquery'],
-        '1.12.' . time(),
+        '1.0.' . time(),
         true
     );
+    wp_enqueue_script(
+        'intersoccer-player-management-filters',
+        plugin_dir_url(__FILE__) . '../js/player-management-filters.js',
+        ['intersoccer-player-management-core', 'select2'],
+        '1.0.' . time(),
+        true
+    );
+    wp_enqueue_script(
+        'intersoccer-player-management-actions',
+        plugin_dir_url(__FILE__) . '../js/player-management-actions.js',
+        ['intersoccer-player-management-filters'],
+        '1.0.' . time(),
+        true
+    );
+
+    // Enqueue Select2 for admin filters
+    if ($is_admin) {
+        wp_enqueue_script('select2', admin_url('js/select2/select2.min.js'), ['jquery'], '4.0.13', true);
+        wp_enqueue_style('select2', admin_url('css/select2.min.css'), [], '4.0.13');
+    }
+
     wp_localize_script(
-        'intersoccer-player-management',
+        'intersoccer-player-management-core',
         'intersoccerPlayer',
         [
             'ajax_url' => admin_url('admin-ajax.php'),
@@ -198,6 +153,7 @@ function intersoccer_render_players_form($is_admin = false, $settings = [])
             'user_id' => $user_id ?: 0,
             'is_admin' => $is_admin ? '1' : '0',
             'nonce_refresh_url' => admin_url('admin-ajax.php?action=intersoccer_refresh_nonce'),
+            'debug' => defined('WP_DEBUG') && WP_DEBUG ? '1' : '0',
         ]
     );
 
@@ -233,6 +189,18 @@ function intersoccer_render_players_form($is_admin = false, $settings = [])
             $inline_css .= '.intersoccer-player-management th { background: ' . esc_attr($header_background) . '; color: #ffffff; }';
         }
     }
+    // Add CSS for Select2 filters and total players display
+    if ($is_admin) {
+        $inline_css .= '
+            .intersoccer-filters { display: flex; flex-wrap: wrap; gap: 15px; align-items: center; margin-bottom: 15px; }
+            .intersoccer-filters label { margin-right: 5px; }
+            .intersoccer-filters .select2-container { min-width: 200px; }
+            .intersoccer-filters .select2-selection--multiple { min-height: 30px; }
+            .intersoccer-filters .select2-selection--single { height: 30px; }
+            .intersoccer-filters .select2-selection__rendered { line-height: 28px; }
+            .total-players { margin-bottom: 10px; font-size: 16px; color: #333; }
+        ';
+    }
     if (!empty($inline_css)) {
         wp_add_inline_style('intersoccer-player-management', $inline_css);
     }
@@ -245,30 +213,44 @@ function intersoccer_render_players_form($is_admin = false, $settings = [])
         <?php endif; ?>
         <div class="intersoccer-message" style="display: none;" role="alert" aria-live="polite"></div>
 
+        <?php if ($is_admin && $total_players > 0) : ?>
+            <div class="total-players">
+                <?php printf(esc_html__('Total Players: %d', 'intersoccer-player-management'), $total_players); ?>
+            </div>
+        <?php endif; ?>
+
         <?php if ($is_admin) : ?>
             <div class="intersoccer-filters">
-                <label for="filter-region"><?php esc_html_e('Filter by Region:', 'intersoccer-player-management'); ?></label>
-                <select id="filter-region" class="filter-select">
-                    <option value=""><?php esc_html_e('All Regions', 'intersoccer-player-management'); ?></option>
-                    <?php foreach ($regions as $region) : ?>
-                        <option value="<?php echo esc_attr($region); ?>"><?php echo esc_html($region); ?></option>
+                <label for="filter-canton"><?php esc_html_e('Filter by Canton', 'intersoccer-player-management'); ?></label>
+                <select id="filter-canton" class="filter-select select2" aria-label="<?php esc_attr_e('Filter players by canton', 'intersoccer-player-management'); ?>">
+                    <option value=""><?php esc_html_e('All Cantons', 'intersoccer-player-management'); ?></option>
+                    <?php foreach ($cantons as $canton) : ?>
+                        <option value="<?php echo esc_attr($canton); ?>"><?php echo esc_html($canton); ?></option>
                     <?php endforeach; ?>
                 </select>
 
-                <label for="filter-age-group"><?php esc_html_e('Filter by Age Group:', 'intersoccer-player-management'); ?></label>
-                <select id="filter-age-group" class="filter-select">
+                <label for="filter-age-group"><?php esc_html_e('Filter by Age Group', 'intersoccer-player-management'); ?></label>
+                <select id="filter-age-group" class="filter-select select2" multiple aria-label="<?php esc_attr_e('Filter players by age group (multiple selection)', 'intersoccer-player-management'); ?>" aria-multiselectable="true">
                     <option value=""><?php esc_html_e('All Age Groups', 'intersoccer-player-management'); ?></option>
                     <?php foreach ($age_groups as $age_group) : ?>
                         <option value="<?php echo esc_attr($age_group); ?>"><?php echo esc_html($age_group); ?></option>
                     <?php endforeach; ?>
                 </select>
 
-                <label for="filter-venue"><?php esc_html_e('Filter by Venue:', 'intersoccer-player-management'); ?></label>
-                <select id="filter-venue" class="filter-select">
-                    <option value=""><?php esc_html_e('All Venues', 'intersoccer-player-management'); ?></option>
-                    <?php foreach ($venues as $venue) : ?>
-                        <option value="<?php echo esc_attr($venue); ?>"><?php echo esc_html($venue); ?></option>
+                <label for="filter-event-type"><?php esc_html_e('Filter by Event Type', 'intersoccer-player-management'); ?></label>
+                <select id="filter-event-type" class="filter-select select2" aria-label="<?php esc_attr_e('Filter players by event type', 'intersoccer-player-management'); ?>">
+                    <option value=""><?php esc_html_e('All Event Types', 'intersoccer-player-management'); ?></option>
+                    <?php foreach ($event_types as $event_type) : ?>
+                        <option value="<?php echo esc_attr($event_type); ?>"><?php echo esc_html($event_type); ?></option>
                     <?php endforeach; ?>
+                </select>
+
+                <label for="filter-gender"><?php esc_html_e('Filter by Gender', 'intersoccer-player-management'); ?></label>
+                <select id="filter-gender" class="filter-select select2" aria-label="<?php esc_attr_e('Filter players by gender', 'intersoccer-player-management'); ?>">
+                    <option value=""><?php esc_html_e('All Genders', 'intersoccer-player-management'); ?></option>
+                    <option value="male"><?php esc_html_e('Male', 'intersoccer-player-management'); ?></option>
+                    <option value="female"><?php esc_html_e('Female', 'intersoccer-player-management'); ?></option>
+                    <option value="other"><?php esc_html_e('Other', 'intersoccer-player-management'); ?></option>
                 </select>
             </div>
         <?php endif; ?>
@@ -287,7 +269,8 @@ function intersoccer_render_players_form($is_admin = false, $settings = [])
                     <tr>
                         <?php if ($is_admin) : ?>
                             <th scope="col"><?php esc_html_e('User ID', 'intersoccer-player-management'); ?></th>
-                            <th scope="col"><?php esc_html_e('Region', 'intersoccer-player-management'); ?></th>
+                            <th scope="col"><?php esc_html_e('Canton', 'intersoccer-player-management'); ?></th>
+                            <th scope="col"><?php esc_html_e('City', 'intersoccer-player-management'); ?></th>
                         <?php endif; ?>
                         <?php if ($show_first_name) : ?>
                             <th scope="col"><?php echo esc_html($first_name_heading); ?></th>
@@ -318,7 +301,7 @@ function intersoccer_render_players_form($is_admin = false, $settings = [])
                 <tbody id="player-table">
                     <?php if (empty($players)) : ?>
                         <tr class="no-players">
-                            <td colspan="<?php echo ($is_admin ? 4 : 0) + ($show_first_name ? 1 : 0) + ($show_last_name ? 1 : 0) + ($show_dob ? 1 : 0) + ($show_gender ? 1 : 0) + ($show_avs_number ? 1 : 0) + ($show_events ? 1 : 0) + ($is_admin ? 2 : 0) + 1; ?>">
+                            <td colspan="<?php echo ($is_admin ? 5 : 0) + ($show_first_name ? 1 : 0) + ($show_last_name ? 1 : 0) + ($show_dob ? 1 : 0) + ($show_gender ? 1 : 0) + ($show_avs_number ? 1 : 0) + ($show_events ? 1 : 0) + ($is_admin ? 2 : 0) + 1; ?>">
                                 <?php esc_html_e('No attendees added yet.', 'intersoccer-player-management'); ?>
                             </td>
                         </tr>
@@ -329,20 +312,21 @@ function intersoccer_render_players_form($is_admin = false, $settings = [])
                                 data-first-name="<?php echo esc_attr($player['first_name'] ?? 'N/A'); ?>"
                                 data-last-name="<?php echo esc_attr($player['last_name'] ?? 'N/A'); ?>"
                                 data-dob="<?php echo esc_attr($player['dob'] ?? 'N/A'); ?>"
-                                data-gender="<?php echo esc_attr($player['gender'] ?? 'N/A'); ?>"
+                                data-gender="<?php echo esc_attr(strtolower($player['gender'] ?? 'N/A')); ?>"
                                 data-avs-number="<?php echo esc_attr($player['avs_number'] ?? 'N/A'); ?>"
                                 data-event-count="<?php echo esc_attr($player['event_count'] ?? 0); ?>"
-                                data-region="<?php echo esc_attr($player['region'] ?? 'Unknown'); ?>"
-                                data-event-regions="<?php echo esc_attr(implode(',', $player['event_regions'] ?? [])); ?>"
+                                data-canton="<?php echo esc_attr($player['canton'] ?? ''); ?>"
+                                data-city="<?php echo esc_attr($player['city'] ?? ''); ?>"
                                 data-event-age-groups="<?php echo esc_attr(implode(',', $player['event_age_groups'] ?? [])); ?>"
-                                data-event-venues="<?php echo esc_attr(implode(',', $player['event_venues'] ?? [])); ?>">
+                                data-event-types="<?php echo esc_attr(implode(',', $player['event_types'] ?? [])); ?>">
                                 <?php if ($is_admin) : ?>
                                     <td class="display-user-id">
                                         <a href="<?php echo esc_url(get_edit_user_link($player['user_id'])); ?>" aria-label="<?php esc_attr_e('Edit user profile', 'intersoccer-player-management'); ?>">
                                             <?php echo esc_html($player['user_id'] ?? 'N/A'); ?>
                                         </a>
                                     </td>
-                                    <td class="display-region"><?php echo esc_html($player['region'] ?? 'Unknown'); ?></td>
+                                    <td class="display-canton"><?php echo esc_html($player['canton'] ?: 'N/A'); ?></td>
+                                    <td class="display-city"><?php echo esc_html($player['city'] ?: 'N/A'); ?></td>
                                 <?php endif; ?>
                                 <?php if ($show_first_name) : ?>
                                     <td class="display-first-name"><?php echo esc_html($player['first_name'] ?? 'N/A'); ?></td>
@@ -370,7 +354,10 @@ function intersoccer_render_players_form($is_admin = false, $settings = [])
                                             <ul>
                                                 <?php foreach ($player['past_events'] as $event) : ?>
                                                     <li>
-                                                        <?php echo esc_html($event['name']); ?> (<?php echo esc_html($event['date']); ?>, <?php echo esc_html($event['venue']); ?>)
+                                                        <?php echo esc_html(is_array($event) ? ($event['name'] ?? $event) : $event); ?>
+                                                        <?php if (is_array($event) && isset($event['date'], $event['venue'])) : ?>
+                                                            (<?php echo esc_html($event['date']); ?>, <?php echo esc_html($event['venue']); ?>)
+                                                        <?php endif; ?>
                                                     </li>
                                                 <?php endforeach; ?>
                                             </ul>
@@ -396,7 +383,10 @@ function intersoccer_render_players_form($is_admin = false, $settings = [])
                                     <span class="error-message" style="display: none;"></span>
                                 </td>
                                 <td>
-                                    <span class="display-region">N/A</span>
+                                    <span class="display-canton">N/A</span>
+                                </td>
+                                <td>
+                                    <span class="display-city">N/A</span>
                                 </td>
                             <?php endif; ?>
                             <?php if ($show_first_name) : ?>
@@ -487,7 +477,7 @@ function intersoccer_render_players_form($is_admin = false, $settings = [])
                             </td>
                         </tr>
                         <tr class="add-player-section add-player-medical">
-                            <td colspan="<?php echo ($is_admin ? 4 : 0) + ($show_first_name ? 1 : 0) + ($show_last_name ? 1 : 0) + ($show_dob ? 1 : 0) + ($show_gender ? 1 : 0) + ($show_avs_number ? 1 : 0) + ($show_events ? 1 : 0) + ($is_admin ? 2 : 0) + 1; ?>">
+                            <td colspan="<?php echo ($is_admin ? 5 : 0) + ($show_first_name ? 1 : 0) + ($show_last_name ? 1 : 0) + ($show_dob ? 1 : 0) + ($show_gender ? 1 : 0) + ($show_avs_number ? 1 : 0) + ($show_events ? 1 : 0) + ($is_admin ? 2 : 0) + 1; ?>">
                                 <label for="player_medical"><?php esc_html_e('Medical Conditions:', 'intersoccer-player-management'); ?></label>
                                 <textarea id="player_medical" name="player_medical" maxlength="500" aria-describedby="medical-instructions"></textarea>
                                 <span id="medical-instructions" class="screen-reader-text"><?php esc_html_e('Optional field for medical conditions.', 'intersoccer-player-management'); ?></span>
@@ -505,28 +495,9 @@ function intersoccer_render_players_form($is_admin = false, $settings = [])
 
 // Hook form to manage-players endpoint
 add_action('woocommerce_account_manage-players_endpoint', function () {
-    error_log('InterSoccer: Triggered woocommerce_account_manage-players_endpoint');
+    if (defined('WP_DEBUG') && WP_DEBUG) {
+        error_log('InterSoccer: Triggered woocommerce_account_manage-players_endpoint');
+    }
     echo intersoccer_render_players_form();
-});
-
-// Add admin menu
-add_action('admin_menu', function () {
-    add_menu_page(
-        __('Players', 'intersoccer-player-management'),
-        __('Players', 'intersoccer-player-management'),
-        'manage_options',
-        'intersoccer-players',
-        function () {
-            if (!current_user_can('manage_options')) {
-                wp_die(esc_html__('You do not have sufficient permissions to access this page.', 'intersoccer-player-management'));
-            }
-            echo '<div class="wrap">';
-            echo '<h1>' . esc_html__('InterSoccer Player Management', 'intersoccer-player-management') . '</h1>';
-            echo intersoccer_render_players_form(true);
-            echo '</div>';
-        },
-        'dashicons-groups',
-        26
-    );
 });
 ?>

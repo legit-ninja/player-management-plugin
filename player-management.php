@@ -2,10 +2,10 @@
 /**
  * Plugin Name: Player Management
  * Description: Manages players for InterSoccer events, integrating with WooCommerce My Account page and providing an admin dashboard.
- * Version: 1.3.0
+ * Version: 1.3.9
  * Author: Jeremy Lee
  * Text Domain: player-management
- * Dependencies: WooCommerce, Elementor (optional for widgets), intersoccer-product-variations
+ * Dependencies: WooCommerce, Elementor (optional for widgets), intersoccer-product-variations (optional)
  */
 
 if (!defined('ABSPATH')) {
@@ -20,7 +20,7 @@ add_action('init', function () {
     load_plugin_textdomain('player-management', false, dirname(plugin_basename(__FILE__)) . '/languages/');
 });
 
-// Check if WooCommerce and intersoccer-product-variations are active
+// Check if WooCommerce is active (required)
 if (!function_exists('is_plugin_active')) {
     include_once ABSPATH . 'wp-admin/includes/plugin.php';
 }
@@ -36,15 +36,16 @@ if (!is_plugin_active('woocommerce/woocommerce.php')) {
     return;
 }
 
+// Check if intersoccer-product-variations is active (optional)
 if (!is_plugin_active('intersoccer-product-variations/intersoccer-product-variations.php')) {
     add_action('admin_notices', function () {
         ?>
-        <div class="notice notice-error">
-            <p><?php esc_html_e('Player Management requires InterSoccer Product Variations to be installed and active.', 'player-management'); ?></p>
+        <div class="notice notice-warning">
+            <p><?php esc_html_e('InterSoccer Product Variations is not active. Some features of Player Management may be limited.', 'player-management'); ?></p>
         </div>
         <?php
     });
-    return;
+    // Continue loading the plugin even if intersoccer-product-variations is not active
 }
 
 // Include core files
@@ -55,7 +56,7 @@ require_once PLAYER_MANAGEMENT_PATH . 'includes/data-deletion.php';
 // Include admin files only in admin context
 if (is_admin()) {
     require_once PLAYER_MANAGEMENT_PATH . 'includes/admin-players.php';
-    require_once PLAYER_MANAGEMENT_PATH . 'includes/admin-players-all.php';
+    require_once PLAYER_MANAGEMENT_PATH . 'includes/admin-advanced.php';
 }
 
 // Include Elementor widget only if Elementor is active
