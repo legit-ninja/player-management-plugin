@@ -259,7 +259,7 @@ jQuery(document).ready(function ($) {
     <style>
       .intersoccer-custom-price .total-price{
         margin-top: 10px;
-        font-size: 0.9em;
+        font-size: 0.5em;
         color: #eec432;
       }
       .intersoccer-custom-price .savings {
@@ -719,3 +719,4 @@ jQuery(document).ready(function ($) {
   $form.trigger("check_variations");
   console.log("InterSoccer: Triggered check_variations on form load");
 });
+

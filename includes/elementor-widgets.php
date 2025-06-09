@@ -2,11 +2,19 @@
 
 /**
  * File: elementor-widgets.php
- * Description: Extends Elementor’s Single Product widget to inject player and day selection fields into the product form variations table for the InterSoccer Player Management plugin. Ensures fields follow the same formatting as other variations.
- * Dependencies: None
+ * Description: Registers Elementor widgets for the InterSoccer Player Management plugin, including the Attendee Management widget with full customization options.
+ * Dependencies: Elementor, player-management.php
  * Changes:
- * - Updated form validation to check hidden camp_days[] inputs instead of visible checkboxes (2025-05-15).
- * - Added price container for Courses to display subtotal and discounted price (2025-05-23).
+ * - Initial Elementor widget for attendee management (2025-05-18).
+ * - Added achievements and events display with toggle controls (2025-05-21).
+ * - Added full customization for columns, headings, and styling, defaulting to "off" (2025-05-21).
+ * - Added safety check for Elementor availability (2025-05-21).
+ * Testing:
+ * - Verify widget renders on Elementor-powered pages.
+ * - Test all customization controls (column visibility, headings, styling).
+ * - Confirm defaults are "off" and form elements can be fully customized.
+ * - Ensure compatibility with player-management.php rendering.
+ * - Confirm no errors when Elementor is not active (handled by intersoccer-player-management.php).
  */
 
 // Prevent direct access
@@ -14,305 +22,370 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-// Inject player, day selection, and price container into the variations table
-add_action('wp_footer', function () {
-    if (!is_product()) {
-        return;
+// Safety check: Ensure Elementor is loaded before proceeding
+if (!class_exists('\Elementor\Widget_Base')) {
+    return; // Silently exit if Elementor is not available
+}
+
+class InterSoccer_Attendee_Management_Widget extends \Elementor\Widget_Base
+{
+    public function get_name()
+    {
+        return 'intersoccer-attendee-management';
     }
 
-    // Get current product
-    global $product;
-    if (!is_a($product, 'WC_Product')) {
-        return;
+    public function get_title()
+    {
+        return __('InterSoccer Attendee Management', 'intersoccer-player-management');
     }
 
-    $product_id = $product->get_id();
-    $user_id = get_current_user_id();
-    $is_variable = $product->is_type('variable');
+    public function get_icon()
+    {
+        return 'eicon-person';
+    }
 
-    // Player selection HTML
-    ob_start();
+    public function get_categories()
+    {
+        return ['intersoccer'];
+    }
+
+    protected function _register_controls()
+    {
+        // Content Section
+        $this->start_controls_section(
+            'content_section',
+            [
+                'label' => __('Content', 'intersoccer-player-management'),
+                'tab' => \Elementor\Controls_Manager::TAB_CONTENT,
+            ]
+        );
+
+        // Form Title
+        $this->add_control(
+            'show_form_title',
+            [
+                'label' => __('Show Form Title', 'intersoccer-player-management'),
+                'type' => \Elementor\Controls_Manager::SWITCHER,
+                'label_on' => __('Yes', 'intersoccer-player-management'),
+                'label_off' => __('No', 'intersoccer-player-management'),
+                'default' => 'no',
+            ]
+        );
+
+        $this->add_control(
+            'form_title_text',
+            [
+                'label' => __('Form Title Text', 'intersoccer-player-management'),
+                'type' => \Elementor\Controls_Manager::TEXT,
+                'default' => __('Manage Your Attendees', 'intersoccer-player-management'),
+                'condition' => [
+                    'show_form_title' => 'yes',
+                ],
+            ]
+        );
+
+        // Add Button
+        $this->add_control(
+            'show_add_button',
+            [
+                'label' => __('Show Add Button', 'intersoccer-player-management'),
+                'type' => \Elementor\Controls_Manager::SWITCHER,
+                'label_on' => __('Yes', 'intersoccer-player-management'),
+                'label_off' => __('No', 'intersoccer-player-management'),
+                'default' => 'no',
+            ]
+        );
+
+        // Column Visibility
+        $this->add_control(
+            'show_first_name',
+            [
+                'label' => __('Show First Name Column', 'intersoccer-player-management'),
+                'type' => \Elementor\Controls_Manager::SWITCHER,
+                'label_on' => __('Yes', 'intersoccer-player-management'),
+                'label_off' => __('No', 'intersoccer-player-management'),
+                'default' => 'no',
+            ]
+        );
+
+        $this->add_control(
+            'show_last_name',
+            [
+                'label' => __('Show Last Name Column', 'intersoccer-player-management'),
+                'type' => \Elementor\Controls_Manager::SWITCHER,
+                'label_on' => __('Yes', 'intersoccer-player-management'),
+                'label_off' => __('No', 'intersoccer-player-management'),
+                'default' => 'no',
+            ]
+        );
+
+        $this->add_control(
+            'show_dob',
+            [
+                'label' => __('Show DOB Column', 'intersoccer-player-management'),
+                'type' => \Elementor\Controls_Manager::SWITCHER,
+                'label_on' => __('Yes', 'intersoccer-player-management'),
+                'label_off' => __('No', 'intersoccer-player-management'),
+                'default' => 'no',
+            ]
+        );
+
+        $this->add_control(
+            'show_gender',
+            [
+                'label' => __('Show Gender Column', 'intersoccer-player-management'),
+                'type' => \Elementor\Controls_Manager::SWITCHER,
+                'label_on' => __('Yes', 'intersoccer-player-management'),
+                'label_off' => __('No', 'intersoccer-player-management'),
+                'default' => 'no',
+            ]
+        );
+
+        $this->add_control(
+            'show_avs_number',
+            [
+                'label' => __('Show AVS Number Column', 'intersoccer-player-management'),
+                'type' => \Elementor\Controls_Manager::SWITCHER,
+                'label_on' => __('Yes', 'intersoccer-player-management'),
+                'label_off' => __('No', 'intersoccer-player-management'),
+                'default' => 'no',
+            ]
+        );
+
+        $this->add_control(
+            'show_events',
+            [
+                'label' => __('Show Events Column', 'intersoccer-player-management'),
+                'type' => \Elementor\Controls_Manager::SWITCHER,
+                'label_on' => __('Yes', 'intersoccer-player-management'),
+                'label_off' => __('No', 'intersoccer-player-management'),
+                'default' => 'no',
+            ]
+        );
+
+        // Column Headings
+        $this->add_control(
+            'first_name_heading',
+            [
+                'label' => __('First Name Heading', 'intersoccer-player-management'),
+                'type' => \Elementor\Controls_Manager::TEXT,
+                'default' => __('First Name', 'intersoccer-player-management'),
+                'condition' => [
+                    'show_first_name' => 'yes',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'last_name_heading',
+            [
+                'label' => __('Last Name Heading', 'intersoccer-player-management'),
+                'type' => \Elementor\Controls_Manager::TEXT,
+                'default' => __('Last Name', 'intersoccer-player-management'),
+                'condition' => [
+                    'show_last_name' => 'yes',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'dob_heading',
+            [
+                'label' => __('DOB Heading', 'intersoccer-player-management'),
+                'type' => \Elementor\Controls_Manager::TEXT,
+                'default' => __('DOB', 'intersoccer-player-management'),
+                'condition' => [
+                    'show_dob' => 'yes',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'gender_heading',
+            [
+                'label' => __('Gender Heading', 'intersoccer-player-management'),
+                'type' => \Elementor\Controls_Manager::TEXT,
+                'default' => __('Gender', 'intersoccer-player-management'),
+                'condition' => [
+                    'show_gender' => 'yes',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'avs_number_heading',
+            [
+                'label' => __('AVS Number Heading', 'intersoccer-player-management'),
+                'type' => \Elementor\Controls_Manager::TEXT,
+                'default' => __('AVS Number', 'intersoccer-player-management'),
+                'condition' => [
+                    'show_avs_number' => 'yes',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'events_heading',
+            [
+                'label' => __('Events Heading', 'intersoccer-player-management'),
+                'type' => \Elementor\Controls_Manager::TEXT,
+                'default' => __('Events', 'intersoccer-player-management'),
+                'condition' => [
+                    'show_events' => 'yes',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'actions_heading',
+            [
+                'label' => __('Actions Heading', 'intersoccer-player-management'),
+                'type' => \Elementor\Controls_Manager::TEXT,
+                'default' => __('Actions', 'intersoccer-player-management'),
+            ]
+        );
+
+        $this->end_controls_section();
+
+        // Style Section
+        $this->start_controls_section(
+            'style_section',
+            [
+                'label' => __('Style', 'intersoccer-player-management'),
+                'tab' => \Elementor\Controls_Manager::TAB_STYLE,
+            ]
+        );
+
+        $this->add_control(
+            'container_background',
+            [
+                'label' => __('Background Color', 'intersoccer-player-management'),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'default' => '',
+                'selectors' => [
+                    '{{WRAPPER}} .intersoccer-player-management' => 'background-color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'container_text_color',
+            [
+                'label' => __('Text Color', 'intersoccer-player-management'),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'default' => '',
+                'selectors' => [
+                    '{{WRAPPER}} .intersoccer-player-management' => 'color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'container_padding',
+            [
+                'label' => __('Padding', 'intersoccer-player-management'),
+                'type' => \Elementor\Controls_Manager::DIMENSIONS,
+                'size_units' => ['px', '%', 'em'],
+                'selectors' => [
+                    '{{WRAPPER}} .intersoccer-player-management' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'table_border_color',
+            [
+                'label' => __('Table Border Color', 'intersoccer-player-management'),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'default' => '#ddd',
+                'selectors' => [
+                    '{{WRAPPER}} .intersoccer-player-management table' => 'border-color: {{VALUE}};',
+                    '{{WRAPPER}} .intersoccer-player-management th' => 'border-color: {{VALUE}};',
+                    '{{WRAPPER}} .intersoccer-player-management td' => 'border-color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'header_background',
+            [
+                'label' => __('Header Background Color', 'intersoccer-player-management'),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'default' => '#f9f9f9',
+                'selectors' => [
+                    '{{WRAPPER}} .intersoccer-player-management th' => 'background-color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->end_controls_section();
+    }
+
+    protected function render()
+    {
+        $settings = $this->get_settings_for_display();
+        echo intersoccer_render_players_form(false, $settings);
+    }
+
+    protected function _content_template()
+    {
 ?>
-    <tr class="intersoccer-player-selection intersoccer-injected">
-        <th><label for="player_assignment_select"><?php esc_html_e('Select an Attendee', 'intersoccer-player-management'); ?></label></th>
-        <td>
-            <div class="intersoccer-player-content">
-                <?php if (!$user_id) : ?>
-                    <p class="intersoccer-login-prompt">Please <a href="https://intersoccer.ch/membership-login/">log in</a> or <a href="https://intersoccer.ch/membership-login/">register</a>.</p>
-                <?php else : ?>
-                    <p>Loading players...</p>
-                <?php endif; ?>
+        <div class="intersoccer-player-management">
+            <h2 class="intersoccer-form-title"><?php echo esc_html($this->get_settings('form_title_text')); ?></h2>
+            <div class="intersoccer-message" style="display: none;" role="alert" aria-live="polite"></div>
+            <div class="intersoccer-player-actions">
+                <a href="#" class="toggle-add-player">Add</a>
             </div>
-        </td>
-    </tr>
-    <?php
-    $player_selection_html = ob_get_clean();
-
-    // Day selection HTML
-    $day_selection_html = '';
-    if ($product->get_type() === 'variable') {
-        ob_start();
-    ?>
-        <tr class="intersoccer-day-selection intersoccer-injected" style="display: none;">
-            <th><label><?php esc_html_e('Select Days', 'intersoccer-player-management'); ?></label></th>
-            <td>
-                <div class="intersoccer-day-checkboxes"></div>
-                <div class="intersoccer-day-notification" style="margin-top: 10px; color: #007cba;"></div>
-                <span class="error-message" style="color: red; display: none;"></span>
-            </td>
-        </tr>
-    <?php
-        $day_selection_html = ob_get_clean();
-    }
-
-    // Price container HTML for Courses
-    $price_container_html = '';
-    if ($product->get_type() === 'variable') {
-        ob_start();
-    ?>
-        <tr class="intersoccer-price-container intersoccer-injected" style="display: none;">
-            <th><label><?php esc_html_e('Price Details', 'intersoccer-player-management'); ?></label></th>
-            <td>
-                <div class="intersoccer-price-details">
-                    <p class="intersoccer-subtotal" style="display: none;">Subtotal: <span class="subtotal-amount"></span></p>
-                    <p class="intersoccer-discounted" style="display: none;">Discounted Price: <span class="discounted-amount"></span></p>
-                </div>
-            </td>
-        </tr>
-    <?php
-        $price_container_html = ob_get_clean();
-    }
-
-    // Inject fields and price container
-    ?>
-    <script>
-        jQuery(document).ready(function($) {
-            console.log('InterSoccer: Document ready, attempting to inject fields');
-
-            function injectFields() {
-                console.log('InterSoccer: injectFields called');
-
-                var $form = $('form.cart');
-                if (!$form.length) {
-                    $form = $('.woocommerce-product-details form.cart, .product form.cart, .single-product form.cart');
-                }
-                if (!$form.length) {
-                    console.error('InterSoccer: Product form not found with any selector');
-                    return;
-                }
-                console.log('InterSoccer: Found product form:', $form);
-
-                if ($form.find('.intersoccer-injected').length > 0) {
-                    console.log('InterSoccer: Fields already injected, skipping');
-                    return;
-                }
-
-                var $variationsTable = $form.find('.variations');
-                if ($variationsTable.length) {
-                    var $tbody = $variationsTable.find('tbody');
-                    if ($tbody.length) {
-                        $tbody.append(<?php echo json_encode($player_selection_html, JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS); ?>);
-                        <?php if ($day_selection_html) : ?>
-                            $tbody.append(<?php echo json_encode($day_selection_html, JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS); ?>);
-                        <?php endif; ?>
-                        <?php if ($price_container_html) : ?>
-                            $tbody.append(<?php echo json_encode($price_container_html, JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS); ?>);
-                        <?php endif; ?>
-                        console.log('InterSoccer: Injected fields and price container into variations table');
-                    } else {
-                        console.error('InterSoccer: Variations table tbody not found, appending to variations table');
-                        $variationsTable.append(<?php echo json_encode($player_selection_html, JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS); ?>);
-                        <?php if ($day_selection_html) : ?>
-                            $variationsTable.append(<?php echo json_encode($day_selection_html, JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS); ?>);
-                        <?php endif; ?>
-                        <?php if ($price_container_html) : ?>
-                            $variationsTable.append(<?php echo json_encode($price_container_html, JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS); ?>);
-                        <?php endif; ?>
-                    }
-                } else {
-                    console.error('InterSoccer: Variations table not found, appended to form');
-                    $form.append(<?php echo json_encode($player_selection_html, JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS); ?>);
-                    <?php if ($day_selection_html) : ?>
-                        $form.append(<?php echo json_encode($day_selection_html, JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS); ?>);
-                    <?php endif; ?>
-                    <?php if ($price_container_html) : ?>
-                        $form.append(<?php echo json_encode($price_container_html, JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS); ?>);
-                    <?php endif; ?>
-                }
-
-                $form.find('.intersoccer-player-content').each(function() {
-                    var $this = $(this);
-                    var htmlContent = $this.html();
-                    $this.html(htmlContent);
-                });
-
-                var $addToCartButton = $form.find('button.single_add_to_cart_button');
-                if ($addToCartButton.length) {
-                    $addToCartButton.prop('disabled', true);
-                    console.log('InterSoccer: Add to Cart button disabled by default');
-                }
-
-                if (intersoccerCheckout.user_id && intersoccerCheckout.user_id !== '0') {
-                    $.ajax({
-                        url: intersoccerCheckout.ajax_url,
-                        type: 'POST',
-                        data: {
-                            action: 'intersoccer_get_user_players',
-                            nonce: intersoccerCheckout.nonce,
-                            user_id: intersoccerCheckout.user_id
-                        },
-                        success: function(response) {
-                            console.log('InterSoccer: Player fetch response:', response);
-                            var $playerContent = $form.find('.intersoccer-player-content');
-                            if (response.success && response.data.players) {
-                                if (response.data.players.length > 0) {
-                                    var $select = $('<select name="player_assignment" id="player_assignment_select" class="player-select intersoccer-player-select"></select>');
-                                    $select.append('<option value=""><?php esc_html_e('Select an Attendee', 'intersoccer-player-management'); ?></option>');
-                                    $.each(response.data.players, function(index, player) {
-                                        $select.append('<option value="' + index + '">' + player.first_name + ' ' + player.last_name + '</option>');
-                                    });
-                                    $playerContent.html($select);
-                                    $playerContent.append('<span class="error-message" style="color: red; display: none;"></span>');
-
-                                    $select.on('change', function() {
-                                        if ($(this).val()) {
-                                            $addToCartButton.prop('disabled', false);
-                                            console.log('InterSoccer: Add to Cart button enabled');
-                                        } else {
-                                            $addToCartButton.prop('disabled', true);
-                                            console.log('InterSoccer: Add to Cart button disabled');
-                                        }
-                                    });
-                                } else {
-                                    $playerContent.html('<p>No players registered. <a href="/my-account/manage-players/">Add a player</a>.</p>');
-                                }
-                                $playerContent.find('p').each(function() {
-                                    var $this = $(this);
-                                    var htmlContent = $this.html();
-                                    $this.html(htmlContent);
-                                });
-                            } else {
-                                $playerContent.html('<p>Error loading players.</p>');
-                            }
-                        },
-                        error: function(xhr) {
-                            console.error('InterSoccer: Failed to fetch players:', xhr.responseText);
-                            $form.find('.intersoccer-player-content').html('<p>Error loading players.</p>');
-                        }
-                    });
-                }
-            }
-
-            injectFields();
-            setTimeout(injectFields, 3000);
-
-            $('form.cart').on('found_variation', function() {
-                if (!$('form.cart').find('.intersoccer-day-selection').length) {
-                    console.log('InterSoccer: Day selection container missing after variation change, re-injecting');
-                    injectFields();
-                }
-            });
-        });
-    </script>
+            <div class="intersoccer-table-wrapper">
+                <table class="wp-list-table widefat fixed striped">
+                    <thead>
+                        <tr>
+                            <# if ( settings.show_first_name ) { #>
+                                <th scope="col">{{{ settings.first_name_heading }}}</th>
+                                <# } #>
+                                    <# if ( settings.show_last_name ) { #>
+                                        <th scope="col">{{{ settings.last_name_heading }}}</th>
+                                        <# } #>
+                                            <# if ( settings.show_dob ) { #>
+                                                <th scope="col">{{{ settings.dob_heading }}}</th>
+                                                <# } #>
+                                                    <# if ( settings.show_gender ) { #>
+                                                        <th scope="col">{{{ settings.gender_heading }}}</th>
+                                                        <# } #>
+                                                            <# if ( settings.show_avs_number ) { #>
+                                                                <th scope="col">{{{ settings.avs_number_heading }}}</th>
+                                                                <# } #>
+                                                                    <# if ( settings.show_events ) { #>
+                                                                        <th scope="col">{{{ settings.events_heading }}}</th>
+                                                                        <# } #>
+                                                                            <th scope="col" class="actions">{{{ settings.actions_heading }}}</th>
+                        </tr>
+                    </thead>
+                    <tbody id="player-table">
+                        <tr class="no-players">
+                            <td colspan="7">No attendees added yet.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
 <?php
+    }
+}
+
+// Register the widget
+add_action('elementor/widgets/register', function ($widgets_manager) {
+    $widgets_manager->register(new InterSoccer_Attendee_Management_Widget());
 });
 
-// Validate player/day selection and fetch price for Courses
-add_action('wp_footer', function () {
-    if (!is_product()) {
-        return;
-    }
-?>
-    <script>
-        jQuery(document).ready(function($) {
-            var $form = $('form.cart');
-            if (!$form.length) {
-                $form = $('.woocommerce-product-details form.cart');
-            }
-            if (!$form.length) {
-                $form = $('.product form.cart');
-            }
-            if (!$form.length) {
-                console.error('InterSoccer: Product form not found for validation');
-                return;
-            }
-
-            // Handle variation change for Courses
-            $form.on('found_variation', function(event, variation) {
-                if (!variation) return;
-
-                $.ajax({
-                    url: intersoccerCheckout.ajax_url,
-                    type: 'POST',
-                    data: {
-                        action: 'intersoccer_get_course_metadata',
-                        nonce: intersoccerCheckout.nonce,
-                        product_id: <?php echo $product_id; ?>,
-                        variation_id: variation.variation_id
-                    },
-                    success: function(response) {
-                        if (response.success && response.data) {
-                            var $priceContainer = $form.find('.intersoccer-price-container');
-                            var regularPrice = parseFloat(variation.display_regular_price);
-                            var customPrice = response.data.weekly_discount ?
-                                regularPrice - (response.data.weekly_discount * (response.data.total_weeks - response.data.remaining_weeks)) :
-                                regularPrice;
-
-                            if (response.data.activity_type === 'course' && customPrice < regularPrice) {
-                                $priceContainer.show();
-                                $form.find('.intersoccer-subtotal').show().find('.subtotal-amount').text(wc_price(regularPrice));
-                                $form.find('.intersoccer-discounted').show().find('.discounted-amount').text(wc_price(customPrice));
-                                $form.find('input[name="adjusted_price"]').val(customPrice);
-                                $form.find('input[name="remaining_weeks"]').val(response.data.remaining_weeks);
-                            } else {
-                                $priceContainer.hide();
-                            }
-                        }
-                    },
-                    error: function(xhr) {
-                        console.error('InterSoccer: Failed to fetch course metadata:', xhr.responseText);
-                    }
-                });
-            });
-
-            // Format price to match WooCommerce
-            function wc_price(price) {
-                return '<?php echo wc_price(0); ?>'.replace('0.00', price.toFixed(2));
-            }
-
-            $form.on('submit', function(e) {
-                var playerId = $form.find('.player-select').val();
-                if (!playerId && intersoccerCheckout.user_id && intersoccerCheckout.user_id !== '0') {
-                    e.preventDefault();
-                    $form.find('.intersoccer-player-selection .error-message').text('Please Select an Attendee.').show();
-                    setTimeout(() => $form.find('.intersoccer-player-selection .error-message').hide(), 5000);
-                }
-                var bookingType = $form.find('select[name="attribute_pa_booking-type"]').val();
-                if (bookingType === 'single-days') {
-                    var selectedDays = $form.find('input[name="camp_days[]"]:checked').length;
-                    if (!selectedDays) {
-                        e.preventDefault();
-                        $form.find('.intersoccer-day-selection .error-message').text('Please select at least one day.').show();
-                        setTimeout(() => $form.find('.intersoccer-day-selection .error-message').hide(), 5000);
-                    }
-                }
-            });
-        });
-    </script>
-    <style>
-        .intersoccer-price-container {
-            margin-top: 15px;
-            padding: 10px;
-            background-color: var(--wp--preset--color--bg-color, #1B1A1A);
-            color: var(--wp--preset--color--text-dark, #FFFEFE);
-            border: 1px solid var(--wp--preset--color--text-light, #8F8E8E);
-            border-radius: 4px;
-        }
-
-        .intersoccer-price-details p {
-            margin: 5px 0;
-        }
-    </style>
-<?php
+// Register the widget category
+add_action('elementor/elements/categories_registered', function ($elements_manager) {
+    $elements_manager->add_category(
+        'intersoccer',
+        [
+            'title' => __('InterSoccer', 'intersoccer-player-management'),
+            'icon' => 'fa fa-plug',
+        ]
+    );
 });
 ?>
