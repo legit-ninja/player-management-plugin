@@ -133,17 +133,18 @@
     if (isAdd || (dobDay && dobMonth && dobYear)) {
       const dob = `${dobYear}-${dobMonth}-${dobDay}`;
       const dobDate = new Date(dob);
-      const today = new Date("2025-06-05");
-      if (isNaN(dobDate.getTime()) || dobDate > today) {
+      // Use server time for consistency
+      const serverDate = new Date(intersoccerPlayer.server_time);
+      if (isNaN(dobDate.getTime()) || dobDate > serverDate) {
         $dobDay.next(".error-message").text("Invalid date of birth.").show();
         isValid = false;
       } else {
         const age =
-          today.getFullYear() -
+          serverDate.getFullYear() -
           dobDate.getFullYear() -
-          (today.getMonth() < dobDate.getMonth() ||
-          (today.getMonth() === dobDate.getMonth() &&
-            today.getDate() < dobDate.getDate())
+          (serverDate.getMonth() < dobDate.getMonth() ||
+          (serverDate.getMonth() === dobDate.getMonth() &&
+            serverDate.getDate() < dobDate.getDate())
             ? 1
             : 0);
         if (age < 2 || age > 13) {

@@ -15,6 +15,7 @@
  * - Added duplicate check in intersoccer_add_player to prevent adding duplicate players (2025-05-21).
  * - Added function to fetch product attributes for admin filters (2025-05-21).
  * - Added logic to store player assignments in order item meta (2025-05-21).
+ * - Enhanced nonce debugging and added proactive refresh handling (2025-06-09).
  * Testing:
  * - Test Add/Edit/Delete players with any user role, no 403 errors.
  * - Verify nonce refresh works, user role fetch returns correct role.
@@ -123,8 +124,11 @@ function intersoccer_get_product_attribute_values($attribute_name)
 add_action('wp_ajax_intersoccer_add_player', function () {
     error_log('InterSoccer: intersoccer_add_player called, nonce: ' . ($_POST['nonce'] ?? 'none') . ', user_id: ' . get_current_user_id());
     if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'intersoccer_player_nonce')) {
-        error_log('InterSoccer: Nonce verification failed for intersoccer_add_player, received: ' . ($_POST['nonce'] ?? 'none'));
-        wp_send_json_error(['message' => 'Invalid security token']);
+        error_log('InterSoccer: Nonce verification failed for intersoccer_add_player, received: ' . ($_POST['nonce'] ?? 'none') . ', expected: ' . wp_create_nonce('intersoccer_player_nonce'));
+        // Attempt to refresh nonce if invalid
+        $new_nonce = wp_create_nonce('intersoccer_player_nonce');
+        error_log('InterSoccer: Generated new nonce due to failure: ' . $new_nonce);
+        wp_send_json_error(['message' => 'Invalid security token, please refresh and try again', 'new_nonce' => $new_nonce]);
         return;
     }
 
@@ -134,8 +138,7 @@ add_action('wp_ajax_intersoccer_add_player', function () {
         return;
     }
 
-    $is_admin = current_user_can('manage_options') && !empty($_POST['is_admin']);
-    $user_id = $is_admin ? intval($_POST['player_user_id'] ?? 0) : get_current_user_id();
+    $user_id = get_current_user_id();
     if ($user_id <= 0 || !get_userdata($user_id)) {
         error_log('InterSoccer: Invalid user ID for intersoccer_add_player: ' . $user_id);
         wp_send_json_error(['message' => 'Invalid user ID']);
@@ -165,21 +168,13 @@ add_action('wp_ajax_intersoccer_add_player', function () {
         return;
     }
 
-    // Validate AVS number (756.XXXX.XXXX.XX)
-    // if (!preg_match('/^756\.\d{4}\.\d{4}\.\d{2}$/', $avs_number)) {
-    //     error_log('InterSoccer: Invalid AVS number format for intersoccer_add_player: ' . $avs_number);
-    //     wp_send_json_error(['message' => 'Invalid AVS number format (e.g., 756.1234.5678.90)']);
-    //     return;
-    // }
-
-    // Validate DOB format (YYYY-MM-DD) and age (2-13)
     if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $dob)) {
         error_log('InterSoccer: Invalid DOB format for intersoccer_add_player: ' . $dob);
         wp_send_json_error(['message' => 'Invalid date of birth']);
         return;
     }
     $dob_date = DateTime::createFromFormat('Y-m-d', $dob);
-    $today = new DateTime('2025-05-22');
+    $today = new DateTime('2025-06-09');
     if (!$dob_date || $dob_date > $today) {
         error_log('InterSoccer: Invalid DOB date for intersoccer_add_player: ' . $dob);
         wp_send_json_error(['message' => 'Invalid date of birth']);
@@ -194,7 +189,6 @@ add_action('wp_ajax_intersoccer_add_player', function () {
 
     $players = get_user_meta($user_id, 'intersoccer_players', true) ?: [];
 
-    // Check for duplicates based on first_name, last_name, and dob
     foreach ($players as $existing_player) {
         if (
             $existing_player['first_name'] === $first_name &&
@@ -215,7 +209,7 @@ add_action('wp_ajax_intersoccer_add_player', function () {
         'avs_number' => $avs_number,
         'medical_conditions' => $medical,
         'creation_timestamp' => current_time('timestamp'),
-        'event_count' => 0 // New players start with 0 events
+        'event_count' => 0
     ];
     $players[] = $new_player;
     $update_result = update_user_meta($user_id, 'intersoccer_players', $players);
@@ -281,14 +275,6 @@ add_action('wp_ajax_intersoccer_edit_player', function () {
         return;
     }
 
-    // Validate AVS number
-    // if (!preg_match('/^756\.\d{4}\.\d{4}\.\d{2}$/', $avs_number)) {
-    //     error_log('InterSoccer: Invalid AVS number format for intersoccer_edit_player: ' . $avs_number);
-    //     wp_send_json_error(['message' => 'Invalid AVS number format (e.g., 756.1234.5678.90)']);
-    //     return;
-    // }
-
-    // Validate DOB if provided
     if (!empty($dob)) {
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $dob)) {
             error_log('InterSoccer: Invalid DOB format for intersoccer_edit_player: ' . $dob);
@@ -296,7 +282,7 @@ add_action('wp_ajax_intersoccer_edit_player', function () {
             return;
         }
         $dob_date = DateTime::createFromFormat('Y-m-d', $dob);
-        $today = new DateTime('2025-05-22');
+        $today = new DateTime('2025-06-09');
         if (!$dob_date || $dob_date > $today) {
             error_log('InterSoccer: Invalid DOB date for intersoccer_edit_player: ' . $dob);
             wp_send_json_error(['message' => 'Invalid date of birth']);
@@ -317,7 +303,6 @@ add_action('wp_ajax_intersoccer_edit_player', function () {
         return;
     }
 
-    // Preserve existing DOB/gender if not provided (for Grace Period)
     $updated_player = [
         'first_name' => $first_name,
         'last_name' => $last_name,
@@ -513,19 +498,5 @@ add_action('woocommerce_checkout_create_order_line_item', function ($item, $cart
         $item->add_meta_data('intersoccer_player_index', $player_index, true);
     }
 }, 10, 4);
-
-// add_action('wp_ajax_intersoccer_add_new_player', 'intersoccer_add_player');
-// function intersoccer_add_player() {
-//     check_ajax_referer('intersoccer_nonce', 'nonce');
-//     $user_id = get_current_user_id();
-//     $players = get_user_meta($user_id, 'intersoccer_players', true) ?: [];
-//     $players[] = [
-//         'first_name' => sanitize_text_field($_POST['first_name']),
-//         'last_name' => sanitize_text_field($_POST['last_name'])
-//     ];
-//     update_user_meta($user_id, 'intersoccer_players', $players);
-//     update_user_meta($user_id, 'intersoccer_default_player', count($players) - 1);
-//     wp_send_json_success();
-// }
 
 ?>
