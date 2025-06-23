@@ -10,6 +10,8 @@ if (!defined('ABSPATH')) {
 }
 
 class Player_Management_Admin {
+    private $all_players_data = [];
+
     public function __construct() {
         add_action('admin_menu', [$this, 'add_admin_menu']);
         add_action('admin_menu', [$this, 'remove_duplicate_menu'], 999);
@@ -89,7 +91,9 @@ class Player_Management_Admin {
 
     public function render_overview_page() {
         wp_enqueue_script('chart-js', 'https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js', [], '3.9.1', true);
-        $users = get_users(['role' => 'customer']);
+
+        // Use all_players_data from render_all_players_page
+        $players = $this->all_players_data;
         $gender_data = [];
         $region_data = [];
         $age_counts = array_fill(3, 11, 0); // Ages 3 to 13
@@ -97,31 +101,22 @@ class Player_Management_Admin {
         $total_players = 0;
         $total_ages = 0;
         $player_count = 0;
-        $active_players = 0; // Players who participated in events this season
-        $new_registrations = 0; // Players registered this month
+        $active_players = 0;
+        $new_registrations = 0;
         $players_with_medical_conditions = 0;
         $coaches_organizers = [];
-        $event_trends = [
-            'months' => [],
-            'camps' => [],
-            'courses' => [],
-            'birthdays' => [],
-        ];
-        $registration_trends = [
-            'months' => [],
-            'counts' => [],
-        ];
+        $event_trends = ['months' => [], 'camps' => [], 'courses' => [], 'birthdays' => []];
+        $registration_trends = ['months' => [], 'counts' => []];
         $season_counts = ['Spring' => 0, 'Summer' => 0, 'Autumn' => 0, 'Winter' => 0];
         $venue_counts = [];
-        $attended_players = 0; // Players who attended at least one event this season
-        $total_events = 0; // Total events this season
-        $total_event_participations = 0; // Total participations across all players
+        $attended_players = 0;
+        $total_events = 0;
+        $total_event_participations = 0;
 
-        // Calculate event trends for the past 6 months and active players
-        $current_date = new DateTime('2025-06-05');
-        $current_season = 'Summer'; // Based on June
-        $season_start = (clone $current_date)->modify('first day of March 2025')->format('Y-m-d'); // Example season start
-        $month_start = (clone $current_date)->modify('first day of this month')->format('Y-m-d'); // Start of June 2025
+        $current_date = new DateTime('2025-06-20 18:14 EDT'); // Updated to current date and time
+        $current_season = 'Summer';
+        $season_start = (clone $current_date)->modify('first day of March 2025')->format('Y-m-d');
+        $month_start = (clone $current_date)->modify('first day of this month')->format('Y-m-d');
         for ($i = 5; $i >= 0; $i--) {
             $month_date = (clone $current_date)->modify("-$i months");
             $month_key = $month_date->format('Y-m');
@@ -133,138 +128,124 @@ class Player_Management_Admin {
             $registration_trends['counts'][$month_key] = 0;
         }
 
-        foreach ($users as $user) {
-            $players = get_user_meta($user->ID, 'intersoccer_players', true) ?: [];
-            $billing_state = get_user_meta($user->ID, 'billing_state', true) ?: '';
-            $billing_city = get_user_meta($user->ID, 'billing_city', true) ?: '';
+        foreach ($players as $player) {
+            $total_players++;
+            $gender = isset($player['gender']) ? strtolower($player['gender']) : 'other';
+            $gender_data[$gender] = isset($gender_data[$gender]) ? $gender_data[$gender] + 1 : 1;
+
+            if (!empty($player['medical_conditions'])) {
+                $players_with_medical_conditions++;
+            }
+
+            $dob = $player['dob'] ?? '';
+            if ($dob) {
+                $age = date_diff(date_create($dob), date_create('2025-06-20'))->y;
+                if ($age >= 3 && $age <= 13) {
+                    $age_counts[$age]++;
+                    $total_ages += $age;
+                    $player_count++;
+                }
+            }
+
+            if (!empty($player['creation_timestamp'])) {
+                $reg_date = new DateTime();
+                $reg_date->setTimestamp($player['creation_timestamp']);
+                $reg_month_key = $reg_date->format('Y-m');
+                if ($reg_date->format('Y-m-d') >= $month_start) {
+                    $new_registrations++;
+                }
+                if (isset($registration_trends['counts'][$reg_month_key])) {
+                    $registration_trends['counts'][$reg_month_key]++;
+                }
+                $month = (int)$reg_date->format('m');
+                if ($month >= 3 && $month <= 5) {
+                    $season_counts['Spring']++;
+                } elseif ($month >= 6 && $month <= 8) {
+                    $season_counts['Summer']++;
+                } elseif ($month >= 9 && $month <= 11) {
+                    $season_counts['Autumn']++;
+                } else {
+                    $season_counts['Winter']++;
+                }
+            }
+
+            $billing_state = $player['canton'] ?? '';
+            $billing_city = $player['city'] ?? '';
             $region = $billing_state && $billing_city ? "$billing_state - $billing_city" : ($billing_state ?: ($billing_city ?: 'Unknown'));
-            $region_data[$region] = isset($region_data[$region]) ? $region_data[$region] + count($players) : count($players);
+            $region_data[$region] = isset($region_data[$region]) ? $region_data[$region] + 1 : 1;
+
             $orders = wc_get_orders([
-                'customer_id' => $user->ID,
+                'customer_id' => $player['user_id'],
                 'status' => ['wc-completed', 'wc-processing'],
                 'limit' => -1,
                 'date_after' => (clone $current_date)->modify('-6 months')->format('Y-m-d'),
             ]);
 
             $has_active_events = false;
-            foreach ($players as $player) {
-                $total_players++;
-                $gender = isset($player['gender']) ? strtolower($player['gender']) : 'other';
-                $gender_data[$gender] = isset($gender_data[$gender]) ? $gender_data[$gender] + 1 : 1;
-
-                if (!empty($player['medical_conditions'])) {
-                    $players_with_medical_conditions++;
-                }
-
-                $dob = $player['dob'] ?? '';
-                if ($dob) {
-                    $age = date_diff(date_create($dob), date_create('2025-06-05'))->y;
-                    if ($age >= 3 && $age <= 13) {
-                        $age_counts[$age]++;
-                        $total_ages += $age;
-                        $player_count++;
+            foreach ($orders as $order) {
+                $order_players = $order->get_meta('intersoccer_players', true);
+                $player_name = isset($player['name']) ? $player['name'] : (isset($player['first_name']) ? $player['first_name'] : '');
+                if ($order_players && in_array($player_name, (array)$order_players)) {
+                    $order_date = new DateTime($order->get_date_created()->date('Y-m-d'));
+                    $month_key = $order_date->format('Y-m');
+                    if ($order_date->format('Y-m-d') >= $season_start) {
+                        $has_active_events = true;
+                        $total_events++;
+                        $total_event_participations++;
                     }
-                }
-
-                // Check for new registrations this month and registration trends
-                if (!empty($player['creation_timestamp'])) {
-                    $reg_date = new DateTime();
-                    $reg_date->setTimestamp($player['creation_timestamp']);
-                    $reg_month_key = $reg_date->format('Y-m');
-                    if ($reg_date->format('Y-m-d') >= $month_start) {
-                        $new_registrations++;
-                    }
-                    if (isset($registration_trends['counts'][$reg_month_key])) {
-                        $registration_trends['counts'][$reg_month_key]++;
-                    }
-                    $month = (int)$reg_date->format('m');
-                    if ($month >= 3 && $month <= 5) {
-                        $season_counts['Spring']++;
-                    } elseif ($month >= 6 && $month <= 8) {
-                        $season_counts['Summer']++;
-                    } elseif ($month >= 9 && $month <= 11) {
-                        $season_counts['Autumn']++;
-                    } else {
-                        $season_counts['Winter']++;
-                    }
-                }
-
-                foreach ($orders as $order) {
-                    $order_players = $order->get_meta('intersoccer_players', true);
-                    $player_name = isset($player['name']) ? $player['name'] : (isset($player['first_name']) ? $player['first_name'] : '');
-                    if ($order_players && in_array($player_name, (array)$order_players)) {
-                        $order_date = new DateTime($order->get_date_created()->date('Y-m-d'));
-                        $month_key = $order_date->format('Y-m');
-                        // Check if order is within this season
-                        if ($order_date->format('Y-m-d') >= $season_start) {
-                            $has_active_events = true;
-                            $total_events++;
-                            $total_event_participations++;
+                    foreach ($order->get_items() as $item) {
+                        $product = $item->get_product();
+                        if (!$product) continue;
+                        $categories = wp_get_post_terms($product->get_id(), 'product_cat', ['fields' => 'names']);
+                        if (in_array('Camps', $categories)) {
+                            $event_type_counts['Camps']++;
+                            if (isset($event_trends['camps'][$month_key])) {
+                                $event_trends['camps'][$month_key]++;
+                            }
+                        } elseif (in_array('Courses', $categories)) {
+                            $event_type_counts['Courses']++;
+                            if (isset($event_trends['courses'][$month_key])) {
+                                $event_trends['courses'][$month_key]++;
+                            }
+                        } elseif (in_array('Birthdays', $categories)) {
+                            $event_type_counts['Birthdays']++;
+                            if (isset($event_trends['birthdays'][$month_key])) {
+                                $event_trends['birthdays'][$month_key]++;
+                            }
                         }
-                        foreach ($order->get_items() as $item) {
-                            $product = $item->get_product();
-                            if (!$product) continue;
-                            $categories = wp_get_post_terms($product->get_id(), 'product_cat', ['fields' => 'names']);
-                            if (in_array('Camps', $categories)) {
-                                $event_type_counts['Camps']++;
-                                if (isset($event_trends['camps'][$month_key])) {
-                                    $event_trends['camps'][$month_key]++;
-                                }
-                            } elseif (in_array('Courses', $categories)) {
-                                $event_type_counts['Courses']++;
-                                if (isset($event_trends['courses'][$month_key])) {
-                                    $event_trends['courses'][$month_key]++;
-                                }
-                            } elseif (in_array('Birthdays', $categories)) {
-                                $event_type_counts['Birthdays']++;
-                                if (isset($event_trends['birthdays'][$month_key])) {
-                                    $event_trends['birthdays'][$month_key]++;
-                                }
-                            }
 
-                            // Venue participation
-                            $venue = $product->get_attribute('pa_venue') ?: 'Unknown';
-                            $venue_counts[$venue] = isset($venue_counts[$venue]) ? $venue_counts[$venue] + 1 : 1;
+                        $venue = $product->get_attribute('pa_venue') ?: 'Unknown';
+                        $venue_counts[$venue] = isset($venue_counts[$venue]) ? $venue_counts[$venue] + 1 : 1;
 
-                            // Assign players to coaches/organizers
-                            $coach = $order->get_meta('assigned_coach', true);
-                            $organizer = $order->get_meta('assigned_organizer', true);
-                            if ($coach) {
-                                $coaches_organizers[$coach] = isset($coaches_organizers[$coach]) ? $coaches_organizers[$coach] + 1 : 1;
-                            }
-                            if ($organizer) {
-                                $coaches_organizers[$organizer] = isset($coaches_organizers[$organizer]) ? $coaches_organizers[$organizer] + 1 : 1;
-                            }
+                        $coach = $order->get_meta('assigned_coach', true);
+                        $organizer = $order->get_meta('assigned_organizer', true);
+                        if ($coach) {
+                            $coaches_organizers[$coach] = isset($coaches_organizers[$coach]) ? $coaches_organizers[$coach] + 1 : 1;
+                        }
+                        if ($organizer) {
+                            $coaches_organizers[$organizer] = isset($coaches_organizers[$organizer]) ? $coaches_organizers[$organizer] + 1 : 1;
                         }
                     }
                 }
-                if ($has_active_events) {
-                    $active_players++;
-                    $attended_players++;
-                }
+            }
+            if ($has_active_events) {
+                $active_players++;
+                $attended_players++;
             }
         }
 
-        // Calculate additional stats
         $average_age = $player_count > 0 ? $total_ages / $player_count : 0;
         $attendance_rate = $total_players > 0 ? ($attended_players / $total_players) * 100 : 0;
         $top_event_type = array_keys($event_type_counts, max($event_type_counts))[0];
         $avg_events_per_player = $total_players > 0 ? $total_event_participations / $total_players : 0;
 
-        // Sort regions by player count (descending) for Top 5 Regions
         arsort($region_data);
         $top_regions = array_slice($region_data, 0, 5, true);
 
-        // Sort venues by participation (descending)
         arsort($venue_counts);
         $top_venues = array_slice($venue_counts, 0, 5, true);
 
-        // Prepare event trends and registration trends data
-        $event_trends_data = [
-            'camps' => [],
-            'courses' => [],
-            'birthdays' => [],
-        ];
+        $event_trends_data = ['camps' => [], 'courses' => [], 'birthdays' => []];
         $registration_trends_data = [];
         foreach ($event_trends['months'] as $month) {
             $month_key = DateTime::createFromFormat('M Y', $month)->format('Y-m');
@@ -274,174 +255,39 @@ class Player_Management_Admin {
             $registration_trends_data[] = $registration_trends['counts'][$month_key] ?? 0;
         }
 
-        // Inline CSS for dense stock broker-style dashboard
         $inline_css = '
-            .wrap { 
-                background: #1e2529; 
-                color: #fff; 
-                padding: 10px; 
-                border-radius: 8px; 
-                font-family: "Arial", sans-serif; 
-                min-height: 100vh; 
-            }
-            h1 { 
-                color: #00ff00; 
-                text-align: center; 
-                font-size: 22px; 
-                margin-bottom: 10px; 
-                text-transform: uppercase; 
-                letter-spacing: 2px; 
-                text-shadow: 0 0 5px rgba(0,255,0,0.5); 
-            }
+            .wrap { background: #1e2529; color: #fff; padding: 10px; border-radius: 8px; font-family: "Arial", sans-serif; min-height: 100vh; }
+            h1 { color: #00ff00; text-align: center; font-size: 22px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 5px rgba(0,255,0,0.5); }
             .dashboard-section { margin-bottom: 8px; }
-            .quick-stats { 
-                display: grid; 
-                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); 
-                gap: 5px; 
-                padding: 8px; 
-                background: #252c31; 
-                border-radius: 6px; 
-            }
-            .quick-stats > div { 
-                background: linear-gradient(135deg, #2c3439, #1e2529); 
-                padding: 10px; 
-                border-radius: 4px; 
-                text-align: center; 
-                box-shadow: 0 1px 3px rgba(0,0,0,0.5); 
-                transition: transform 0.3s ease, box-shadow 0.3s ease; 
-                border: 1px solid rgba(0,255,0,0.1); 
-            }
-            .quick-stats > div:hover { 
-                transform: translateY(-2px); 
-                box-shadow: 0 3px 8px rgba(0,255,0,0.4); 
-                border-color: rgba(0,255,0,0.3); 
-            }
-            .quick-stats h3 { 
-                margin: 0 0 3px 0; 
-                font-size: 11px; 
-                color: #bbb; 
-                text-transform: uppercase; 
-                letter-spacing: 0.8px; 
-            }
-            .quick-stats p { 
-                font-size: 16px; 
-                margin: 0; 
-                color: #00ff00; 
-                font-weight: 600; 
-                text-shadow: 0 0 2px rgba(0,255,0,0.3); 
-            }
-            .quick-stats .alert p { 
-                color: #ff4444; 
-                text-shadow: 0 0 2px rgba(255,68,68,0.3); 
-            }
-            .main-dashboard { 
-                display: grid; 
-                grid-template-columns: 30% 40% 30%; 
-                gap: 5px; 
-                padding: 8px; 
-                background: #252c31; 
-                border-radius: 6px; 
-            }
-            .left-column, .center-column, .right-column { 
-                display: flex; 
-                flex-direction: column; 
-                gap: 5px; 
-            }
-            .widget { 
-                background: linear-gradient(135deg, #2c3439, #1e2529); 
-                padding: 10px; 
-                border-radius: 4px; 
-                box-shadow: 0 1px 3px rgba(0,0,0,0.5); 
-                transition: box-shadow 0.3s ease; 
-                border: 1px solid rgba(0,255,0,0.1); 
-            }
-            .widget:hover { 
-                box-shadow: 0 3px 8px rgba(0,255,0,0.4); 
-                border-color: rgba(0,255,0,0.3); 
-            }
-            .widget h2 { 
-                font-size: 12px; 
-                margin: 0 0 6px 0; 
-                color: #00ff00; 
-                text-align: center; 
-                text-transform: uppercase; 
-                letter-spacing: 0.8px; 
-                text-shadow: 0 0 2px rgba(0,255,0,0.2); 
-            }
-            .chart-container { 
-                width: 100% !important; 
-                height: 180px !important; 
-                margin: 0 auto; 
-                position: relative; 
-            }
-            .event-trends .chart-container { 
-                width: 100% !important; 
-                height: 250px !important; 
-            }
-            .mini-chart .chart-container { 
-                height: 120px !important; 
-            }
-            .widget canvas { 
-                width: 100% !important; 
-                height: 100% !important; 
-            }
-            .small-charts { 
-                display: grid; 
-                grid-template-columns: repeat(2, 1fr); 
-                gap: 5px; 
-            }
-            .tables-section { 
-                display: grid; 
-                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
-                gap: 5px; 
-                padding: 8px; 
-                background: #252c31; 
-                border-radius: 6px; 
-            }
-            .tables-section > div, .coaches-section, .venues-section { 
-                background: linear-gradient(135deg, #2c3439, #1e2529); 
-                padding: 10px; 
-                border-radius: 4px; 
-                box-shadow: 0 1px 3px rgba(0,0,0,0.5); 
-                border: 1px solid rgba(0,255,0,0.1); 
-            }
-            .coaches-section, .venues-section { 
-                grid-column: 1 / -1; 
-                margin-top: 5px; 
-            }
-            .venues-section { 
-                max-height: 200px; 
-                overflow-y: auto; 
-            }
-            .wp-list-table { 
-                background: transparent; 
-                color: #fff; 
-                border: none; 
-                font-size: 11px; 
-            }
-            .wp-list-table th { 
-                background: #2c3439; 
-                color: #00ff00; 
-                border: 1px solid #3a4449; 
-                font-size: 11px; 
-                text-transform: uppercase; 
-                letter-spacing: 0.8px; 
-            }
-            .wp-list-table td { 
-                background: #1e2529; 
-                border: 1px solid #3a4449; 
-                font-size: 10px; 
-            }
-            .wp-list-table tr:hover td { 
-                background: #2c3439; 
-                transition: background 0.2s ease; 
-            }
-            .wp-list-table .sortable { 
-                cursor: pointer; 
-            }
-            .wp-list-table .sortable:hover { 
-                color: #ff4444; 
-            }
+            .quick-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 5px; padding: 8px; background: #252c31; border-radius: 6px; }
+            .quick-stats > div { background: linear-gradient(135deg, #2c3439, #1e2529); padding: 10px; border-radius: 4px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.5); transition: transform 0.3s ease, box-shadow 0.3s ease; border: 1px solid rgba(0,255,0,0.1); }
+            .quick-stats > div:hover { transform: translateY(-2px); box-shadow: 0 3px 8px rgba(0,255,0,0.4); border-color: rgba(0,255,0,0.3); }
+            .quick-stats h3 { margin: 0 0 3px 0; font-size: 11px; color: #bbb; text-transform: uppercase; letter-spacing: 0.8px; }
+            .quick-stats p { font-size: 16px; margin: 0; color: #00ff00; font-weight: 600; text-shadow: 0 0 2px rgba(0,255,0,0.3); }
+            .quick-stats .alert p { color: #ff4444; text-shadow: 0 0 2px rgba(255,68,68,0.3); }
+            .main-dashboard { display: grid; grid-template-columns: 30% 40% 30%; gap: 5px; padding: 8px; background: #252c31; border-radius: 6px; }
+            .left-column, .center-column, .right-column { display: flex; flex-direction: column; gap: 5px; }
+            .widget { background: linear-gradient(135deg, #2c3439, #1e2529); padding: 10px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.5); transition: box-shadow 0.3s ease; border: 1px solid rgba(0,255,0,0.1); }
+            .widget:hover { box-shadow: 0 3px 8px rgba(0,255,0,0.4); border-color: rgba(0,255,0,0.3); }
+            .widget h2 { font-size: 12px; margin: 0 0 6px 0; color: #00ff00; text-align: center; text-transform: uppercase; letter-spacing: 0.8px; text-shadow: 0 0 2px rgba(0,255,0,0.2); }
+            .chart-container { width: 100% !important; height: 180px !important; margin: 0 auto; position: relative; }
+            .event-trends .chart-container { width: 100% !important; height: 250px !important; }
+            .mini-chart .chart-container { height: 120px !important; }
+            .widget canvas { width: 100% !important; height: 100% !important; }
+            .small-charts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; }
+            .tables-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 5px; padding: 8px; background: #252c31; border-radius: 6px; }
+            .tables-section > div, .coaches-section, .venues-section { background: linear-gradient(135deg, #2c3439, #1e2529); padding: 10px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.5); border: 1px solid rgba(0,255,0,0.1); }
+            .coaches-section, .venues-section { grid-column: 1 / -1; margin-top: 5px; }
+            .venues-section { max-height: 200px; overflow-y: auto; }
+            .wp-list-table { background: transparent; color: #fff; border: none; font-size: 11px; }
+            .wp-list-table th { background: #2c3439; color: #00ff00; border: 1px solid #3a4449; font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; }
+            .wp-list-table td { background: #1e2529; border: 1px solid #3a4449; font-size: 10px; }
+            .wp-list-table tr:hover td { background: #2c3439; transition: background 0.2s ease; }
+            .wp-list-table .sortable { cursor: pointer; }
+            .wp-list-table .sortable:hover { color: #ff4444; }
+            .filter-section { margin-bottom: 10px; padding: 10px; background: #252c31; border-radius: 6px; }
+            .filter-section label { margin-right: 10px; color: #bbb; }
+            .filter-section select, .filter-section input { padding: 5px; width: 200px; }
 
             @media (max-width: 1200px) {
                 .main-dashboard { grid-template-columns: 50% 50%; }
@@ -461,42 +307,6 @@ class Player_Management_Admin {
         ?>
         <div class="wrap">
             <h1><?php _e('Players Overview Dashboard', 'player-management'); ?></h1>
-
-            <!-- Quick Stats -->
-            <div class="dashboard-section quick-stats">
-                <div>
-                    <h3><?php _e('Total Players', 'player-management'); ?></h3>
-                    <p><?php echo esc_html($total_players); ?></p>
-                </div>
-                <div>
-                    <h3><?php _e('Active Players', 'player-management'); ?></h3>
-                    <p><?php echo esc_html($active_players); ?></p>
-                </div>
-                <div>
-                    <h3><?php _e('Attendance Rate', 'player-management'); ?></h3>
-                    <p><?php echo esc_html(number_format($attendance_rate, 1)); ?>%</p>
-                </div>
-                <div>
-                    <h3><?php _e('Total Events', 'player-management'); ?></h3>
-                    <p><?php echo esc_html($total_events); ?></p>
-                </div>
-                <div>
-                    <h3><?php _e('Avg Events/Player', 'player-management'); ?></h3>
-                    <p><?php echo esc_html(number_format($avg_events_per_player, 1)); ?></p>
-                </div>
-                <div class="<?php echo $players_with_medical_conditions > 0 ? 'alert' : ''; ?>">
-                    <h3><?php _e('Medical Alerts', 'player-management'); ?></h3>
-                    <p><?php echo esc_html($players_with_medical_conditions); ?></p>
-                </div>
-                <div>
-                    <h3><?php _e('New This Month', 'player-management'); ?></h3>
-                    <p><?php echo esc_html($new_registrations); ?></p>
-                </div>
-                <div>
-                    <h3><?php _e('Top Event Type', 'player-management'); ?></h3>
-                    <p><?php echo esc_html($top_event_type); ?></p>
-                </div>
-            </div>
 
             <!-- Main Dashboard -->
             <div class="dashboard-section main-dashboard">
@@ -824,9 +634,7 @@ class Player_Management_Admin {
                                     bValue = parseInt(bValue);
                                     return isAscending ? bValue - aValue : aValue - bValue;
                                 } else {
-                                    return isAscending 
-                                        ? bValue.localeCompare(aValue) 
-                                        : aValue.localeCompare(bValue);
+                                    return isAscending ? bValue.localeCompare(aValue) : aValue.localeCompare(bValue);
                                 }
                             });
 
@@ -843,16 +651,13 @@ class Player_Management_Admin {
     public function render_all_players_page() {
         $users = get_users(['role' => 'customer']);
         $all_players = [];
-        $all_cantons = [];
-        $all_age_groups = array_map(function($age) { return "Age $age"; }, range(3, 14)); // Ages 3-14
-        $all_event_types = [];
-        $all_genders = ['Male', 'Female', 'Other'];
-        $today = '2025-06-05';
+        $unique_cantons = [];
+        $unique_genders = [];
+        $today = '2025-06-20';
 
         foreach ($users as $user) {
             $players = get_user_meta($user->ID, 'intersoccer_players', true) ?: [];
             $billing_state = get_user_meta($user->ID, 'billing_state', true) ?: '';
-            $billing_city = get_user_meta($user->ID, 'billing_city', true) ?: '';
             $orders = wc_get_orders([
                 'customer_id' => $user->ID,
                 'status' => ['wc-completed', 'wc-processing'],
@@ -864,13 +669,11 @@ class Player_Management_Admin {
                 $player['user_email'] = $user->user_email;
                 $player['index'] = $index;
                 $player['canton'] = $billing_state;
-                $player['city'] = $billing_city;
+                $player['city'] = get_user_meta($user->ID, 'billing_city', true) ?: '';
                 $player['event_count'] = 0;
                 $player['past_events'] = [];
-                $player['event_age_groups'] = [];
                 $player['event_types'] = [];
 
-                // Calculate age group based on DOB
                 $dob = $player['dob'] ?? '';
                 if ($dob) {
                     $age = date_diff(date_create($dob), date_create($today))->y;
@@ -902,7 +705,6 @@ class Player_Management_Admin {
                             if ($end_date && $this->is_date_past($end_date, $today)) {
                                 $player['past_events'][] = $item->get_name();
                             }
-                            // Collect event type data
                             if ($event_type && !in_array($event_type, $player['event_types'])) {
                                 $player['event_types'][] = $event_type;
                             }
@@ -911,31 +713,53 @@ class Player_Management_Admin {
                 }
 
                 $all_players[] = $player;
-                if ($billing_state && !in_array($billing_state, $all_cantons)) {
-                    $all_cantons[] = $billing_state;
+                if ($billing_state && !in_array($billing_state, $unique_cantons)) {
+                    $unique_cantons[] = $billing_state;
                 }
-                foreach ($player['event_types'] as $event_type) {
-                    if (!in_array($event_type, $all_event_types)) {
-                        $all_event_types[] = $event_type;
-                    }
+                $gender = isset($player['gender']) ? $player['gender'] : 'Unknown';
+                if (!in_array($gender, $unique_genders)) {
+                    $unique_genders[] = $gender;
                 }
             }
         }
 
-        sort($all_cantons);
-        sort($all_event_types);
+        // Store all_players_data for use in render_overview_page
+        $this->all_players_data = $all_players;
 
-        // Pass filter data and total players to intersoccer_render_players_form
-        $settings = [
-            'cantons' => $all_cantons,
-            'age_groups' => $all_age_groups,
-            'event_types' => $all_event_types,
-            'total_players' => count($all_players),
-        ];
+        $total_players = count($all_players);
         ?>
         <div class="wrap">
             <h1><?php _e('All Players', 'player-management'); ?></h1>
-            <?php echo intersoccer_render_players_form(true, $settings); ?>
+
+            <!-- Quick Stats with Only Total Players -->
+            <div class="dashboard-section quick-stats">
+                <div>
+                    <h3><?php _e('Total Players', 'player-management'); ?></h3>
+                    <p><?php echo esc_html($total_players); ?></p>
+                </div>
+            </div>
+
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <label for="filter-canton"><?php _e('Filter by Canton:', 'player-management'); ?></label>
+                <select id="filter-canton" class="widefat" style="width: 200px;">
+                    <option value=""><?php _e('All Cantons', 'player-management'); ?></option>
+                    <?php foreach ($unique_cantons as $canton) : ?>
+                        <option value="<?php echo esc_attr($canton); ?>"><?php echo esc_html($canton); ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <label for="filter-gender"><?php _e('Filter by Gender:', 'player-management'); ?></label>
+                <select id="filter-gender" class="widefat" style="width: 200px;">
+                    <option value=""><?php _e('All Genders', 'player-management'); ?></option>
+                    <?php foreach ($unique_genders as $gender) : ?>
+                        <option value="<?php echo esc_attr(strtolower($gender)); ?>"><?php echo esc_html($gender); ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <label for="player-search"><?php _e('Search by Name:', 'player-management'); ?></label>
+                <input type="text" id="player-search" placeholder="<?php _e('Enter player name...', 'player-management'); ?>" class="widefat">
+            </div>
+
+            <?php echo intersoccer_render_players_form(true, ['total_players' => $total_players]); ?>
         </div>
         <?php
     }

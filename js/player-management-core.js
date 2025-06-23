@@ -90,19 +90,19 @@
       ? $medicalRow.find('[name="player_medical"]')
       : $medicalRow.find('[name="player_medical"]');
 
-    const userId = $userId.val()?.trim();
-    const firstName = $firstName.val().trim();
-    const lastName = $lastName.val().trim();
-    const dobDay = $dobDay.val();
-    const dobMonth = $dobMonth.val();
-    const dobYear = $dobYear.val();
-    const gender = $gender.val();
-    const avsNumber = $avsNumber.val().trim();
+    const userId = $userId?.val()?.trim();
+    const firstName = $firstName?.val()?.trim();
+    const lastName = $lastName?.val()?.trim();
+    const dobDay = $dobDay?.val();
+    const dobMonth = $dobMonth?.val();
+    const dobYear = $dobYear?.val();
+    const gender = $gender?.val();
+    const avsNumber = $avsNumber?.val()?.trim();
     const medical = (
-      $medicalRow.length
+      $medicalRow?.length
         ? $medicalRow.find('[name="player_medical"]').val()
         : ""
-    ).trim();
+    )?.trim();
 
     if (isAdmin && isAdd && (!userId || userId <= 0)) {
       $userId.next(".error-message").text("Valid user ID required.").show();
@@ -110,8 +110,7 @@
     }
     if (
       !firstName ||
-      firstName.length > 50 ||
-      !/^[a-zA-Z\s\-\p{L}]+$/.test(firstName)
+      firstName.length > 50 
     ) {
       $firstName
         .next(".error-message")
@@ -121,8 +120,7 @@
     }
     if (
       !lastName ||
-      lastName.length > 50 ||
-      !/^[a-zA-Z\s\-\p{L}]+$/.test(lastName)
+      lastName.length > 50
     ) {
       $lastName
         .next(".error-message")
@@ -133,7 +131,6 @@
     if (isAdd || (dobDay && dobMonth && dobYear)) {
       const dob = `${dobYear}-${dobMonth}-${dobDay}`;
       const dobDate = new Date(dob);
-      // Use server time for consistency
       const serverDate = new Date(intersoccerPlayer.server_time);
       if (isNaN(dobDate.getTime()) || dobDate > serverDate) {
         $dobDay.next(".error-message").text("Invalid date of birth.").show();
@@ -162,14 +159,14 @@
         isValid = false;
       }
     }
-    if (avsNumber.length < 6) {
+    if (avsNumber && avsNumber.length < 6) {
       $avsNumber
         .next(".error-message")
         .text("Valid AVS number required.")
         .show();
       isValid = false;
     }
-    if (medical.length > 500) {
+    if (medical && medical.length > 500) {
       $medical
         .next(".error-message")
         .text("Medical conditions must be under 500 chars.")
