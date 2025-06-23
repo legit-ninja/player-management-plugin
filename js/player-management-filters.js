@@ -1,14 +1,12 @@
 /**
  * File: player-management-filters.js
- * Description: Handles filter logic for the player management table. Applies filters for Canton, Age Group, Event Type, and Gender, and initializes Select2 for filter dropdowns.
- * Dependencies: jQuery, player-management-core.js
+ * Description: Handles filter logic for the player management table. Applies pre-populated server-side filters for Canton and Gender, and name search in real-time.
+ * Dependencies: jQuery, player-management-core.js, Select2
  */
 
 (function ($) {
   if (typeof intersoccerPlayer === "undefined") {
-    console.error(
-      "InterSoccer: intersoccerPlayer not defined. Filters disabled."
-    );
+    console.error("InterSoccer: intersoccerPlayer not defined. Filters disabled.");
     return;
   }
 
@@ -16,10 +14,10 @@
   const isAdmin = intersoccerPlayer.is_admin === "1";
   const debugEnabled = intersoccerPlayer.debug === "1";
 
-  // Initialize Select2 for filters
+  // Initialize Select2 for filters if admin
   if (isAdmin) {
     $(document).ready(function() {
-      $('#filter-canton, #filter-age-group, #filter-event-type, #filter-gender').select2({
+      $('#filter-canton, #filter-gender').select2({
         placeholder: "Select an option",
         allowClear: true,
         width: 'resolve'
@@ -30,34 +28,22 @@
     });
   }
 
-  // Apply filters to the table
+  // Apply all filters in real-time
   function applyFilters() {
     const cantonFilter = $("#filter-canton").val() || "";
-    const ageGroupFilters = $("#filter-age-group").val() || []; // Multi-select
-    const eventTypeFilter = $("#filter-event-type").val() || "";
     const genderFilter = $("#filter-gender").val() || "";
+    const searchTerm = $("#player-search").val().toLowerCase().trim();
 
     if (debugEnabled) {
-      console.log(
-        "InterSoccer: Applying filters - Canton:",
-        cantonFilter,
-        "Age-Groups:",
-        ageGroupFilters,
-        "Event Type:",
-        eventTypeFilter,
-        "Gender:",
-        genderFilter
-      );
+      console.log("InterSoccer: Applying filters - Canton:", cantonFilter, "Gender:", genderFilter, "Search:", searchTerm);
     }
 
     $table.find("tr[data-player-index]").each(function () {
       const $row = $(this);
       const canton = ($row.data("canton") || "").toString().trim();
-      const eventAgeGroupsRaw = $row.data("event-age-groups") || "";
-      const eventAgeGroups = eventAgeGroupsRaw ? [eventAgeGroupsRaw.trim()] : []; // Treat as single value
-      const eventTypesRaw = $row.data("event-types") || "";
-      const eventTypes = eventTypesRaw ? eventTypesRaw.split(",").map(item => item.trim()).filter(item => item) : [];
       const gender = ($row.data("gender") || "other").toString().trim().toLowerCase();
+      const firstName = $row.find(".display-first-name").text().toLowerCase();
+      const lastName = $row.find(".display-last-name").text().toLowerCase();
 
       let showRow = true;
 
@@ -66,49 +52,33 @@
         showRow = false;
       }
 
-      // Age-Group filter (multi-select)
-      if (ageGroupFilters.length > 0 && ageGroupFilters[0] !== "") {
-        const hasValidAgeGroups = eventAgeGroups.length > 0 && eventAgeGroups[0] !== "";
-        const matchesAgeGroup = hasValidAgeGroups && eventAgeGroups.some(ageGroup => ageGroupFilters.includes(ageGroup));
-        if (!matchesAgeGroup && hasValidAgeGroups) {
-          showRow = false;
-        }
-      }
-
-      // Event Type filter
-      if (eventTypeFilter) {
-        const hasValidEventTypes = eventTypes.length > 0;
-        if (hasValidEventTypes && !eventTypes.includes(eventTypeFilter)) {
-          showRow = false;
-        }
-        // If no event types and "All Event Types" is not selected, hide the row
-        if (!hasValidEventTypes && eventTypeFilter !== "") {
-          showRow = false;
-        }
-      }
-
       // Gender filter
       if (genderFilter && gender !== genderFilter) {
         showRow = false;
       }
 
+      // Name search filter
+      if (searchTerm && !firstName.includes(searchTerm) && !lastName.includes(searchTerm)) {
+        showRow = false;
+      }
+
       if (debugEnabled) {
-        console.log("InterSoccer: Row data:", { canton, eventAgeGroups, eventTypes, gender, showRow });
+        console.log("InterSoccer: Row data:", { canton, gender, firstName, lastName, showRow });
       }
       $row.toggle(showRow);
     });
   }
 
-  // Initialize filters
+  // Initialize filters and event listeners
   if (isAdmin) {
-    $("#filter-canton, #filter-age-group, #filter-event-type, #filter-gender").on(
-      "change",
-      function () {
-        applyFilters();
-      }
-    );
-    // Apply filters on page load if values are set
-    applyFilters();
+    $(document).ready(function () {
+      // Real-time filter application
+      $("#filter-canton, #filter-gender").on("change", applyFilters);
+      $("#player-search").on("input", applyFilters);
+
+      // Apply filters on page load
+      applyFilters();
+    });
   }
 
   // Expose applyFilters for use after actions
