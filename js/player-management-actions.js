@@ -76,7 +76,7 @@
     const data = {
       action: action,
       nonce: intersoccerPlayer.nonce,
-      user_id: intersoccerPlayer.user_id,
+      user_id: isAdmin ? userId : intersoccerPlayer.user_id,
       player_user_id: userId,
       player_first_name: firstName,
       player_last_name: lastName,

@@ -294,13 +294,13 @@ add_action('wp_ajax_intersoccer_edit_player', function () {
     $players[$index] = $updated_player;
     $update_result = update_user_meta($user_id, 'intersoccer_players', $players);
     if ($update_result === false) {
-        error_log('InterSoccer: Failed to update intersoccer_players meta for user ' . $user_id);
+        error_log('InterSoccer: Failed to update intersoccer_players meta for user ' . $user_id . ' with data: ' . json_encode($updated_player));
         wp_send_json_error(['message' => 'Failed to save player data']);
         return;
     }
     wp_cache_delete('intersoccer_players_' . $user_id, 'intersoccer');
 
-    error_log('InterSoccer: Player edited successfully for user ' . $user_id);
+    error_log('InterSoccer: Player edited successfully for user ' . $user_id . ' with data: ' . json_encode($updated_player));
     wp_send_json_success([
         'message' => 'Player updated successfully',
         'player' => $updated_player,
@@ -403,7 +403,7 @@ add_action('wp_ajax_intersoccer_get_player', function () {
     }
 
     $is_admin = current_user_can('manage_options') && !empty($_POST['is_admin']);
-    $user_id = $is_admin ? intval($_POST['player_user_id'] ?? 0) : get_current_user_id();
+    $user_id = $is_admin ? intval($_POST['user_id'] ?? 0) : get_current_user_id();
     if ($user_id <= 0 || !get_userdata($user_id)) {
         error_log('InterSoccer: Invalid user ID for intersoccer_get_player: ' . $user_id);
         wp_send_json_error(['message' => 'Invalid user ID']);
