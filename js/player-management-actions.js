@@ -16,6 +16,38 @@
   const isAdmin = intersoccerPlayer.is_admin === "1";
   const debugEnabled = intersoccerPlayer.debug === "1";
 
+  // Fetch player data via AJAX
+  function fetchPlayerData(userId, index, callback) {
+    $.ajax({
+      url: intersoccerPlayer.ajax_url,
+      type: "POST",
+      data: {
+        action: "intersoccer_get_player",
+        nonce: intersoccerPlayer.nonce,
+        user_id: userId,
+        player_index: index,
+        is_admin: isAdmin ? "1" : "0"
+      },
+      success: function(response) {
+        if (response.success && response.data.player) {
+          if (debugEnabled) console.log("InterSoccer: Fetched player data:", response.data.player);
+          callback(response.data.player);
+        } else {
+          console.error("InterSoccer: Failed to fetch player data:", response.data?.message);
+          $message.text("Error: Unable to load player data.").show();
+          setTimeout(() => $message.hide(), 10000);
+          callback(null);
+        }
+      },
+      error: function(xhr) {
+        console.error("InterSoccer: AJAX error fetching player data:", xhr.status, xhr.responseText);
+        $message.text("Error: Failed to load player data - " + (xhr.responseText || "Unknown error")).show();
+        setTimeout(() => $message.hide(), 10000);
+        callback(null);
+      }
+    });
+  }
+
   // Save player (add or edit)
   function savePlayer($row, isAdd = false) {
     if (intersoccerState.isProcessing) return;
@@ -235,101 +267,110 @@
     const userId = $row.data("user-id") || intersoccerPlayer.user_id;
     intersoccerState.editingIndex = index;
 
-    const firstName = $row.attr("data-first-name") || "N/A";
-    const lastName = $row.attr("data-last-name") || "N/A";
-    const dob = $row.attr("data-dob") || "N/A";
-    const dobParts = dob !== "N/A" ? dob.split("-") : ["", "", ""];
-    const dobYear = dobParts[0];
-    const dobMonth = dobParts[1];
-    const dobDay = dobParts[2];
-    const gender = $row.attr("data-gender") || "N/A";
-    const avsNumber = $row.attr("data-avs-number") || "N/A";
-    const eventCount = $row.attr("data-event-count") || 0;
-    const canton = $row.data("canton") || "";
-    const city = $row.data("city") || "";
-    const medical = $row.next(`.medical-row[data-player-index="${index}"]`).find('[name="player_medical"]').val() || "";
-    const creationTimestamp = $row.attr("data-creation-timestamp") || "";
-
-    let colIndex = 0;
-    if (isAdmin) {
-      $row.find("td").eq(colIndex++).html(`<a href="/wp-admin/user-edit.php?user_id=${userId}" aria-label="Edit user profile">${userId}</a>`);
-      $row.find("td").eq(colIndex++).html(`<span class="display-canton">${canton}</span>`);
-      $row.find("td").eq(colIndex++).html(`<span class="display-city">${city}</span>`);
-    }
-    $row.find("td").eq(colIndex++).html(`
-      <input type="text" name="player_first_name" value="${firstName === "N/A" ? "" : firstName}" required aria-required="true" maxlength="50">
-      <span class="error-message" style="display: none;"></span>
-    `);
-    $row.find("td").eq(colIndex++).html(`
-      <input type="text" name="player_last_name" value="${lastName === "N/A" ? "" : lastName}" required aria-required="true" maxlength="50">
-      <span class="error-message" style="display: none;"></span>
-    `);
-    $row.find("td").eq(colIndex++).html(`
-      <select name="player_dob_day" required aria-required="true">
-          <option value="">Day</option>
-          ${Array.from({ length: 31 }, (_, i) => i + 1).map(day => `<option value="${String(day).padStart(2, "0")}" ${dobDay === String(day).padStart(2, "0") ? "selected" : ""}>${day}</option>`).join("")}
-      </select>
-      <select name="player_dob_month" required aria-required="true">
-          <option value="">Month</option>
-          ${Array.from({ length: 12 }, (_, i) => i + 1).map(month => `<option value="${String(month).padStart(2, "0")}" ${dobMonth === String(month).padStart(2, "0") ? "selected" : ""}>${new Date(2025, month - 1, 1).toLocaleString('default', { month: 'long' })}</option>`).join("")}
-      </select>
-      <select name="player_dob_year" required aria-required="true">
-          <option value="">Year</option>
-          ${Array.from({ length: 2023 - 2011 + 1 }, (_, i) => 2023 - i).map(year => `<option value="${year}" ${dobYear === String(year) ? "selected" : ""}>${year}</option>`).join("")}
-      </select>
-      <span class="error-message" style="display: none;"></span>
-    `);
-    $row.find("td").eq(colIndex++).html(`
-      <select name="player_gender" required aria-required="true">
-          <option value="">Select Gender</option>
-          <option value="male" ${gender === "male" ? "selected" : ""}>Male</option>
-          <option value="female" ${gender === "female" ? "selected" : ""}>Female</option>
-          <option value="other" ${gender === "other" ? "selected" : ""}>Other</option>
-      </select>
-      <span class="error-message" style="display: none;"></span>
-    `);
-    $row.find("td").eq(colIndex++).html(`
-      <input type="text" name="player_avs_number" value="${avsNumber === "N/A" ? "" : avsNumber}" required aria-required="true" maxlength="16" pattern="756\\.\\d{4}\\.\\d{4}\\.\\d{2}">
-      <span class="error-message" style="display: none;"></span>
-    `);
-    $row.find("td").eq(colIndex++).html(`<span class="display-event-count">${eventCount}</span>`);
-    if (isAdmin) {
-      $row.find("td").eq(colIndex++).html(`<span class="display-medical-conditions">${medical ? medical.substring(0, 20) + (medical.length > 20 ? "..." : "") : ""}</span>`);
-      $row.find("td").eq(colIndex++).html(`<span class="display-creation-date">${creationTimestamp ? new Date(creationTimestamp * 1000).toISOString().split("T")[0] : "N/A"}</span>`);
-      $row.find("td").eq(colIndex++).html(`<span class="display-past-events">No past events.</span>`);
-    }
-    $row.find(".actions").html(`
-      <a href="#" class="player-submit" aria-label="Save Player">Save</a> /
-      <a href="#" class="cancel-edit" aria-label="Cancel Edit">Cancel</a> /
-      <a href="#" class="delete-player" aria-label="Delete player ${firstName || ""}">Delete</a>
-    `);
-
-    // Insert medical row for the edited player
-    if (intersoccerState.editingIndex === index) {
-      const $medicalRow = $(`
-        <tr class="medical-row active" data-player-index="${index}">
-          <td colspan="${isAdmin ? 11 : 7}">
-            <label for="player_medical_${index}">Medical Conditions:</label>
-            <textarea id="player_medical_${index}" name="player_medical" maxlength="500" aria-describedby="medical-instructions-${index}">${medical}</textarea>
-            <span id="medical-instructions-${index}" class="screen-reader-text">Optional field for medical conditions.</span>
-            <span class="error-message" style="display: none;"></span>
-          </td>
-        </tr>
-      `);
-      $row.after($medicalRow);
-      $table.find(`.medical-row[data-player-index="${index}"]:not(:first)`).remove();
-    }
-
-    // Disable edit buttons on other rows only
-    $table.find(`tr[data-player-index]`).not($row).each(function () {
-      const $otherRow = $(this);
-      const otherIndex = $otherRow.data("player-index");
-      if (parseInt(otherIndex) !== parseInt(index)) {
-        $otherRow.find(".edit-player").addClass("disabled").attr("aria-disabled", "true");
+    // Fetch player data to get the latest medical conditions
+    fetchPlayerData(userId, index, function(player) {
+      if (!player) {
+        $message.text("Error: Could not load player data for editing.").show();
+        setTimeout(() => $message.hide(), 10000);
+        return;
       }
-    });
 
-    $(this).attr("aria-expanded", "true");
+      const firstName = $row.attr("data-first-name") || player.first_name || "N/A";
+      const lastName = $row.attr("data-last-name") || player.last_name || "N/A";
+      const dob = $row.attr("data-dob") || player.dob || "N/A";
+      const dobParts = dob !== "N/A" ? dob.split("-") : ["", "", ""];
+      const dobYear = dobParts[0];
+      const dobMonth = dobParts[1];
+      const dobDay = dobParts[2];
+      const gender = $row.attr("data-gender") || player.gender || "N/A";
+      const avsNumber = $row.attr("data-avs-number") || player.avs_number || "N/A";
+      const eventCount = $row.attr("data-event-count") || player.event_count || 0;
+      const canton = $row.data("canton") || "";
+      const city = $row.data("city") || "";
+      const medical = player.medical_conditions || "";
+      const creationTimestamp = $row.attr("data-creation-timestamp") || (player.creation_timestamp ? player.creation_timestamp : "");
+
+      let colIndex = 0;
+      if (isAdmin) {
+        $row.find("td").eq(colIndex++).html(`<a href="/wp-admin/user-edit.php?user_id=${userId}" aria-label="Edit user profile">${userId}</a>`);
+        $row.find("td").eq(colIndex++).html(`<span class="display-canton">${canton}</span>`);
+        $row.find("td").eq(colIndex++).html(`<span class="display-city">${city}</span>`);
+      }
+      $row.find("td").eq(colIndex++).html(`
+        <input type="text" name="player_first_name" value="${firstName === "N/A" ? "" : firstName}" required aria-required="true" maxlength="50">
+        <span class="error-message" style="display: none;"></span>
+      `);
+      $row.find("td").eq(colIndex++).html(`
+        <input type="text" name="player_last_name" value="${lastName === "N/A" ? "" : lastName}" required aria-required="true" maxlength="50">
+        <span class="error-message" style="display: none;"></span>
+      `);
+      $row.find("td").eq(colIndex++).html(`
+        <select name="player_dob_day" required aria-required="true">
+            <option value="">Day</option>
+            ${Array.from({ length: 31 }, (_, i) => i + 1).map(day => `<option value="${String(day).padStart(2, "0")}" ${dobDay === String(day).padStart(2, "0") ? "selected" : ""}>${day}</option>`).join("")}
+        </select>
+        <select name="player_dob_month" required aria-required="true">
+            <option value="">Month</option>
+            ${Array.from({ length: 12 }, (_, i) => i + 1).map(month => `<option value="${String(month).padStart(2, "0")}" ${dobMonth === String(month).padStart(2, "0") ? "selected" : ""}>${new Date(2025, month - 1, 1).toLocaleString('default', { month: 'long' })}</option>`).join("")}
+        </select>
+        <select name="player_dob_year" required aria-required="true">
+            <option value="">Year</option>
+            ${Array.from({ length: 2023 - 2011 + 1 }, (_, i) => 2023 - i).map(year => `<option value="${year}" ${dobYear === String(year) ? "selected" : ""}>${year}</option>`).join("")}
+        </select>
+        <span class="error-message" style="display: none;"></span>
+      `);
+      $row.find("td").eq(colIndex++).html(`
+        <select name="player_gender" required aria-required="true">
+            <option value="">Select Gender</option>
+            <option value="male" ${gender === "male" ? "selected" : ""}>Male</option>
+            <option value="female" ${gender === "female" ? "selected" : ""}>Female</option>
+            <option value="other" ${gender === "other" ? "selected" : ""}>Other</option>
+        </select>
+        <span class="error-message" style="display: none;"></span>
+      `);
+      $row.find("td").eq(colIndex++).html(`
+        <input type="text" name="player_avs_number" value="${avsNumber === "N/A" ? "" : avsNumber}" required aria-required="true" maxlength="16" pattern="756\\.\\d{4}\\.\\d{4}\\.\\d{2}">
+        <span class="error-message" style="display: none;"></span>
+      `);
+      $row.find("td").eq(colIndex++).html(`<span class="display-event-count">${eventCount}</span>`);
+      if (isAdmin) {
+        $row.find("td").eq(colIndex++).html(`<span class="display-medical-conditions">${medical ? medical.substring(0, 20) + (medical.length > 20 ? "..." : "") : ""}</span>`);
+        $row.find("td").eq(colIndex++).html(`<span class="display-creation-date">${creationTimestamp ? new Date(creationTimestamp * 1000).toISOString().split("T")[0] : "N/A"}</span>`);
+        $row.find("td").eq(colIndex++).html(`<span class="display-past-events">No past events.</span>`);
+      }
+      $row.find(".actions").html(`
+        <a href="#" class="player-submit" aria-label="Save Player">Save</a> /
+        <a href="#" class="cancel-edit" aria-label="Cancel Edit">Cancel</a> /
+        <a href="#" class="delete-player" aria-label="Delete player ${firstName || ""}">Delete</a>
+      `);
+
+      // Insert medical row for the edited player with existing medical conditions
+      if (intersoccerState.editingIndex === index) {
+        const $medicalRow = $(`
+          <tr class="medical-row active" data-player-index="${index}">
+            <td colspan="${isAdmin ? 11 : 7}">
+              <label for="player_medical_${index}">Medical Conditions:</label>
+              <textarea id="player_medical_${index}" name="player_medical" maxlength="500" aria-describedby="medical-instructions-${index}">${medical}</textarea>
+              <span id="medical-instructions-${index}" class="screen-reader-text">Optional field for medical conditions.</span>
+              <span class="error-message" style="display: none;"></span>
+            </td>
+          </tr>
+        `);
+        $row.after($medicalRow);
+        $table.find(`.medical-row[data-player-index="${index}"]:not(:first)`).remove();
+      }
+
+      // Disable edit buttons on other rows only
+      $table.find(`tr[data-player-index]`).not($row).each(function () {
+        const $otherRow = $(this);
+        const otherIndex = $otherRow.data("player-index");
+        if (parseInt(otherIndex) !== parseInt(index)) {
+          $otherRow.find(".edit-player").addClass("disabled").attr("aria-disabled", "true");
+        }
+      });
+
+      $(this).attr("aria-expanded", "true");
+    });
   });
 
   // Cancel edit
