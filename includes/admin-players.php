@@ -152,8 +152,9 @@ class Player_Management_Admin {
     public function render_all_players_page() {
         $users = get_users(['role' => 'customer']);
         $all_players = [];
-        $unique_cantons = [];
-        $unique_genders = [];
+        $total_players = 0;
+        $male_count = 0;
+        $female_count = 0;
         $today = '2025-06-23';
 
         foreach ($users as $user) {
@@ -166,6 +167,7 @@ class Player_Management_Admin {
             ]);
 
             foreach ($players as $index => $player) {
+                $total_players++;
                 $player['user_id'] = $user->ID;
                 $player['user_email'] = $user->user_email;
                 $player['index'] = $index;
@@ -184,6 +186,10 @@ class Player_Management_Admin {
                         $player['event_age_groups'] = [];
                     }
                 }
+
+                $gender = strtolower($player['gender'] ?? 'other');
+                if ($gender === 'male') $male_count++;
+                elseif ($gender === 'female') $female_count++;
 
                 foreach ($orders as $order) {
                     $order_players = $order->get_meta('intersoccer_players', true);
@@ -214,48 +220,65 @@ class Player_Management_Admin {
                 }
 
                 $all_players[] = $player;
-                if ($billing_state && !in_array($billing_state, $unique_cantons)) {
-                    $unique_cantons[] = $billing_state;
-                }
-                $gender = isset($player['gender']) ? $player['gender'] : 'Unknown';
-                if (!in_array($gender, $unique_genders)) {
-                    $unique_genders[] = $gender;
-                }
             }
         }
 
         // Store all_players_data for use in render_overview_page
         $this->all_players_data = $all_players;
 
-        $total_players = count($all_players);
+        $inline_css = '
+            .quick-stats { display: flex; justify-content: space-between; margin-bottom: 15px; }
+            .quick-stats div { text-align: center; flex: 1; padding: 10px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 5px; }
+            .quick-stats div h3 { margin: 0 0 5px; font-size: 14px; }
+            .quick-stats div p { margin: 0; font-size: 16px; font-weight: bold; }
+            @media (max-width: 600px) {
+                .quick-stats { flex-direction: column; }
+                .quick-stats div { margin-bottom: 10px; }
+            }
+            .filter-section { margin-bottom: 15px; }
+            @media (max-width: 600px) {
+                .intersoccer-player-management table, .intersoccer-player-management thead, .intersoccer-player-management tbody, .intersoccer-player-management th, .intersoccer-player-management td, .intersoccer-player-management tr {
+                    display: block;
+                }
+                .intersoccer-player-management thead tr { position: absolute; top: -9999px; left: -9999px; }
+                .intersoccer-player-management tr { margin-bottom: 15px; border: 1px solid #ddd; }
+                .intersoccer-player-management td { border: none; position: relative; padding-left: 50%; }
+                .intersoccer-player-management td:before {
+                    content: attr(data-label);
+                    position: absolute;
+                    left: 10px;
+                    width: 45%;
+                    padding-right: 10px;
+                    white-space: nowrap;
+                    font-weight: bold;
+                }
+                .intersoccer-player-management .actions { text-align: right; padding-right: 10px; }
+                .intersoccer-player-management .actions a { display: block; margin: 5px 0; }
+            }
+        ';
+        wp_add_inline_style('intersoccer-player-management', $inline_css);
         ?>
         <div class="wrap">
             <h1><?php _e('All Players', 'player-management'); ?></h1>
 
-            <!-- Quick Stats with Only Total Players -->
+            <!-- Quick Stats with Total Players, Males, and Females side-by-side -->
             <div class="dashboard-section quick-stats">
                 <div>
                     <h3><?php _e('Total Players', 'player-management'); ?></h3>
                     <p><?php echo esc_html($total_players); ?></p>
                 </div>
+                <div>
+                    <h3><?php _e('Male Players', 'player-management'); ?></h3>
+                    <p><?php echo esc_html($male_count); ?></p>
+                </div>
+                <div>
+                    <h3><?php _e('Female Players', 'player-management'); ?></h3>
+                    <p><?php echo esc_html($female_count); ?></p>
+                </div>
             </div>
 
-            <!-- Filter Section -->
+            <!-- Filter Section with only Name Search -->
             <div class="filter-section">
-                <label for="filter-canton"><?php _e('Filter by Canton:', 'player-management'); ?></label>
-                <select id="filter-canton" class="widefat" style="width: 200px;">
-                    <option value=""><?php _e('All Cantons', 'player-management'); ?></option>
-                    <?php foreach ($unique_cantons as $canton) : ?>
-                        <option value="<?php echo esc_attr($canton); ?>"><?php echo esc_html($canton); ?></option>
-                    <?php endforeach; ?>
-                </select>
-                <label for="filter-gender"><?php _e('Filter by Gender:', 'player-management'); ?></label>
-                <select id="filter-gender" class="widefat" style="width: 200px;">
-                    <option value=""><?php _e('All Genders', 'player-management'); ?></option>
-                    <?php foreach ($unique_genders as $gender) : ?>
-                        <option value="<?php echo esc_attr(strtolower($gender)); ?>"><?php echo esc_html($gender); ?></option>
-                    <?php endforeach; ?>
-                </select>
                 <label for="player-search"><?php _e('Search by Name:', 'player-management'); ?></label>
                 <input type="text" id="player-search" placeholder="<?php _e('Enter player name...', 'player-management'); ?>" class="widefat">
             </div>

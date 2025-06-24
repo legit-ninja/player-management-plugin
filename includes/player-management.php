@@ -138,7 +138,7 @@ function intersoccer_render_players_form($is_admin = false, $settings = [])
         true
     );
 
-    // Enqueue Select2 for admin filters
+    // Enqueue Select2 for admin filters (only if needed, currently just for compatibility)
     if ($is_admin) {
         wp_enqueue_script('select2', admin_url('js/select2/select2.min.js'), ['jquery'], '4.0.13', true);
         wp_enqueue_style('select2', admin_url('css/select2.min.css'), [], '4.0.13');
@@ -189,16 +189,30 @@ function intersoccer_render_players_form($is_admin = false, $settings = [])
             $inline_css .= '.intersoccer-player-management th { background: ' . esc_attr($header_background) . '; color: #ffffff; }';
         }
     }
-    // Add CSS for Select2 filters and total players display
+    // Add CSS for total players display and responsive table
     if ($is_admin) {
         $inline_css .= '
-            .intersoccer-filters { display: flex; flex-wrap: wrap; gap: 15px; align-items: center; margin-bottom: 15px; }
-            .intersoccer-filters label { margin-right: 5px; }
-            .intersoccer-filters .select2-container { min-width: 200px; }
-            .intersoccer-filters .select2-selection--multiple { min-height: 30px; }
-            .intersoccer-filters .select2-selection--single { height: 30px; }
-            .intersoccer-filters .select2-selection__rendered { line-height: 28px; }
             .total-players { margin-bottom: 10px; font-size: 16px; color: #333; }
+            .intersoccer-player-management table { width: 100%; table-layout: fixed; }
+            @media (max-width: 600px) {
+                .intersoccer-player-management table, .intersoccer-player-management thead, .intersoccer-player-management tbody, .intersoccer-player-management th, .intersoccer-player-management td, .intersoccer-player-management tr {
+                    display: block;
+                }
+                .intersoccer-player-management thead tr { position: absolute; top: -9999px; left: -9999px; }
+                .intersoccer-player-management tr { margin-bottom: 15px; border: 1px solid #ddd; }
+                .intersoccer-player-management td { border: none; position: relative; padding-left: 50%; }
+                .intersoccer-player-management td:before {
+                    content: attr(data-label);
+                    position: absolute;
+                    left: 10px;
+                    width: 45%;
+                    padding-right: 10px;
+                    white-space: nowrap;
+                    font-weight: bold;
+                }
+                .intersoccer-player-management .actions { text-align: right; padding-right: 10px; }
+                .intersoccer-player-management .actions a { display: block; margin: 5px 0; }
+            }
         ';
     }
     if (!empty($inline_css)) {
@@ -220,23 +234,7 @@ function intersoccer_render_players_form($is_admin = false, $settings = [])
         <?php endif; ?>
 
         <?php if ($is_admin) : ?>
-            <div class="intersoccer-filters">
-                <label for="filter-canton"><?php esc_html_e('Filter by Canton', 'intersoccer-player-management'); ?></label>
-                <select id="filter-canton" class="filter-select select2" aria-label="<?php esc_attr_e('Filter players by canton', 'intersoccer-player-management'); ?>">
-                    <option value=""><?php esc_html_e('All Cantons', 'intersoccer-player-management'); ?></option>
-                    <?php foreach ($cantons as $canton) : ?>
-                        <option value="<?php echo esc_attr($canton); ?>"><?php echo esc_html($canton); ?></option>
-                    <?php endforeach; ?>
-                </select>
-
-                <label for="filter-gender"><?php esc_html_e('Filter by Gender', 'intersoccer-player-management'); ?></label>
-                <select id="filter-gender" class="filter-select select2" aria-label="<?php esc_attr_e('Filter players by gender', 'intersoccer-player-management'); ?>">
-                    <option value=""><?php esc_html_e('All Genders', 'intersoccer-player-management'); ?></option>
-                    <option value="male"><?php esc_html_e('Male', 'intersoccer-player-management'); ?></option>
-                    <option value="female"><?php esc_html_e('Female', 'intersoccer-player-management'); ?></option>
-                    <option value="other"><?php esc_html_e('Other', 'intersoccer-player-management'); ?></option>
-                </select>
-            </div>
+            <!-- No filters section here anymore -->
         <?php endif; ?>
 
         <?php if ($show_add_button) : ?>
