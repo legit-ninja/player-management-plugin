@@ -92,56 +92,153 @@ class Player_Management_Admin {
     public function render_overview_page() {
         wp_enqueue_script('chart-js', 'https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js', [], '3.9.1', true);
 
+        global $wpdb;
         $players = $this->all_players_data;
-        $region_data = [];
-        $event_type_counts = ['Camps' => 0, 'Courses' => 0, 'Birthdays' => 0];
+        $canton_data = []; // Renamed from region_data to reflect canton focus
+        $gender_data = ['male' => 0, 'female' => 0, 'other' => 0];
+        $top_cantons = [];
         $total_players = 0;
+        $assigned_count = 0;
+        $unassigned_count = 0;
+        $users_without_players = 0;
 
-        foreach ($players as $player) {
-            $total_players++;
-            $region = $player['canton'] && $player['city'] ? "{$player['canton']} - {$player['city']}" : ($player['canton'] ?: ($player['city'] ?: 'Unknown'));
-            $region_data[$region] = isset($region_data[$region]) ? $region_data[$region] + 1 : 1;
+        // Collect data
+        $all_users = get_users(['role' => 'customer']);
+        $roster_players = $wpdb->get_results(
+            "SELECT DISTINCT first_name, last_name FROM {$wpdb->prefix}intersoccer_rosters",
+            ARRAY_A
+        );
+        $assigned_players = [];
+        foreach ($roster_players as $roster_player) {
+            $assigned_players[$roster_player['first_name'] . '|' . $roster_player['last_name']] = true;
+        }
 
-            $orders = wc_get_orders(['customer_id' => $player['user_id'], 'status' => ['wc-completed', 'wc-processing'], 'limit' => -1]);
-            foreach ($orders as $order) {
-                foreach ($order->get_items() as $item) {
-                    $product = $item->get_product();
-                    if ($product) {
-                        $categories = wp_get_post_terms($product->get_id(), 'product_cat', ['fields' => 'names']);
-                        if (in_array('Camps', $categories)) $event_type_counts['Camps']++;
-                        elseif (in_array('Courses', $categories)) $event_type_counts['Courses']++;
-                        elseif (in_array('Birthdays', $categories)) $event_type_counts['Birthdays']++;
-                    }
+        foreach ($all_users as $user) {
+            $user_players = get_user_meta($user->ID, 'intersoccer_players', true) ?: [];
+            if (empty($user_players)) {
+                $users_without_players++;
+                continue;
+            }
+            $billing_state = get_user_meta($user->ID, 'billing_state', true) ?: 'Unknown';
+            foreach ($user_players as $player) {
+                $total_players++;
+                $canton_data[$billing_state] = isset($canton_data[$billing_state]) ? $canton_data[$billing_state] + 1 : 1;
+                $gender_data[strtolower($player['gender'] ?? 'other')]++;
+
+                $player_key = $player['first_name'] . '|' . $player['last_name'];
+                if (isset($assigned_players[$player_key])) {
+                    $assigned_count++;
                 }
             }
         }
+        $unassigned_count = $total_players - $assigned_count;
 
-        $inline_css = '.wrap { background: #1e2529; color: #fff; padding: 10px; } .chart-container { width: 100%; height: 200px; }';
+        // Sort and get top 5 cantons
+        arsort($canton_data);
+        $top_cantons = array_slice($canton_data, 0, 5, true);
+
+        $inline_css = '
+            .wrap { background: #1e2529; color: #fff; padding: 10px; }
+            .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; margin-bottom: 20px; }
+            .dashboard-card { background: #2a2f33; padding: 15px; border-radius: 5px; text-align: center; }
+            .dashboard-card h3 { margin: 0 0 10px; font-size: 14px; color: #ddd; }
+            .dashboard-card p { margin: 0; font-size: 20px; font-weight: bold; color: #fff; }
+            .chart-container { width: 100%; height: 200px; }
+            @media (max-width: 600px) {
+                .dashboard-grid { grid-template-columns: 1fr; }
+                .chart-container { height: 150px; }
+            }
+        ';
         wp_add_inline_style('intersoccer-player-management', $inline_css);
         ?>
         <div class="wrap">
             <h1><?php _e('Players Overview Dashboard', 'player-management'); ?></h1>
-            <div class="dashboard-section">
-                <div class="widget">
-                    <h2><?php _e('Players by Region', 'player-management'); ?></h2>
-                    <div class="chart-container"><canvas id="regionChart"></canvas></div>
+            <div class="dashboard-grid">
+                <!-- Total Players -->
+                <div class="dashboard-card">
+                    <h3><?php _e('Total Players', 'player-management'); ?></h3>
+                    <p><?php echo esc_html($total_players); ?></p>
                 </div>
-                <div class="widget">
-                    <h2><?php _e('Event Type Distribution', 'player-management'); ?></h2>
-                    <div class="chart-container"><canvas id="eventTypeChart"></canvas></div>
+                <!-- Users Without Players -->
+                <div class="dashboard-card">
+                    <h3><?php _e('Users Without Players', 'player-management'); ?></h3>
+                    <p><?php echo esc_html($users_without_players); ?></p>
+                </div>
+                <!-- Assigned vs Unassigned -->
+                <div class="dashboard-card">
+                    <h3><?php _e('Assigned vs Unassigned', 'player-management'); ?></h3>
+                    <div class="chart-container"><canvas id="assignedChart"></canvas></div>
+                </div>
+                <!-- Gender Breakdown -->
+                <div class="dashboard-card">
+                    <h3><?php _e('Gender Breakdown', 'player-management'); ?></h3>
+                    <div class="chart-container"><canvas id="genderChart"></canvas></div>
+                </div>
+                <!-- Players by Canton -->
+                <div class="dashboard-card">
+                    <h3><?php _e('Players by Canton', 'player-management'); ?></h3>
+                    <div class="chart-container"><canvas id="cantonChart"></canvas></div>
+                </div>
+                <!-- Top 5 Cantons -->
+                <div class="dashboard-card">
+                    <h3><?php _e('Top 5 Cantons', 'player-management'); ?></h3>
+                    <div class="chart-container"><canvas id="topCantonsChart"></canvas></div>
                 </div>
             </div>
             <script type="text/javascript">
                 document.addEventListener('DOMContentLoaded', function() {
-                    new Chart(document.getElementById('regionChart'), {
+                    // Assigned vs Unassigned Pie Chart
+                    new Chart(document.getElementById('assignedChart'), {
+                        type: 'pie',
+                        data: {
+                            labels: ['Assigned', 'Unassigned'],
+                            datasets: [{
+                                data: [<?php echo esc_js($assigned_count); ?>, <?php echo esc_js($unassigned_count); ?>],
+                                backgroundColor: ['#36A2EB', '#FF6384']
+                            }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+                    });
+
+                    // Gender Breakdown Pie Chart
+                    new Chart(document.getElementById('genderChart'), {
+                        type: 'pie',
+                        data: {
+                            labels: ['Male', 'Female', 'Other'],
+                            datasets: [{
+                                data: [<?php echo esc_js($gender_data['male']); ?>, <?php echo esc_js($gender_data['female']); ?>, <?php echo esc_js($gender_data['other']); ?>],
+                                backgroundColor: ['#4BC0C0', '#FFCD56', '#C9CBCF']
+                            }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+                    });
+
+                    // Players by Canton Bar Chart
+                    new Chart(document.getElementById('cantonChart'), {
                         type: 'bar',
-                        data: { labels: <?php echo json_encode(array_keys($region_data)); ?>, datasets: [{ label: 'Players', data: <?php echo json_encode(array_values($region_data)); ?>, backgroundColor: '#36A2EB' }] },
+                        data: {
+                            labels: <?php echo json_encode(array_keys($canton_data)); ?>,
+                            datasets: [{
+                                label: 'Players',
+                                data: <?php echo json_encode(array_values($canton_data)); ?>,
+                                backgroundColor: '#36A2EB'
+                            }]
+                        },
                         options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
                     });
-                    new Chart(document.getElementById('eventTypeChart'), {
-                        type: 'pie',
-                        data: { labels: <?php echo json_encode(array_keys($event_type_counts)); ?>, datasets: [{ data: <?php echo json_encode(array_values($event_type_counts)); ?>, backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'] }] },
-                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+
+                    // Top 5 Cantons Bar Chart
+                    new Chart(document.getElementById('topCantonsChart'), {
+                        type: 'bar',
+                        data: {
+                            labels: <?php echo json_encode(array_keys($top_cantons)); ?>,
+                            datasets: [{
+                                label: 'Registrations',
+                                data: <?php echo json_encode(array_values($top_cantons)); ?>,
+                                backgroundColor: '#FF6384'
+                            }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
                     });
                 });
             </script>
@@ -159,7 +256,7 @@ class Player_Management_Admin {
 
         foreach ($users as $user) {
             $players = get_user_meta($user->ID, 'intersoccer_players', true) ?: [];
-            $billing_state = get_user_meta($user->ID, 'billing_state', true) ?: '';
+            $billing_state = get_user_meta($user->ID, 'billing_state', true) ?: 'Unknown';
             $orders = wc_get_orders([
                 'customer_id' => $user->ID,
                 'status' => ['wc-completed', 'wc-processing'],
