@@ -229,22 +229,6 @@ function intersoccer_render_players_form($is_admin = false, $settings = [])
                     <?php endforeach; ?>
                 </select>
 
-                <label for="filter-age-group"><?php esc_html_e('Filter by Age Group', 'intersoccer-player-management'); ?></label>
-                <select id="filter-age-group" class="filter-select select2" multiple aria-label="<?php esc_attr_e('Filter players by age group (multiple selection)', 'intersoccer-player-management'); ?>" aria-multiselectable="true">
-                    <option value=""><?php esc_html_e('All Age Groups', 'intersoccer-player-management'); ?></option>
-                    <?php foreach ($age_groups as $age_group) : ?>
-                        <option value="<?php echo esc_attr($age_group); ?>"><?php echo esc_html($age_group); ?></option>
-                    <?php endforeach; ?>
-                </select>
-
-                <label for="filter-event-type"><?php esc_html_e('Filter by Event Type', 'intersoccer-player-management'); ?></label>
-                <select id="filter-event-type" class="filter-select select2" aria-label="<?php esc_attr_e('Filter players by event type', 'intersoccer-player-management'); ?>">
-                    <option value=""><?php esc_html_e('All Event Types', 'intersoccer-player-management'); ?></option>
-                    <?php foreach ($event_types as $event_type) : ?>
-                        <option value="<?php echo esc_attr($event_type); ?>"><?php echo esc_html($event_type); ?></option>
-                    <?php endforeach; ?>
-                </select>
-
                 <label for="filter-gender"><?php esc_html_e('Filter by Gender', 'intersoccer-player-management'); ?></label>
                 <select id="filter-gender" class="filter-select select2" aria-label="<?php esc_attr_e('Filter players by gender', 'intersoccer-player-management'); ?>">
                     <option value=""><?php esc_html_e('All Genders', 'intersoccer-player-management'); ?></option>

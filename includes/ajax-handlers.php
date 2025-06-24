@@ -4,28 +4,6 @@
  * File: ajax-handlers.php
  * Description: Handles AJAX requests for the InterSoccer Player Management plugin, including adding, editing, deleting players, refreshing nonces, fetching user roles, and retrieving player data. Supports all logged-in user roles and admin management. Includes event count and region for players.
  * Dependencies: WordPress, WooCommerce
- * Changes:
- * - Added creation_timestamp to player data for Grace Period (2025-05-18).
- * - Enhanced debugging with detailed error logs for nonce, validation, and meta updates (2025-05-18).
- * - Added AVS number validation and admin user_id handling (2025-05-21).
- * - Added event_count to player responses (2025-05-21).
- * - Added intersoccer_get_player action for fallback data retrieval (2025-05-21).
- * - Added function_exists check for intersoccer_get_player_event_count to prevent redeclaration (2025-05-21).
- * - Added region to player responses for admin dashboard filtering (2025-05-21).
- * - Added duplicate check in intersoccer_add_player to prevent adding duplicate players (2025-05-21).
- * - Added function to fetch product attributes for admin filters (2025-05-21).
- * - Added logic to store player assignments in order item meta (2025-05-21).
- * - Enhanced nonce debugging and added proactive refresh handling (2025-06-09).
- * Testing:
- * - Test Add/Edit/Delete players with any user role, no 403 errors.
- * - Verify nonce refresh works, user role fetch returns correct role.
- * - Check server logs for nonce, validation, or AVS errors.
- * - Confirm creation_timestamp, avs_number, event_count, and region in intersoccer_players meta.
- * - Test intersoccer_get_player returns correct player data including region.
- * - Verify no redeclaration errors for intersoccer_get_player_event_count.
- * - Confirm intersoccer_add_player prevents duplicate player entries.
- * - Test admin filters pull from product attributes (Region, Age-Group, Venue).
- * - Verify player assignments are saved in order item meta during checkout.
  */
 
 // Prevent direct access
@@ -125,7 +103,6 @@ add_action('wp_ajax_intersoccer_add_player', function () {
     error_log('InterSoccer: intersoccer_add_player called, nonce: ' . ($_POST['nonce'] ?? 'none') . ', user_id: ' . get_current_user_id());
     if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'intersoccer_player_nonce')) {
         error_log('InterSoccer: Nonce verification failed for intersoccer_add_player, received: ' . ($_POST['nonce'] ?? 'none') . ', expected: ' . wp_create_nonce('intersoccer_player_nonce'));
-        // Attempt to refresh nonce if invalid
         $new_nonce = wp_create_nonce('intersoccer_player_nonce');
         error_log('InterSoccer: Generated new nonce due to failure: ' . $new_nonce);
         wp_send_json_error(['message' => 'Invalid security token, please refresh and try again', 'new_nonce' => $new_nonce]);
@@ -174,7 +151,7 @@ add_action('wp_ajax_intersoccer_add_player', function () {
         return;
     }
     $dob_date = DateTime::createFromFormat('Y-m-d', $dob);
-    $today = new DateTime('2025-06-09');
+    $today = new DateTime('2025-06-23');
     if (!$dob_date || $dob_date > $today) {
         error_log('InterSoccer: Invalid DOB date for intersoccer_add_player: ' . $dob);
         wp_send_json_error(['message' => 'Invalid date of birth']);
@@ -282,7 +259,7 @@ add_action('wp_ajax_intersoccer_edit_player', function () {
             return;
         }
         $dob_date = DateTime::createFromFormat('Y-m-d', $dob);
-        $today = new DateTime('2025-06-09');
+        $today = new DateTime('2025-06-23');
         if (!$dob_date || $dob_date > $today) {
             error_log('InterSoccer: Invalid DOB date for intersoccer_edit_player: ' . $dob);
             wp_send_json_error(['message' => 'Invalid date of birth']);
