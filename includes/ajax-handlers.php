@@ -259,7 +259,7 @@ add_action('wp_ajax_intersoccer_edit_player', function () {
             return;
         }
         $dob_date = DateTime::createFromFormat('Y-m-d', $dob);
-        $today = new DateTime('2025-06-23');
+        $today = new DateTime('2025-06-29');
         if (!$dob_date || $dob_date > $today) {
             error_log('InterSoccer: Invalid DOB date for intersoccer_edit_player: ' . $dob);
             wp_send_json_error(['message' => 'Invalid date of birth']);
@@ -280,31 +280,52 @@ add_action('wp_ajax_intersoccer_edit_player', function () {
         return;
     }
 
+    $original_player = $players[$index];
     $updated_player = [
         'first_name' => $first_name,
         'last_name' => $last_name,
-        'dob' => !empty($dob) ? $dob : $players[$index]['dob'],
-        'gender' => !empty($gender) ? $gender : $players[$index]['gender'],
+        'dob' => !empty($dob) ? $dob : $original_player['dob'],
+        'gender' => !empty($gender) ? $gender : $original_player['gender'],
         'avs_number' => $avs_number,
         'medical_conditions' => $medical,
-        'creation_timestamp' => $players[$index]['creation_timestamp'] ?? current_time('timestamp'),
+        'creation_timestamp' => $original_player['creation_timestamp'] ?? current_time('timestamp'),
         'event_count' => intersoccer_get_player_event_count($user_id, $index),
         'region' => get_user_meta($user_id, 'intersoccer_region', true) ?: 'Unknown'
     ];
     $players[$index] = $updated_player;
-    $update_result = update_user_meta($user_id, 'intersoccer_players', $players);
-    if ($update_result === false) {
-        error_log('InterSoccer: Failed to update intersoccer_players meta for user ' . $user_id . ' with data: ' . json_encode($updated_player));
-        wp_send_json_error(['message' => 'Failed to save player data']);
-        return;
-    }
-    wp_cache_delete('intersoccer_players_' . $user_id, 'intersoccer');
 
-    error_log('InterSoccer: Player edited successfully for user ' . $user_id . ' with data: ' . json_encode($updated_player));
-    wp_send_json_success([
-        'message' => 'Player updated successfully',
-        'player' => $updated_player,
-    ]);
+    // Log comparison to validate unchanged data
+    $is_unchanged = ($original_player['first_name'] === $first_name &&
+                    $original_player['last_name'] === $last_name &&
+                    $original_player['dob'] === $updated_player['dob'] &&
+                    $original_player['gender'] === $updated_player['gender'] &&
+                    $original_player['avs_number'] === $avs_number &&
+                    $original_player['medical_conditions'] === $medical);
+    error_log('InterSoccer: Original player: ' . json_encode($original_player));
+    error_log('InterSoccer: Updated player: ' . json_encode($updated_player));
+    error_log('InterSoccer: Data unchanged: ' . ($is_unchanged ? 'Yes' : 'No'));
+
+    global $wpdb;
+    error_log('InterSoccer: Pre-update players array: ' . json_encode($players));
+    error_log('InterSoccer: Updating meta for user_id: ' . $user_id . ', meta_key: intersoccer_players');
+
+    $update_result = update_user_meta($user_id, 'intersoccer_players', $players);
+    error_log('InterSoccer: update_user_meta result: ' . var_export($update_result, true));
+    error_log('InterSoccer: Last query: ' . $wpdb->last_query);
+    error_log('InterSoccer: Last error: ' . $wpdb->last_error);
+
+    if ($update_result === false) {
+        error_log('InterSoccer: Update attempt failed for user ' . $user_id . ' with data: ' . json_encode($updated_player));
+    }
+
+    wp_cache_delete('intersoccer_players_' . $user_id, 'intersoccer');
+    if ($is_unchanged && $update_result === false) {
+        error_log('InterSoccer: No changes detected, update skipped but considered successful');
+        wp_send_json_success(['message' => 'No changes detected, player data unchanged']);
+    } else {
+        error_log('InterSoccer: Player edited successfully for user ' . $user_id . ' with data: ' . json_encode($updated_player));
+        wp_send_json_success(['message' => 'Player updated successfully', 'player' => $updated_player]);
+    }
 });
 
 // Delete Player
