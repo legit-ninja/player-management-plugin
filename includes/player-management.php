@@ -115,6 +115,24 @@ function intersoccer_render_players_form($is_admin = false, $settings = [])
         $players = $unique_players;
     }
 
+    // Preload player data for client-side use
+    $preload_players = [];
+    foreach ($players as $index => $player) {
+        $preload_players[$index] = [
+            'first_name' => $player['first_name'] ?? 'N/A',
+            'last_name' => $player['last_name'] ?? 'N/A',
+            'dob' => $player['dob'] ?? 'N/A',
+            'gender' => $player['gender'] ?? 'N/A',
+            'avs_number' => $player['avs_number'] ?? 'N/A',
+            'event_count' => $player['event_count'] ?? 0,
+            'medical_conditions' => $player['medical_conditions'] ?? '',
+            'creation_timestamp' => $player['creation_timestamp'] ?? '',
+            'user_id' => $player['user_id'] ?? $user_id,
+            'canton' => $player['canton'] ?? '',
+            'city' => $player['city'] ?? '',
+        ];
+    }
+
     // Enqueue scripts
     wp_enqueue_script(
         'intersoccer-player-management-core',
@@ -154,18 +172,26 @@ function intersoccer_render_players_form($is_admin = false, $settings = [])
             'is_admin' => $is_admin ? '1' : '0',
             'nonce_refresh_url' => admin_url('admin-ajax.php?action=intersoccer_refresh_nonce'),
             'debug' => defined('WP_DEBUG') && WP_DEBUG ? '1' : '0',
+            'preload_players' => $preload_players, // Preload player data
+            'server_time' => current_time('mysql'), // For age validation
         ]
     );
 
-    // Enqueue stylesheet
+    // Enqueue stylesheet and loading GIF
     wp_enqueue_style(
         'intersoccer-player-management',
         plugin_dir_url(__FILE__) . '../css/player-management.css',
         [],
         '1.0.' . time()
     );
+    wp_enqueue_style(
+        'intersoccer-loading',
+        plugin_dir_url(__FILE__) . '../css/loading.css',
+        [],
+        '1.0.' . time()
+    );
 
-    // Add inline CSS for dynamic Elementor widget styles
+    // Add inline CSS for dynamic Elementor widget styles and loading animation
     $inline_css = '';
     if (!empty($container_background) || !empty($container_text_color) || !empty($container_padding) || !empty($table_border_color) || !empty($header_background)) {
         $inline_css .= '.intersoccer-player-management {';
@@ -189,32 +215,28 @@ function intersoccer_render_players_form($is_admin = false, $settings = [])
             $inline_css .= '.intersoccer-player-management th { background: ' . esc_attr($header_background) . '; color: #ffffff; }';
         }
     }
-    // Add CSS for total players display and responsive table
-    if ($is_admin) {
-        $inline_css .= '
-            .total-players { margin-bottom: 10px; font-size: 16px; color: #333; }
-            .intersoccer-player-management table { width: 100%; table-layout: fixed; }
-            @media (max-width: 600px) {
-                .intersoccer-player-management table, .intersoccer-player-management thead, .intersoccer-player-management tbody, .intersoccer-player-management th, .intersoccer-player-management td, .intersoccer-player-management tr {
-                    display: block;
-                }
-                .intersoccer-player-management thead tr { position: absolute; top: -9999px; left: -9999px; }
-                .intersoccer-player-management tr { margin-bottom: 15px; border: 1px solid #ddd; }
-                .intersoccer-player-management td { border: none; position: relative; padding-left: 50%; }
-                .intersoccer-player-management td:before {
-                    content: attr(data-label);
-                    position: absolute;
-                    left: 10px;
-                    width: 45%;
-                    padding-right: 10px;
-                    white-space: nowrap;
-                    font-weight: bold;
-                }
-                .intersoccer-player-management .actions { text-align: right; padding-right: 10px; }
-                .intersoccer-player-management .actions a { display: block; margin: 5px 0; }
-            }
-        ';
-    }
+    // Add CSS for loading animation
+    $inline_css .= '
+        .loading::before {
+            content: "";
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #7ab55c;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+        }
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        .loading td { position: relative; }
+    ';
     if (!empty($inline_css)) {
         wp_add_inline_style('intersoccer-player-management', $inline_css);
     }
