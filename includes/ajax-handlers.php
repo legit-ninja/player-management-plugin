@@ -151,7 +151,7 @@ add_action('wp_ajax_intersoccer_add_player', function () {
         return;
     }
     $dob_date = DateTime::createFromFormat('Y-m-d', $dob);
-    $today = new DateTime('2025-06-23');
+    $today = new DateTime('2025-06-29');
     if (!$dob_date || $dob_date > $today) {
         error_log('InterSoccer: Invalid DOB date for intersoccer_add_player: ' . $dob);
         wp_send_json_error(['message' => 'Invalid date of birth']);
@@ -206,7 +206,8 @@ add_action('wp_ajax_intersoccer_add_player', function () {
 
 // Edit Player
 add_action('wp_ajax_intersoccer_edit_player', function () {
-    error_log('InterSoccer: intersoccer_edit_player called, nonce: ' . ($_POST['nonce'] ?? 'none') . ', user_id: ' . get_current_user_id());
+    $startTime = microtime(true);
+    error_log('InterSoccer: intersoccer_edit_player called at ' . date('Y-m-d H:i:s', $startTime) . ', nonce: ' . ($_POST['nonce'] ?? 'none') . ', user_id: ' . get_current_user_id());
     if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'intersoccer_player_nonce')) {
         error_log('InterSoccer: Nonce verification failed for intersoccer_edit_player, received: ' . ($_POST['nonce'] ?? 'none'));
         wp_send_json_error(['message' => 'Invalid security token']);
@@ -310,6 +311,9 @@ add_action('wp_ajax_intersoccer_edit_player', function () {
     error_log('InterSoccer: Updating meta for user_id: ' . $user_id . ', meta_key: intersoccer_players');
 
     $update_result = update_user_meta($user_id, 'intersoccer_players', $players);
+    $endTime = microtime(true);
+    error_log('InterSoccer: intersoccer_edit_player processed in ' . ($endTime - $startTime) . ' seconds');
+
     error_log('InterSoccer: update_user_meta result: ' . var_export($update_result, true));
     error_log('InterSoccer: Last query: ' . $wpdb->last_query);
     error_log('InterSoccer: Last error: ' . $wpdb->last_error);
@@ -410,7 +414,9 @@ add_action('wp_ajax_intersoccer_get_user_role', function () {
 
 // Get Player (for fallback data retrieval)
 add_action('wp_ajax_intersoccer_get_player', function () {
-    error_log('InterSoccer: intersoccer_get_player called, nonce: ' . ($_POST['nonce'] ?? 'none') . ', user_id: ' . get_current_user_id());
+    $startTime = microtime(true);
+    error_log('InterSoccer: intersoccer_get_player called at ' . date('Y-m-d H:i:s', $startTime) . ', nonce: ' . ($_POST['nonce'] ?? 'none') . ', user_id: ' . get_current_user_id());
+
     if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'intersoccer_player_nonce')) {
         error_log('InterSoccer: Nonce verification failed for intersoccer_get_player, received: ' . ($_POST['nonce'] ?? 'none'));
         wp_send_json_error(['message' => 'Invalid security token']);
@@ -445,10 +451,19 @@ add_action('wp_ajax_intersoccer_get_player', function () {
         return;
     }
 
-    $player = $players[$index];
-    $player['event_count'] = intersoccer_get_player_event_count($user_id, $index);
-    $player['user_id'] = $user_id;
-    $player['region'] = get_user_meta($user_id, 'intersoccer_region', true) ?: 'Unknown';
+    // Add transient caching to speed up retrieval
+    $cache_key = 'intersoccer_player_' . $user_id . '_' . $index;
+    $player = get_transient($cache_key);
+    if (false === $player) {
+        $player = $players[$index];
+        $player['event_count'] = intersoccer_get_player_event_count($user_id, $index);
+        $player['user_id'] = $user_id;
+        $player['region'] = get_user_meta($user_id, 'intersoccer_region', true) ?: 'Unknown';
+        set_transient($cache_key, $player, 300); // Cache for 5 minutes
+    }
+
+    $endTime = microtime(true);
+    error_log('InterSoccer: intersoccer_get_player processed in ' . ($endTime - $startTime) . ' seconds');
 
     error_log('InterSoccer: Player fetched successfully for user ' . $user_id . ', index: ' . $index);
     wp_send_json_success([

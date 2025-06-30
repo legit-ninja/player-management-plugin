@@ -1,9 +1,3 @@
-/**
- * File: player-management-core.js
- * Description: Core setup, validation, and event handlers for player management. Manages form toggling, validation of player data, and nonce refreshing for AJAX requests.
- * Dependencies: jQuery (checked)
- */
-
 (function ($) {
   // Dependency checks
   if (typeof $ === "undefined") {
