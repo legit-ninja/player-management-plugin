@@ -1,3 +1,4 @@
+"use strict";
 (function ($) {
   if (typeof intersoccerPlayer === "undefined" || typeof intersoccerValidateRow === "undefined") {
     console.error("InterSoccer: Dependencies not loaded. Actions disabled.");
@@ -13,7 +14,9 @@
   // Fetch player data via AJAX
   function fetchPlayerData(userId, index, callback) {
     const startTime = Date.now();
-    console.log("InterSoccer: Starting fetchPlayerData for userId:", userId, "index:", index, "at", new Date(startTime).toISOString());
+    if (debugEnabled) {
+      console.log("InterSoccer: Starting fetchPlayerData for userId:", userId, "index:", index, "at", new Date(startTime).toISOString());
+    }
     $.ajax({
       url: intersoccerPlayer.ajax_url,
       type: "POST",
@@ -26,7 +29,9 @@
       },
       success: function(response) {
         const endTime = Date.now();
-        console.log("InterSoccer: fetchPlayerData completed at", new Date(endTime).toISOString(), "Duration:", (endTime - startTime), "ms");
+        if (debugEnabled) {
+          console.log("InterSoccer: fetchPlayerData completed at", new Date(endTime).toISOString(), "Duration:", (endTime - startTime), "ms");
+        }
         if (response.success && response.data.player) {
           if (debugEnabled) console.log("InterSoccer: Fetched player data:", response.data.player);
           callback(response.data.player);
@@ -88,7 +93,9 @@
     if (!isAdd) data.player_index = index;
 
     const startTime = Date.now();
-    console.log("InterSoccer: Starting savePlayer AJAX at", new Date(startTime).toISOString());
+    if (debugEnabled) {
+      console.log("InterSoccer: Starting savePlayer AJAX at", new Date(startTime).toISOString(), "Data:", data);
+    }
 
     $.ajax({
       url: intersoccerPlayer.ajax_url,
@@ -96,12 +103,17 @@
       data: data,
       success: (response) => {
         const endTime = Date.now();
-        console.log("InterSoccer: savePlayer AJAX completed at", new Date(endTime).toISOString(), "Duration:", (endTime - startTime), "ms");
+        if (debugEnabled) {
+          console.log("InterSoccer: savePlayer AJAX completed at", new Date(endTime).toISOString(), "Duration:", (endTime - startTime), "ms");
+        }
 
         if (response.success) {
           $message.text(response.data.message).show();
           setTimeout(() => $message.hide(), 10000);
-          console.log("InterSoccer: AJAX success response:", response);
+          if (debugEnabled) console.log("InterSoccer: AJAX success response:", response);
+
+          // Clear preload cache to ensure fresh data
+          intersoccerPlayer.preload_players = {};
 
           const player = response.data.player;
           if (isAdd) {
@@ -123,8 +135,8 @@
                   data-gender="${player.gender || "N/A"}" 
                   data-avs-number="${player.avs_number || "N/A"}"
                   data-event-count="${player.event_count || 0}"
-                  data-canton="${$row.find(".display-canton").text() || ""}"
-                  data-city="${$row.find(".display-city").text() || ""}"
+                  data-canton="${player.canton || $row.find(".display-canton").text() || ""}"
+                  data-city="${player.city || $row.find(".display-city").text() || ""}"
                   data-creation-timestamp="${player.creation_timestamp || ""}"
                   data-event-regions=""
                   data-event-age-groups=""
@@ -136,12 +148,12 @@
                   }
                   ${
                     isAdmin
-                      ? `<td class="display-canton">${$row.find(".display-canton").text() || ""}</td>`
+                      ? `<td class="display-canton">${player.canton || $row.find(".display-canton").text() || ""}</td>`
                       : ""
                   }
                   ${
                     isAdmin
-                      ? `<td class="display-city">${$row.find(".display-city").text() || ""}</td>`
+                      ? `<td class="display-city">${player.city || $row.find(".display-city").text() || ""}</td>`
                       : ""
                   }
                   <td class="display-first-name">${player.first_name || "N/A"}</td>
@@ -162,7 +174,7 @@
                   }
                   ${
                     isAdmin
-                      ? `<td class="display-past-events">No past events.</td>`
+                      ? `<td class="display-past-events">${player.past_events && player.past_events.length ? player.past_events.map(event => event.name + (event.date && event.venue ? ` (${event.date}, ${event.venue})` : '')).join('<br>') : "No past events."}</td>`
                       : ""
                   }
                   <td class="actions">
@@ -180,10 +192,9 @@
             $(".add-player-section input, .add-player-section select, .add-player-section textarea").val("");
             $(".add-player-section .error-message").hide();
           } else {
-            console.log("InterSoccer: Edit mode, response data:", response.data);
-            console.log("InterSoccer: Player defined:", typeof player !== "undefined");
+            if (debugEnabled) console.log("InterSoccer: Edit mode, response data:", response.data);
             if (typeof player === "undefined" && response.data.message === "No changes detected, player data unchanged") {
-              console.log("InterSoccer: Handling unchanged data case");
+              if (debugEnabled) console.log("InterSoccer: Handling unchanged data case");
               const index = $row.data("player-index");
               const userId = $row.data("user-id") || intersoccerPlayer.user_id;
 
@@ -196,6 +207,7 @@
               const canton = $row.data("canton") || "";
               const city = $row.data("city") || "";
               const creationTimestamp = $row.attr("data-creation-timestamp") || "";
+              const pastEvents = $row.find(".display-past-events").html() || "No past events.";
 
               let colIndex = 0;
               if (isAdmin) {
@@ -212,15 +224,11 @@
               if (isAdmin) {
                 $row.find("td").eq(colIndex++).html(`<span class="display-medical-conditions">${medical ? medical.substring(0, 20) + (medical.length > 20 ? "..." : "") : ""}</span>`);
                 $row.find("td").eq(colIndex++).html(`<span class="display-creation-date">${creationTimestamp ? new Date(creationTimestamp * 1000).toISOString().split("T")[0] : "N/A"}</span>`);
-                $row.find("td").eq(colIndex++).html(`<span class="display-past-events">No past events.</span>`);
+                $row.find("td").eq(colIndex++).html(`<span class="display-past-events">${pastEvents}</span>`);
               }
               $row.find(".actions").html(`
                 <a href="#" class="edit-player" data-index="${index}" data-user-id="${userId}" aria-label="Edit player ${firstName || ""}" aria-expanded="false">Edit</a>
               `);
-              $table.find(`.medical-row[data-player-index="${index}"]`).remove();
-              intersoccerState.editingIndex = null;
-              $table.find(".edit-player").removeClass("disabled").attr("aria-disabled", "false");
-              if (isAdmin && typeof intersoccerApplyFilters === "function") intersoccerApplyFilters();
             } else {
               $row.attr("data-user-id", player.user_id || userId);
               $row.attr("data-first-name", player.first_name || "N/A");
@@ -232,8 +240,8 @@
               $row.attr("data-creation-timestamp", player.creation_timestamp || "");
               if (isAdmin) {
                 $row.find(".display-user-id").html(`<a href="/wp-admin/user-edit.php?user_id=${player.user_id || userId}" aria-label="Edit user profile">${player.user_id || userId}</a>`);
-                $row.find(".display-canton").text($row.data("canton") || "");
-                $row.find(".display-city").text($row.data("city") || "");
+                $row.find(".display-canton").text(player.canton || $row.data("canton") || "");
+                $row.find(".display-city").text(player.city || $row.data("city") || "");
               }
               $row.find(".display-first-name").text(player.first_name || "N/A");
               $row.find(".display-last-name").text(player.last_name || "N/A");
@@ -244,23 +252,26 @@
               if (isAdmin) {
                 $row.find(".display-medical-conditions").text(medical ? medical.substring(0, 20) + (medical.length > 20 ? "..." : "") : "");
                 $row.find(".display-creation-date").text(player.creation_timestamp ? new Date(player.creation_timestamp * 1000).toISOString().split("T")[0] : "N/A");
-                $row.find(".display-past-events").text("No past events.");
+                $row.find(".display-past-events").html(player.past_events && player.past_events.length ? player.past_events.map(event => event.name + (event.date && event.venue ? ` (${event.date}, ${event.venue})` : '')).join('<br>') : "No past events.");
               }
               $row.find(".actions").html(`
                 <a href="#" class="edit-player" data-index="${index}" data-user-id="${player.user_id || userId}" aria-label="Edit player ${player.first_name || ""}" aria-expanded="false">Edit</a>
               `);
-              $table.find(`.medical-row[data-player-index="${index}"]`).remove();
-              intersoccerState.editingIndex = null;
-              $table.find(".edit-player").removeClass("disabled").attr("aria-disabled", "false");
             }
-            if (isAdmin && typeof intersoccerApplyFilters === "function") intersoccerApplyFilters();
+            $table.find(`.medical-row[data-player-index="${index}"]`).remove();
+            intersoccerState.editingIndex = null;
+            $table.find(".edit-player").removeClass("disabled").attr("aria-disabled", "false");
+            $row.removeClass("editing");
+            if (isAdmin && typeof intersoccerApplyFilters === "function") {
+              if (debugEnabled) console.log("InterSoccer: Applying filters after save");
+              intersoccerApplyFilters();
+            }
           }
         } else {
           console.error("InterSoccer: AJAX response failure:", response.data?.message);
           $message.text(response.data.message || "Failed to save player.").show();
           setTimeout(() => $message.hide(), 10000);
         }
-        console.log("InterSoccer: Save complete, editingIndex:", intersoccerState.editingIndex);
       },
       error: (xhr) => {
         console.error("InterSoccer: AJAX error:", xhr.status, "Response:", xhr.responseText);
@@ -287,7 +298,7 @@
         intersoccerState.isProcessing = false;
         if (isAdd) intersoccerState.isAdding = false;
         $submitLink.removeClass("disabled").attr("aria-disabled", "false").find(".spinner").hide();
-      },
+      }
     });
   }
 
@@ -317,17 +328,24 @@
     const userId = $row.data("user-id") || intersoccerPlayer.user_id;
     intersoccerState.editingIndex = index;
 
+    // Add editing class and show message
+    $row.addClass("editing");
+    $message.text(`Editing player: ${$row.find(".display-first-name").text()} ${$row.find(".display-last-name").text()}`).show();
+    setTimeout(() => $message.hide(), 5000);
+
     // Use preloaded data if available
     if (intersoccerPlayer.preload_players && intersoccerPlayer.preload_players[index]) {
       const startTime = Date.now();
-      console.log("InterSoccer: Using preloaded player data at", new Date(startTime).toISOString());
+      if (debugEnabled) console.log("InterSoccer: Using preloaded player data at", new Date(startTime).toISOString());
       const player = intersoccerPlayer.preload_players[index];
       const endTime = Date.now();
-      console.log("InterSoccer: Preload completed at", new Date(endTime).toISOString(), "Duration:", (endTime - startTime), "ms");
+      if (debugEnabled) console.log("InterSoccer: Preload completed at", new Date(endTime).toISOString(), "Duration:", (endTime - startTime), "ms");
 
       if (!player) {
         $message.text("Error: Could not load preloaded player data for editing.").show();
         setTimeout(() => $message.hide(), 10000);
+        $row.removeClass("editing");
+        intersoccerState.editingIndex = null;
         return;
       }
 
@@ -341,8 +359,8 @@
       const gender = $row.attr("data-gender") || player.gender || "N/A";
       const avsNumber = $row.attr("data-avs-number") || player.avs_number || "N/A";
       const eventCount = $row.attr("data-event-count") || player.event_count || 0;
-      const canton = $row.data("canton") || "";
-      const city = $row.data("city") || "";
+      const canton = $row.data("canton") || player.canton || "";
+      const city = $row.data("city") || player.city || "";
       const medical = player.medical_conditions || "";
       const creationTimestamp = $row.attr("data-creation-timestamp") || (player.creation_timestamp ? player.creation_timestamp : "");
 
@@ -385,14 +403,15 @@
         <span class="error-message" style="display: none;"></span>
       `);
       $row.find("td").eq(colIndex++).html(`
-        <input type="text" name="player_avs_number" value="${avsNumber === "N/A" ? "" : avsNumber}" required aria-required="true" maxlength="16" pattern="756\\.\\d{4}\\.\\d{4}\\.\\d{2}">
+        <input type="text" name="player_avs_number" value="${avsNumber === "N/A" ? "" : avsNumber}" required aria-required="true" maxlength="50">
+        <span class="avs-instruction">No AVS? Enter foreign insurance number or "0000" and email us the insurance details.</span>
         <span class="error-message" style="display: none;"></span>
       `);
       $row.find("td").eq(colIndex++).html(`<span class="display-event-count">${eventCount}</span>`);
       if (isAdmin) {
         $row.find("td").eq(colIndex++).html(`<span class="display-medical-conditions">${medical ? medical.substring(0, 20) + (medical.length > 20 ? "..." : "") : ""}</span>`);
         $row.find("td").eq(colIndex++).html(`<span class="display-creation-date">${creationTimestamp ? new Date(creationTimestamp * 1000).toISOString().split("T")[0] : "N/A"}</span>`);
-        $row.find("td").eq(colIndex++).html(`<span class="display-past-events">No past events.</span>`);
+        $row.find("td").eq(colIndex++).html(`<span class="display-past-events">${player.past_events && player.past_events.length ? player.past_events.map(event => event.name + (event.date && event.venue ? ` (${event.date}, ${event.venue})` : '')).join('<br>') : "No past events."}</span>`);
       }
       $row.find(".actions").html(`
         <a href="#" class="player-submit" aria-label="Save Player">Save</a> /
@@ -416,7 +435,7 @@
         $table.find(`.medical-row[data-player-index="${index}"]:not(:first)`).remove();
       }
 
-      // Disable edit buttons on other rows only
+      // Disable edit buttons on other rows and focus on first input
       $table.find(`tr[data-player-index]`).not($row).each(function () {
         const $otherRow = $(this);
         const otherIndex = $otherRow.data("player-index");
@@ -424,19 +443,22 @@
           $otherRow.find(".edit-player").addClass("disabled").attr("aria-disabled", "true");
         }
       });
+      $row.find('[name="player_first_name"]').focus();
 
       $(this).attr("aria-expanded", "true");
     } else {
       $row.addClass("loading");
       const startTime = Date.now();
-      console.log("InterSoccer: Starting fetchPlayerData at", new Date(startTime).toISOString());
+      if (debugEnabled) console.log("InterSoccer: Starting fetchPlayerData at", new Date(startTime).toISOString());
       fetchPlayerData(userId, index, function(player) {
         const endTime = Date.now();
-        console.log("InterSoccer: fetchPlayerData completed at", new Date(endTime).toISOString(), "Duration:", (endTime - startTime), "ms");
+        if (debugEnabled) console.log("InterSoccer: fetchPlayerData completed at", new Date(endTime).toISOString(), "Duration:", (endTime - startTime), "ms");
         $row.removeClass("loading");
         if (!player) {
           $message.text("Error: Could not load player data for editing.").show();
           setTimeout(() => $message.hide(), 10000);
+          $row.removeClass("editing");
+          intersoccerState.editingIndex = null;
           return;
         }
 
@@ -450,8 +472,8 @@
         const gender = $row.attr("data-gender") || player.gender || "N/A";
         const avsNumber = $row.attr("data-avs-number") || player.avs_number || "N/A";
         const eventCount = $row.attr("data-event-count") || player.event_count || 0;
-        const canton = $row.data("canton") || "";
-        const city = $row.data("city") || "";
+        const canton = $row.data("canton") || player.canton || "";
+        const city = $row.data("city") || player.city || "";
         const medical = player.medical_conditions || "";
         const creationTimestamp = $row.attr("data-creation-timestamp") || (player.creation_timestamp ? player.creation_timestamp : "");
 
@@ -494,14 +516,15 @@
           <span class="error-message" style="display: none;"></span>
         `);
         $row.find("td").eq(colIndex++).html(`
-          <input type="text" name="player_avs_number" value="${avsNumber === "N/A" ? "" : avsNumber}" required aria-required="true" maxlength="16" pattern="756\\.\\d{4}\\.\\d{4}\\.\\d{2}">
+          <input type="text" name="player_avs_number" value="${avsNumber === "N/A" ? "" : avsNumber}" required aria-required="true" maxlength="50">
+          <span class="avs-instruction">No AVS? Enter foreign insurance number or "0000" and email us the insurance details.</span>
           <span class="error-message" style="display: none;"></span>
         `);
         $row.find("td").eq(colIndex++).html(`<span class="display-event-count">${eventCount}</span>`);
         if (isAdmin) {
           $row.find("td").eq(colIndex++).html(`<span class="display-medical-conditions">${medical ? medical.substring(0, 20) + (medical.length > 20 ? "..." : "") : ""}</span>`);
           $row.find("td").eq(colIndex++).html(`<span class="display-creation-date">${creationTimestamp ? new Date(creationTimestamp * 1000).toISOString().split("T")[0] : "N/A"}</span>`);
-          $row.find("td").eq(colIndex++).html(`<span class="display-past-events">No past events.</span>`);
+          $row.find("td").eq(colIndex++).html(`<span class="display-past-events">${player.past_events && player.past_events.length ? player.past_events.map(event => event.name + (event.date && event.venue ? ` (${event.date}, ${event.venue})` : '')).join('<br>') : "No past events."}</span>`);
         }
         $row.find(".actions").html(`
           <a href="#" class="player-submit" aria-label="Save Player">Save</a> /
@@ -525,7 +548,7 @@
           $table.find(`.medical-row[data-player-index="${index}"]:not(:first)`).remove();
         }
 
-        // Disable edit buttons on other rows only
+        // Disable edit buttons on other rows and focus on first input
         $table.find(`tr[data-player-index]`).not($row).each(function () {
           const $otherRow = $(this);
           const otherIndex = $otherRow.data("player-index");
@@ -533,6 +556,7 @@
             $otherRow.find(".edit-player").addClass("disabled").attr("aria-disabled", "true");
           }
         });
+        $row.find('[name="player_first_name"]').focus();
 
         $(this).attr("aria-expanded", "true");
       });
@@ -542,19 +566,29 @@
   // Cancel edit
   $container.on("click", ".cancel-edit", function (e) {
     e.preventDefault();
+    const currentTime = Date.now();
+    if (currentTime - intersoccerState.lastClickTime < intersoccerState.clickDebounceMs) return;
+    intersoccerState.lastClickTime = currentTime;
+
     const $row = $(this).closest("tr");
     const index = $row.data("player-index");
     const userId = $row.data("user-id") || intersoccerPlayer.user_id;
 
-    const firstName = $row.attr("data-first-name") || "N/A";
-    const lastName = $row.attr("data-last-name") || "N/A";
-    const dob = $row.attr("data-dob") || "N/A";
-    const gender = $row.attr("data-gender") || "N/A";
-    const avsNumber = $row.attr("data-avs-number") || "N/A";
-    const eventCount = $row.attr("data-event-count") || 0;
-    const canton = $row.data("canton") || "";
-    const city = $row.data("city") || "";
-    const creationTimestamp = $row.attr("data-creation-timestamp") || "";
+    if (debugEnabled) console.log("InterSoccer: Canceling edit for player index:", index, "userId:", userId);
+
+    // Use preloaded data if available, fallback to data-* attributes
+    const player = intersoccerPlayer.preload_players && intersoccerPlayer.preload_players[index] ? intersoccerPlayer.preload_players[index] : null;
+    const firstName = player ? player.first_name : $row.attr("data-first-name") || "N/A";
+    const lastName = player ? player.last_name : $row.attr("data-last-name") || "N/A";
+    const dob = player ? player.dob : $row.attr("data-dob") || "N/A";
+    const gender = player ? player.gender : $row.attr("data-gender") || "N/A";
+    const avsNumber = player ? player.avs_number : $row.attr("data-avs-number") || "N/A";
+    const eventCount = player ? player.event_count : $row.attr("data-event-count") || 0;
+    const canton = player ? player.canton : $row.data("canton") || "";
+    const city = player ? player.city : $row.data("city") || "";
+    const medical = player ? player.medical_conditions : "";
+    const creationTimestamp = player ? player.creation_timestamp : $row.attr("data-creation-timestamp") || "";
+    const pastEvents = player && player.past_events && player.past_events.length ? player.past_events.map(event => event.name + (event.date && event.venue ? ` (${event.date}, ${event.venue})` : '')).join('<br>') : ($row.find(".display-past-events").html() || "No past events.");
 
     let colIndex = 0;
     if (isAdmin) {
@@ -571,16 +605,22 @@
     if (isAdmin) {
       $row.find("td").eq(colIndex++).html(`<span class="display-medical-conditions">${medical ? medical.substring(0, 20) + (medical.length > 20 ? "..." : "") : ""}</span>`);
       $row.find("td").eq(colIndex++).html(`<span class="display-creation-date">${creationTimestamp ? new Date(creationTimestamp * 1000).toISOString().split("T")[0] : "N/A"}</span>`);
-      $row.find("td").eq(colIndex++).html(`<span class="display-past-events">No past events.</span>`);
+      $row.find("td").eq(colIndex++).html(`<span class="display-past-events">${pastEvents}</span>`);
     }
     $row.find(".actions").html(`
       <a href="#" class="edit-player" data-index="${index}" data-user-id="${userId}" aria-label="Edit player ${firstName || ""}" aria-expanded="false">Edit</a>
     `);
     $table.find(`.medical-row[data-player-index="${index}"]`).remove();
+    $row.removeClass("editing");
     intersoccerState.editingIndex = null;
     $table.find(".edit-player").removeClass("disabled").attr("aria-disabled", "false");
 
-    if (isAdmin && typeof intersoccerApplyFilters === "function") intersoccerApplyFilters();
+    if (isAdmin && typeof intersoccerApplyFilters === "function") {
+      if (debugEnabled) console.log("InterSoccer: Applying filters after cancel");
+      intersoccerApplyFilters();
+    }
+
+    if (debugEnabled) console.log("InterSoccer: Edit canceled, row restored for index:", index);
   });
 
   // Delete player
@@ -615,9 +655,13 @@
             $table.find(".no-players").remove();
             $table.find(".add-player-section").before(`<tr class="no-players"><td colspan="${isAdmin ? 11 : 7}">No attendees added yet.</td></tr>`);
           }
+          intersoccerPlayer.preload_players = {}; // Clear preload cache
           intersoccerState.editingIndex = null;
           $table.find(".edit-player").removeClass("disabled").attr("aria-disabled", "false");
-          if (isAdmin && typeof intersoccerApplyFilters === "function") intersoccerApplyFilters();
+          if (isAdmin && typeof intersoccerApplyFilters === "function") {
+            if (debugEnabled) console.log("InterSoccer: Applying filters after delete");
+            intersoccerApplyFilters();
+          }
         } else {
           console.error("InterSoccer: Delete AJAX response failure:", response.data?.message);
           $message.text(response.data.message || "Failed to delete player.").show();
