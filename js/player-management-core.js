@@ -1,5 +1,5 @@
+"use strict";
 (function ($) {
-  // Dependency checks
   if (typeof $ === "undefined") {
     console.error("InterSoccer: jQuery is not loaded. Player management disabled.");
     return;
@@ -13,7 +13,6 @@
     return;
   }
 
-  // Check for container
   const $container = $(".intersoccer-player-management");
   if (!$container.length) {
     console.error("InterSoccer: Player management container (.intersoccer-player-management) not found.");
@@ -37,6 +36,7 @@
   // Toggle Add Attendee section
   $container.on("click", ".toggle-add-player", function (e) {
     e.preventDefault();
+    e.stopPropagation(); // Prevent propagation to avoid closing select2 dropdown
     const $section = $(".add-player-section");
     const isVisible = $section.hasClass("active");
     $section.toggleClass("active", !isVisible);
@@ -44,11 +44,10 @@
     if (!isVisible) {
       $("#player_first_name").focus();
     } else {
-      $(
-        ".add-player-section input, .add-player-section select, .add-player-section textarea"
-      ).val("");
+      $(".add-player-section input, .add-player-section select, .add-player-section textarea").val("");
       $(".add-player-section .error-message").hide();
     }
+    if (debugEnabled) console.log("InterSoccer: Toggled add player section, visible:", !isVisible);
   });
 
   // Cancel Add
@@ -56,10 +55,12 @@
     e.preventDefault();
     $(".add-player-section").removeClass("active");
     $(".toggle-add-player").attr("aria-expanded", "false").focus();
-    $(
-      ".add-player-section input, .add-player-section select, .add-player-section textarea"
-    ).val("");
+    $(".add-player-section input, .add-player-section select, .add-player-section textarea").val("");
     $(".add-player-section .error-message").hide();
+    if (isAdmin && $("#player_user_id").hasClass("select2-hidden-accessible")) {
+      $("#player_user_id").select2("destroy").val("");
+      if (debugEnabled) console.log("InterSoccer: Destroyed select2 on cancel add");
+    }
   });
 
   // Validation
@@ -68,9 +69,7 @@
     $row.find(".error-message").hide();
     const $medicalRow = isAdd
       ? $row.next(".add-player-medical")
-      : $row.next(
-          `.medical-row[data-player-index="${$row.data("player-index")}"]`
-        );
+      : $row.next(`.medical-row[data-player-index="${$row.data("player-index")}"]`);
 
     const $userId = $row.find('[name="player_user_id"]');
     const $firstName = $row.find('[name="player_first_name"]');
@@ -80,9 +79,7 @@
     const $dobYear = $row.find('[name="player_dob_year"]');
     const $gender = $row.find('[name="player_gender"]');
     const $avsNumber = $row.find('[name="player_avs_number"]');
-    const $medical = isAdd
-      ? $medicalRow.find('[name="player_medical"]')
-      : $medicalRow.find('[name="player_medical"]');
+    const $medical = $medicalRow.length ? $medicalRow.find('[name="player_medical"]') : null;
 
     const userId = $userId?.val()?.trim();
     const firstName = $firstName?.val()?.trim();
@@ -92,11 +89,7 @@
     const dobYear = $dobYear?.val();
     const gender = $gender?.val();
     const avsNumber = $avsNumber?.val()?.trim();
-    const medical = (
-      $medicalRow?.length
-        ? $medicalRow.find('[name="player_medical"]').val()
-        : ""
-    )?.trim();
+    const medical = $medical?.val()?.trim() || "";
 
     if (isAdmin && isAdd && (!userId || userId <= 0)) {
       $userId.next(".error-message").text("Valid user ID required.").show();
@@ -105,22 +98,22 @@
     if (
       !firstName ||
       firstName.length > 50 ||
-      !/^[a-zA-Z\s-]+$/.test(firstName)
+      !/^[\p{L}\s-]+$/u.test(firstName)
     ) {
       $firstName
         .next(".error-message")
-        .text("Valid first name required (max 50 chars, letters only).")
+        .text("Valid first name required (max 50 chars, letters, spaces, hyphens allowed).")
         .show();
       isValid = false;
     }
     if (
       !lastName ||
       lastName.length > 50 ||
-      !/^[a-zA-Z\s-]+$/.test(lastName)
+      !/^[\p{L}\s-]+$/u.test(lastName)
     ) {
       $lastName
         .next(".error-message")
-        .text("Valid last name required (max 50 chars, letters only).")
+        .text("Valid last name required (max 50 chars, letters, spaces, hyphens allowed).")
         .show();
       isValid = false;
     }
@@ -171,7 +164,7 @@
     }
 
     if (debugEnabled) {
-      console.log("InterSoccer: Validated AVS number:", avsNumber, "Valid:", isValid);
+      console.log("InterSoccer: Validated row:", { userId, firstName, lastName, dob: `${dobYear}-${dobMonth}-${dobDay}`, gender, avsNumber, medical, isValid });
     }
 
     return isValid;

@@ -94,7 +94,7 @@ class Player_Management_Admin {
 
         global $wpdb;
         $players = $this->all_players_data;
-        $canton_data = []; // Renamed from region_data to reflect canton focus
+        $canton_data = [];
         $gender_data = ['male' => 0, 'female' => 0, 'other' => 0];
         $top_cantons = [];
         $total_players = 0;
@@ -247,22 +247,21 @@ class Player_Management_Admin {
     }
 
     public function render_all_players_page() {
-        $users = get_users(['role' => 'customer']);
+        $users = get_users(['role__in' => ['customer', 'subscriber']]);
         $all_players = [];
         $total_players = 0;
         $male_count = 0;
         $female_count = 0;
-        $today = '2025-06-23';
+        $users_without_players = 0;
+        $today = current_time('mysql');
 
         foreach ($users as $user) {
             $players = get_user_meta($user->ID, 'intersoccer_players', true) ?: [];
+            if (empty($players)) {
+                $users_without_players++;
+                continue;
+            }
             $billing_state = get_user_meta($user->ID, 'billing_state', true) ?: 'Unknown';
-            $orders = wc_get_orders([
-                'customer_id' => $user->ID,
-                'status' => ['wc-completed', 'wc-processing'],
-                'limit' => -1
-            ]);
-
             foreach ($players as $index => $player) {
                 $total_players++;
                 $player['user_id'] = $user->ID;
@@ -288,9 +287,14 @@ class Player_Management_Admin {
                 if ($gender === 'male') $male_count++;
                 elseif ($gender === 'female') $female_count++;
 
+                $orders = wc_get_orders([
+                    'customer_id' => $user->ID,
+                    'status' => ['wc-completed', 'wc-processing'],
+                    'limit' => -1
+                ]);
                 foreach ($orders as $order) {
                     $order_players = $order->get_meta('intersoccer_players', true);
-                    $player_name = isset($player['name']) ? $player['name'] : (isset($player['first_name']) ? $player['first_name'] : '');
+                    $player_name = isset($player['first_name']) ? $player['first_name'] . ' ' . $player['last_name'] : '';
                     if ($order_players && in_array($player_name, (array)$order_players)) {
                         foreach ($order->get_items() as $item) {
                             $product = $item->get_product();
@@ -323,17 +327,31 @@ class Player_Management_Admin {
         // Store all_players_data for use in render_overview_page
         $this->all_players_data = $all_players;
 
+        // Get users for dropdown
+        $user_options = '';
+        foreach ($users as $user) {
+            $user_players = get_user_meta($user->ID, 'intersoccer_players', true) ?: [];
+            $user_options .= sprintf(
+                '<option value="%d" %s>%s (%s)</option>',
+                esc_attr($user->ID),
+                empty($user_players) ? 'data-no-players="true"' : '',
+                esc_html($user->user_email),
+                esc_html($user->display_name)
+            );
+        }
+
         $inline_css = '
             .quick-stats { display: flex; justify-content: space-between; margin-bottom: 15px; }
             .quick-stats div { text-align: center; flex: 1; padding: 10px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 5px; }
             .quick-stats div h3 { margin: 0 0 5px; font-size: 14px; }
             .quick-stats div p { margin: 0; font-size: 16px; font-weight: bold; }
+            .filter-section { margin-bottom: 15px; }
+            .user-select-section { margin-bottom: 15px; }
+            .user-select-section select { width: 300px; }
             @media (max-width: 600px) {
                 .quick-stats { flex-direction: column; }
                 .quick-stats div { margin-bottom: 10px; }
-            }
-            .filter-section { margin-bottom: 15px; }
-            @media (max-width: 600px) {
+                .user-select-section select { width: 100%; }
                 .intersoccer-player-management table, .intersoccer-player-management thead, .intersoccer-player-management tbody, .intersoccer-player-management th, .intersoccer-player-management td, .intersoccer-player-management tr {
                     display: block;
                 }
@@ -358,7 +376,7 @@ class Player_Management_Admin {
         <div class="wrap">
             <h1><?php _e('All Players', 'player-management'); ?></h1>
 
-            <!-- Quick Stats with Total Players, Males, and Females side-by-side -->
+            <!-- Quick Stats with Total Players, Males, Females, and Users Without Players -->
             <div class="dashboard-section quick-stats">
                 <div>
                     <h3><?php _e('Total Players', 'player-management'); ?></h3>
@@ -372,9 +390,23 @@ class Player_Management_Admin {
                     <h3><?php _e('Female Players', 'player-management'); ?></h3>
                     <p><?php echo esc_html($female_count); ?></p>
                 </div>
+                <div>
+                    <h3><?php _e('Users Without Players', 'player-management'); ?></h3>
+                    <p><?php echo esc_html($users_without_players); ?></p>
+                </div>
             </div>
 
-            <!-- Filter Section with only Name Search -->
+            <!-- User Selection for Adding Players -->
+            <div class="user-select-section">
+                <label for="user-select"><?php _e('Select User to Add Player:', 'player-management'); ?></label>
+                <select id="user-select" name="user_select">
+                    <option value=""><?php _e('Select a user', 'player-management'); ?></option>
+                    <?php echo $user_options; ?>
+                </select>
+                <button id="add-player-for-user" class="button button-primary"><?php _e('Add Player', 'player-management'); ?></button>
+            </div>
+
+            <!-- Filter Section with Name Search -->
             <div class="filter-section">
                 <label for="player-search"><?php _e('Search by Name:', 'player-management'); ?></label>
                 <input type="text" id="player-search" placeholder="<?php _e('Enter player name...', 'player-management'); ?>" class="widefat">
@@ -382,13 +414,35 @@ class Player_Management_Admin {
 
             <?php echo intersoccer_render_players_form(true, ['total_players' => $total_players]); ?>
         </div>
+        <script>
+            jQuery(document).ready(function($) {
+                $('#user-select').select2({
+                    placeholder: '<?php _e('Select a user', 'player-management'); ?>',
+                    allowClear: true,
+                    width: 'resolve'
+                });
+
+                $('#add-player-for-user').on('click', function(e) {
+                    e.preventDefault();
+                    const userId = $('#user-select').val();
+                    if (!userId) {
+                        alert('<?php _e('Please select a user.', 'player-management'); ?>');
+                        return;
+                    }
+                    $('.add-player-section').addClass('active');
+                    $('.toggle-add-player').attr('aria-expanded', 'true');
+                    $('#player_user_id').val(userId);
+                    $('#player_first_name').focus();
+                });
+            });
+        </script>
         <?php
     }
 
     private function is_date_past($end_date, $today) {
         try {
             $end = DateTime::createFromFormat('d/m/Y', $end_date);
-            $today_date = DateTime::createFromFormat('Y-m-d', $today);
+            $today_date = DateTime::createFromFormat('Y-m-d H:i:s', $today);
             return $end && $today_date && $end < $today_date;
         } catch (Exception $e) {
             if (defined('WP_DEBUG') && WP_DEBUG) {
@@ -396,21 +450,6 @@ class Player_Management_Admin {
             }
             return false;
         }
-    }
-
-    private function get_event_type($product) {
-        if (!$product) {
-            return '';
-        }
-        $categories = wp_get_post_terms($product->get_id(), 'product_cat', ['fields' => 'names']);
-        if (in_array('Camps', $categories)) {
-            return 'Camps';
-        } elseif (in_array('Courses', $categories)) {
-            return 'Courses';
-        } elseif (in_array('Birthdays', $categories)) {
-            return 'Birthdays';
-        }
-        return '';
     }
 }
 
