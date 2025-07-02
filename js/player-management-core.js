@@ -104,7 +104,8 @@
     }
     if (
       !firstName ||
-      firstName.length > 50 
+      firstName.length > 50 ||
+      !/^[a-zA-Z\s-]+$/.test(firstName)
     ) {
       $firstName
         .next(".error-message")
@@ -114,7 +115,8 @@
     }
     if (
       !lastName ||
-      lastName.length > 50
+      lastName.length > 50 ||
+      !/^[a-zA-Z\s-]+$/.test(lastName)
     ) {
       $lastName
         .next(".error-message")
@@ -153,10 +155,10 @@
         isValid = false;
       }
     }
-    if (avsNumber && avsNumber.length < 6) {
+    if (avsNumber && !/^(756\.\d{4}\.\d{4}\.\d{2}|0000|[A-Za-z0-9]{4,50})$/.test(avsNumber)) {
       $avsNumber
         .next(".error-message")
-        .text("Valid AVS number required.")
+        .text("Invalid AVS number. Use at least 4 characters, '0000', or Swiss AVS format (756.XXXX.XXXX.XX).")
         .show();
       isValid = false;
     }
@@ -166,6 +168,10 @@
         .text("Medical conditions must be under 500 chars.")
         .show();
       isValid = false;
+    }
+
+    if (debugEnabled) {
+      console.log("InterSoccer: Validated AVS number:", avsNumber, "Valid:", isValid);
     }
 
     return isValid;

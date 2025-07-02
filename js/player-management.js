@@ -1,21 +1,24 @@
-jQuery(document).ready(function ($) {
-  // Check if intersoccerCheckout is initialized
+(function ($) {
+  // Check if intersoccerPlayer is initialized
   if (
-    typeof intersoccerCheckout === "undefined" ||
-    !intersoccerCheckout.ajax_url
+    typeof intersoccerPlayer === "undefined" ||
+    !intersoccerPlayer.ajax_url ||
+    !intersoccerPlayer.nonce
   ) {
-    console.warn(
-      "intersoccerCheckout is not initialized. Player management will not work."
-    );
+    console.warn("InterSoccer: intersoccerPlayer is not initialized. Player management will not work.");
     return;
   }
 
   // Target the Manage Players section
   const $managePlayers = $(".intersoccer-player-management");
   if (!$managePlayers.length) {
-    console.warn("Manage Players container not found on the page.");
+    console.warn("InterSoccer: Manage Players container not found on the page.");
     return;
   }
+
+  const $tableBody = $managePlayers.find(".wp-list-table tbody");
+  const $message = $managePlayers.find(".intersoccer-message");
+  const debugEnabled = intersoccerPlayer.debug === "1";
 
   // Initialize Flatpickr on date inputs with error handling
   try {
@@ -32,416 +35,333 @@ jQuery(document).ready(function ($) {
       },
     });
   } catch (e) {
-    console.error("Flatpickr initialization failed:", e);
+    console.error("InterSoccer: Flatpickr initialization failed:", e);
   }
 
-  // Fetch and display players
+  // Populate table with preloaded players
+  function populatePlayers() {
+    if (
+      intersoccerPlayer.preload_players &&
+      Object.keys(intersoccerPlayer.preload_players).length > 0
+    ) {
+      console.log("InterSoccer: Populating table with preloaded players:", intersoccerPlayer.preload_players);
+      $tableBody.empty();
+      Object.keys(intersoccerPlayer.preload_players).forEach((index) => {
+        const player = intersoccerPlayer.preload_players[index];
+        if (!player.first_name || !player.last_name) {
+          console.warn("InterSoccer: Player data missing first_name or last_name at index:", index);
+          return;
+        }
+        const rowHtml = `
+          <tr data-player-index="${index}"
+              data-user-id="${player.user_id || intersoccerPlayer.user_id}"
+              data-first-name="${player.first_name || 'N/A'}"
+              data-last-name="${player.last_name || 'N/A'}"
+              data-dob="${player.dob || 'N/A'}"
+              data-gender="${player.gender || 'N/A'}"
+              data-avs-number="${player.avs_number || 'N/A'}"
+              data-event-count="${player.event_count || 0}"
+              data-canton="${player.canton || ''}"
+              data-city="${player.city || ''}">
+            <td class="display-first-name">${player.first_name || 'N/A'}</td>
+            <td class="display-last-name">${player.last_name || 'N/A'}</td>
+            <td class="display-dob">${player.dob || 'N/A'}</td>
+            <td class="display-gender">${player.gender || 'N/A'}</td>
+            <td class="display-avs-number">${player.avs_number || 'N/A'}</td>
+            <td class="display-event-count">${player.event_count || 0}</td>
+            <td class="actions">
+              <a href="#" class="edit-player" data-index="${index}" data-user-id="${player.user_id || intersoccerPlayer.user_id}" aria-label="Edit player ${player.first_name || ''}" aria-expanded="false">Edit</a>
+            </td>
+          </tr>
+        `;
+        $tableBody.append(rowHtml);
+      });
+      if (!Object.keys(intersoccerPlayer.preload_players).length) {
+        $tableBody.html('<tr class="no-players"><td colspan="7">No attendees added yet.</td></tr>');
+      }
+    } else {
+      console.log("InterSoccer: No preloaded players, falling back to AJAX fetch");
+      fetchUserPlayers();
+    }
+  }
+
+  // Fetch players via AJAX (fallback)
   function fetchUserPlayers() {
     $.ajax({
-      url: intersoccerCheckout.ajax_url,
+      url: intersoccerPlayer.ajax_url,
       type: "POST",
       data: {
         action: "intersoccer_get_user_players",
-        nonce: intersoccerCheckout.nonce,
-        user_id: intersoccerCheckout.user_id,
+        nonce: intersoccerPlayer.nonce,
+        user_id: intersoccerPlayer.user_id,
       },
       contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+      beforeSend: function () {
+        $tableBody.addClass("loading");
+        if (debugEnabled) console.log("InterSoccer: Fetching players via AJAX");
+      },
       success: function (response) {
-        console.log("Players fetch response:", response);
+        console.log("InterSoccer: Players fetch response:", response);
         if (
           response.success &&
           response.data.players &&
           Array.isArray(response.data.players)
         ) {
-          const $tableBody = $managePlayers.find(".wp-list-table tbody");
-          if (!$tableBody.length) {
-            console.warn("Table body not found in Manage Players section.");
-            return;
-          }
           $tableBody.empty();
           response.data.players.forEach((player, index) => {
-            if (!player.name) {
-              console.warn("Player data missing name at index:", index);
+            if (!player.first_name || !player.last_name) {
+              console.warn("InterSoccer: Player data missing first_name or last_name at index:", index);
               return;
             }
-            $tableBody.append(`
-                            <tr data-player-index="${index}">
-                                <td>${player.name}</td>
-                                <td>${player.dob || "N/A"}</td>
-                                <td>${player.gender || "N/A"}</td>
-                                <td>${player.medical_conditions || "None"}</td>
-                                <td>
-                                    <button class="button edit-player" data-index="${index}" aria-label="Edit player ${
-              player.name
-            }">
-                                        Edit
-                                    </button>
-                                    <button class="button delete-player" data-index="${index}" aria-label="Delete player ${
-              player.name
-            }">
-                                        Delete
-                                    </button>
-                                </td>
-                            </tr>
-                        `);
+            const rowHtml = `
+              <tr data-player-index="${index}"
+                  data-user-id="${player.user_id || intersoccerPlayer.user_id}"
+                  data-first-name="${player.first_name || 'N/A'}"
+                  data-last-name="${player.last_name || 'N/A'}"
+                  data-dob="${player.dob || 'N/A'}"
+                  data-gender="${player.gender || 'N/A'}"
+                  data-avs-number="${player.avs_number || 'N/A'}"
+                  data-event-count="${player.event_count || 0}"
+                  data-canton="${player.canton || ''}"
+                  data-city="${player.city || ''}">
+                <td class="display-first-name">${player.first_name || 'N/A'}</td>
+                <td class="display-last-name">${player.last_name || 'N/A'}</td>
+                <td class="display-dob">${player.dob || 'N/A'}</td>
+                <td class="display-gender">${player.gender || 'N/A'}</td>
+                <td class="display-avs-number">${player.avs_number || 'N/A'}</td>
+                <td class="display-event-count">${player.event_count || 0}</td>
+                <td class="actions">
+                  <a href="#" class="edit-player" data-index="${index}" data-user-id="${player.user_id || intersoccerPlayer.user_id}" aria-label="Edit player ${player.first_name || ''}" aria-expanded="false">Edit</a>
+                </td>
+              </tr>
+            `;
+            $tableBody.append(rowHtml);
           });
+          if (!response.data.players.length) {
+            $tableBody.html('<tr class="no-players"><td colspan="7">No attendees added yet.</td></tr>');
+          }
         } else {
-          $managePlayers
-            .find(".wp-list-table tbody")
-            .html('<tr><td colspan="5">No players found.</td></tr>');
+          $tableBody.html('<tr><td colspan="7">Error loading players. Please try again.</td></tr>');
+          $message.text("Error loading players. Please try again.").show();
+          setTimeout(() => $message.hide(), 5000);
         }
       },
       error: function (xhr, status, error) {
-        console.error("Players fetch error:", status, error, xhr.responseText);
-        $managePlayers
-          .find(".wp-list-table tbody")
-          .html(
-            '<tr><td colspan="5">Error loading players. Please try again.</td></tr>'
-          );
+        console.error("InterSoccer: Players fetch error:", status, error, xhr.responseText);
+        $tableBody.html('<tr><td colspan="7">Error loading players. Please try again.</td></tr>');
+        $message.text("Error loading players: " + (xhr.responseText || "Unknown error")).show();
+        setTimeout(() => $message.hide(), 5000);
+      },
+      complete: function () {
+        $tableBody.removeClass("loading");
       },
     });
   }
 
   // Handle form submission to add a player
-  $managePlayers.on("submit", "#add-player-form", function (e) {
+  $managePlayers.on("click", ".player-submit", function (e) {
     e.preventDefault();
-    const $form = $(this);
-    const $spinner = $form.find(".spinner");
+    const $row = $(this).closest("tr");
+    const isAdd = $row.hasClass("add-player-section");
+    if (intersoccerState.isProcessing || (isAdd && intersoccerState.isAdding)) return;
+
+    if (!intersoccerValidateRow($row, isAdd)) return;
+
+    intersoccerState.isProcessing = true;
+    if (isAdd) intersoccerState.isAdding = true;
+    const $spinner = $row.find(".spinner").show();
     const playerData = {
-      player_name: $form.find("#player_name").val(),
-      player_dob: $form.find("#player_dob").val(),
-      player_gender: $form.find("#player_gender").val(),
-      player_medical: $form.find("#player_medical").val(),
+      player_first_name: $row.find("#player_first_name").val(),
+      player_last_name: $row.find("#player_last_name").val(),
+      player_dob: `${$row.find("#player_dob_year").val()}-${$row.find("#player_dob_month").val()}-${$row.find("#player_dob_day").val()}`,
+      player_gender: $row.find("#player_gender").val(),
+      player_avs_number: $row.find("#player_avs_number").val(),
+      player_medical: $row.next(".add-player-medical").find("#player_medical").val() || "",
     };
 
     // Validate required fields
-    if (!playerData.player_name || !playerData.player_dob) {
-      alert("Player name and date of birth are required.");
+    if (!playerData.player_first_name || !playerData.player_last_name || !playerData.player_dob || !playerData.player_gender || !playerData.player_avs_number) {
+      $message.text("All fields are required.").show();
+      setTimeout(() => $message.hide(), 5000);
+      intersoccerState.isProcessing = false;
+      intersoccerState.isAdding = false;
+      $spinner.hide();
       return;
     }
 
-    if (
-      !/^\d{4}-\d{2}-\d{2}$/.test(playerData.player_dob) ||
-      !new Date(playerData.player_dob).getTime()
-    ) {
-      alert("Invalid date of birth format. Use YYYY-MM-DD.");
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(playerData.player_dob) || !new Date(playerData.player_dob).getTime()) {
+      $message.text("Invalid date of birth format. Use YYYY-MM-DD.").show();
+      setTimeout(() => $message.hide(), 5000);
+      intersoccerState.isProcessing = false;
+      intersoccerState.isAdding = false;
+      $spinner.hide();
       return;
     }
 
-    // Refresh nonce before sending AJAX
     refreshNonce(function (newNonce) {
       if (!newNonce) {
-        console.error("Nonce refresh failed.");
+        console.error("InterSoccer: Nonce refresh failed.");
+        $message.text("Error: Failed to refresh security token.").show();
+        setTimeout(() => $message.hide(), 5000);
+        intersoccerState.isProcessing = false;
+        intersoccerState.isAdding = false;
+        $spinner.hide();
         return;
       }
-      $spinner.show();
       $.ajax({
-        url: intersoccerCheckout.ajax_url,
+        url: intersoccerPlayer.ajax_url,
         type: "POST",
         data: {
           action: "intersoccer_add_player",
-          nonce: newNonce || intersoccerCheckout.nonce,
-          player_name: playerData.player_name,
+          nonce: newNonce || intersoccerPlayer.nonce,
+          player_first_name: playerData.player_first_name,
+          player_last_name: playerData.player_last_name,
           player_dob: playerData.player_dob,
           player_gender: playerData.player_gender,
+          player_avs_number: playerData.player_avs_number,
           player_medical: playerData.player_medical,
-          user_id: intersoccerCheckout.user_id,
+          user_id: intersoccerPlayer.user_id,
         },
         contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+        beforeSend: function () {
+          if (debugEnabled) console.log("InterSoccer: Sending add player request with data:", playerData);
+        },
         success: function (response) {
-          console.log("Add player response:", response);
+          console.log("InterSoccer: Add player response:", response);
           $spinner.hide();
           if (response.success) {
-            $form[0].reset();
-            fetchUserPlayers();
+            $row.find("input, select, textarea").val("");
+            $row.next(".add-player-medical").find("textarea").val("");
+            $row.removeClass("active");
+            $(".toggle-add-player").attr("aria-expanded", "false");
+            populatePlayers();
+            $message.text(response.data.message || "Player added successfully.").show();
+            setTimeout(() => $message.hide(), 5000);
           } else {
-            alert(response.data.message || "Error adding player.");
+            $message.text(response.data.message || "Error adding player.").show();
+            setTimeout(() => $message.hide(), 5000);
             if (response.data.new_nonce) {
-              intersoccerCheckout.nonce = response.data.new_nonce;
-              console.log("Updated nonce due to failure: ", intersoccerCheckout.nonce);
+              intersoccerPlayer.nonce = response.data.new_nonce;
+              console.log("InterSoccer: Updated nonce due to failure:", intersoccerPlayer.nonce);
             }
           }
         },
         error: function (xhr, status, error) {
-          console.error("Add player error:", status, error, xhr.responseText);
-          $spinner.hide();
-          alert("Error adding player: " + (xhr.responseText || "Unknown error") + " (Status: " + xhr.status + ")");
+          console.error("InterSoccer: Add player error:", status, error, xhr.responseText);
+          $message.text("Error adding player: " + (xhr.responseText || "Unknown error")).show();
+          setTimeout(() => $message.hide(), 5000);
           refreshNonce(function (newNonce) {
             if (newNonce) {
-              intersoccerCheckout.nonce = newNonce;
-              console.log("Refreshed nonce after error: ", intersoccerCheckout.nonce);
+              intersoccerPlayer.nonce = newNonce;
+              console.log("InterSoccer: Refreshed nonce after error:", intersoccerPlayer.nonce);
             }
           });
+        },
+        complete: function () {
+          intersoccerState.isProcessing = false;
+          intersoccerState.isAdding = false;
+          $spinner.hide();
         },
       });
     });
   });
 
   // Edit player functionality
-  $managePlayers.on("click", ".edit-player", function () {
-    const index = $(this).data("index");
-    const $row = $(this).closest("tr");
-    const playerData = $row
-      .find("td")
-      .map(function () {
-        return $(this).text();
-      })
-      .get();
-
-    const editForm = `
-            <tr class="edit-form">
-                <td colspan="5">
-                    <form class="update-player-form">
-                        <p>
-                            <label for="edit-player-name">Name:</label>
-                            <input type="text" id="edit-player-name" name="name" value="${
-                              playerData[0]
-                            }" required>
-                        </p>
-                        <p>
-                            <label for="edit-player-dob">Date of Birth (YYYY-MM-DD):</label>
-                            <input type="text" id="edit-player-dob" name="dob" class="date-picker" value="${
-                              playerData[1] !== "N/A" ? playerData[1] : ""
-                            }" pattern="\\d{4}-\\d{2}-\\d{2}" placeholder="YYYY-MM-DD">
-                        </p>
-                        <p>
-                            <label for="edit-player-gender">Gender:</label>
-                            <select id="edit-player-gender" name="gender">
-                                <option value="" ${
-                                  playerData[2] === "N/A" ? "selected" : ""
-                                }>Select Gender</option>
-                                <option value="male" ${
-                                  playerData[2] === "male" ? "selected" : ""
-                                }>Male</option>
-                                <option value="female" ${
-                                  playerData[2] === "female" ? "selected" : ""
-                                }>Female</option>
-                                <option value="other" ${
-                                  playerData[2] === "other" ? "selected" : ""
-                                }>Other</option>
-                            </select>
-                        </p>
-                        <p>
-                            <label for="edit-player-medical">Medical Conditions:</label>
-                            <textarea id="edit-player-medical" name="medical_conditions">${
-                              playerData[3] !== "None" ? playerData[3] : ""
-                            }</textarea>
-                        </p>
-                        <p>
-                            <button type="submit" class="button update-player" data-index="${index}">Update</button>
-                            <button type="button" class="button cancel-edit">Cancel</button>
-                        </p>
-                    </form>
-                </td>
-            </tr>
-        `;
-    $row.after(editForm);
-    $row.hide();
-
-    try {
-      flatpickr("#edit-player-dob", {
-        dateFormat: "Y-m-d",
-        maxDate: "today",
-        enableTime: false,
-        allowInput: true,
-        clickOpens: true,
-        altInput: true,
-        altFormat: "F j, Y",
-        onClose: function (selectedDates, dateStr, instance) {
-          instance.element.value = dateStr;
-        },
-      });
-    } catch (e) {
-      console.error("Flatpickr initialization for edit form failed:", e);
-    }
+  $managePlayers.on("click", ".edit-player", function (e) {
+    // Handled by player-management-actions.js
   });
 
   // Cancel edit
-  $managePlayers.on("click", ".cancel-edit", function () {
-    const $editRow = $(this).closest("tr.edit-form");
-    const $playerRow = $editRow.prev("tr");
-    $editRow.remove();
-    $playerRow.show();
-  });
-
-  // Update player
-  $managePlayers.on("submit", ".update-player-form", function (e) {
-    e.preventDefault();
-    const $form = $(this);
-    const index = $form.find(".update-player").data("index");
-    const updatedPlayer = {
-      name: $form.find('input[name="name"]').val(),
-      dob: $form.find('input[name="dob"]').val(),
-      gender: $form.find('select[name="gender"]').val(),
-      medical_conditions: $form
-        .find('textarea[name="medical_conditions"]')
-        .val(),
-    };
-
-    if (!updatedPlayer.name) {
-      alert("Player name is required.");
-      return;
-    }
-
-    refreshNonce(function (newNonce) {
-      if (!newNonce) {
-        console.error("Nonce refresh failed.");
-        return;
-      }
-      $.ajax({
-        url: intersoccerCheckout.ajax_url,
-        type: "POST",
-        data: {
-          action: "intersoccer_update_player",
-          nonce: newNonce || intersoccerCheckout.nonce,
-          user_id: intersoccerCheckout.user_id,
-          player_index: index,
-          player_data: JSON.stringify(updatedPlayer),
-        },
-        contentType: "application/x-www-form-urlencoded; charset=UTF-8",
-        beforeSend: function () {
-          console.log("Sending update player request with data:", {
-            action: "intersoccer_update_player",
-            nonce: newNonce || intersoccerCheckout.nonce,
-            user_id: intersoccerCheckout.user_id,
-            player_index: index,
-            player_data: updatedPlayer,
-          });
-        },
-        success: function (response) {
-          console.log("Update player response:", response);
-          if (response.success) {
-            fetchUserPlayers();
-          } else {
-            alert(response.data.message || "Error updating player.");
-            if (response.data.new_nonce) {
-              intersoccerCheckout.nonce = response.data.new_nonce;
-              console.log("Updated nonce due to failure: ", intersoccerCheckout.nonce);
-            }
-          }
-        },
-        error: function (xhr, status, error) {
-          console.error("Update player error:", status, error, xhr.responseText);
-          alert(
-            "Error updating player: " + (xhr.responseText || "Unknown error")
-          );
-          refreshNonce(function (newNonce) {
-            if (newNonce) {
-              intersoccerCheckout.nonce = newNonce;
-              console.log("Refreshed nonce after error: ", intersoccerCheckout.nonce);
-            }
-          });
-        },
-      });
-    });
+  $managePlayers.on("click", ".cancel-edit", function (e) {
+    // Handled by player-management-actions.js
   });
 
   // Delete player
-  $managePlayers.on("click", ".delete-player", function () {
-    const index = $(this).data("index");
-    if (!confirm("Are you sure you want to delete this player?")) {
-      return;
-    }
-
-    refreshNonce(function (newNonce) {
-      if (!newNonce) {
-        console.error("Nonce refresh failed.");
-        return;
-      }
-      $.ajax({
-        url: intersoccerCheckout.ajax_url,
-        type: "POST",
-        data: {
-          action: "intersoccer_delete_player",
-          nonce: newNonce || intersoccerCheckout.nonce,
-          user_id: intersoccerCheckout.user_id,
-          index: index,
-        },
-        contentType: "application/x-www-form-urlencoded; charset=UTF-8",
-        success: function (response) {
-          console.log("Delete player response:", response);
-          if (response.success) {
-            fetchUserPlayers();
-          } else {
-            alert(response.data.message || "Error deleting player.");
-            if (response.data.new_nonce) {
-              intersoccerCheckout.nonce = response.data.new_nonce;
-              console.log("Updated nonce due to failure: ", intersoccerCheckout.nonce);
-            }
-          }
-        },
-        error: function (xhr, status, error) {
-          console.error("Delete player error:", status, error, xhr.responseText);
-          alert("Error deleting player. Please try again.");
-          refreshNonce(function (newNonce) {
-            if (newNonce) {
-              intersoccerCheckout.nonce = newNonce;
-              console.log("Refreshed nonce after error: ", intersoccerCheckout.nonce);
-            }
-          });
-        },
-      });
-    });
+  $managePlayers.on("click", ".delete-player", function (e) {
+    // Handled by player-management-actions.js
   });
 
+  // Handle first login modal
+  if ($('#intersoccer-first-login').length) {
+    $('#player-modal').show();
+    $('#add-player-form').submit(function (e) {
+      e.preventDefault();
+      const playerData = {
+        player_first_name: $('#player-first-name').val(),
+        player_last_name: $('#player-last-name').val(),
+        player_dob: $('#player-dob').val(),
+        player_gender: $('#player-gender').val(),
+        player_avs_number: $('#player-avs-number').val(),
+        player_medical: $('#player-medical').val(),
+      };
+
+      if (!playerData.player_first_name || !playerData.player_last_name || !playerData.player_dob || !playerData.player_gender || !playerData.player_avs_number) {
+        $message.text("All fields are required.").show();
+        setTimeout(() => $message.hide(), 5000);
+        return;
+      }
+
+      refreshNonce(function (newNonce) {
+        if (!newNonce) {
+          console.error("InterSoccer: Nonce refresh failed.");
+          $message.text("Error: Failed to refresh security token.").show();
+          setTimeout(() => $message.hide(), 5000);
+          return;
+        }
+        $.post(intersoccerPlayer.ajax_url, {
+          action: 'intersoccer_add_player',
+          nonce: newNonce || intersoccerPlayer.nonce,
+          player_first_name: playerData.player_first_name,
+          player_last_name: playerData.player_last_name,
+          player_dob: playerData.player_dob,
+          player_gender: playerData.player_gender,
+          player_avs_number: playerData.player_avs_number,
+          player_medical: playerData.player_medical,
+          user_id: intersoccerPlayer.user_id,
+        }, function (response) {
+          if (response.success) {
+            window.location.reload();
+          } else {
+            $message.text(response.data.message || "Error adding player.").show();
+            setTimeout(() => $message.hide(), 5000);
+            if (response.data.new_nonce) {
+              intersoccerPlayer.nonce = response.data.new_nonce;
+              console.log("InterSoccer: Updated nonce due to failure:", intersoccerPlayer.nonce);
+            }
+          }
+        }).fail(function (xhr, status, error) {
+          console.error("InterSoccer: Add player error:", status, error, xhr.responseText);
+          $message.text("Error adding player: " + (xhr.responseText || "Unknown error")).show();
+          setTimeout(() => $message.hide(), 5000);
+          refreshNonce(function (newNonce) {
+            if (newNonce) {
+              intersoccerPlayer.nonce = newNonce;
+              console.log("InterSoccer: Refreshed nonce after error:", intersoccerPlayer.nonce);
+            }
+          });
+        });
+      });
+    });
+  }
+
   // Initial fetch
-  fetchUserPlayers();
+  populatePlayers();
 
   // Refresh nonce function with callback
   function refreshNonce(callback) {
-    $.get(intersoccerCheckout.nonce_refresh_url, function (response) {
+    $.get(intersoccerPlayer.nonce_refresh_url, function (response) {
       if (response.success) {
         const newNonce = response.data.nonce;
-        intersoccerCheckout.nonce = newNonce;
-        console.log("Nonce refreshed: ", newNonce);
+        intersoccerPlayer.nonce = newNonce;
+        console.log("InterSoccer: Nonce refreshed:", newNonce);
         if (callback) callback(newNonce);
       } else {
-        console.error("Nonce refresh failed:", response);
+        console.error("InterSoccer: Nonce refresh failed:", response);
         if (callback) callback(null);
       }
     }).fail(function (xhr, status, error) {
-      console.error("Nonce refresh error:", status, error);
+      console.error("InterSoccer: Nonce refresh error:", status, error);
       if (callback) callback(null);
     });
   }
-});
-
-jQuery(document).ready(function($) {
-    if ($('#intersoccer-first-login').length) {
-        $('#player-modal').show();
-        $('#add-player-form').submit(function(e) {
-            e.preventDefault();
-            refreshNonce(function (newNonce) {
-                if (!newNonce) {
-                    console.error("Nonce refresh failed.");
-                    return;
-                }
-                $.post(intersoccerCheckout.ajax_url, {
-                    action: 'intersoccer_add_player',
-                    nonce: newNonce || intersoccerCheckout.nonce,
-                    first_name: $('#player-first-name').val(),
-                    last_name: $('#player-last-name').val()
-                }, function(response) {
-                    if (response.success) {
-                        window.location.reload();
-                    } else {
-                        alert(response.data.message || "Error adding player.");
-                        if (response.data.new_nonce) {
-                            intersoccerCheckout.nonce = response.data.new_nonce;
-                            console.log("Updated nonce due to failure: ", intersoccerCheckout.nonce);
-                        }
-                    }
-                }).fail(function (xhr, status, error) {
-                    console.error("Add player error:", status, error, xhr.responseText);
-                    alert("Error adding player: " + (xhr.responseText || "Unknown error"));
-                    refreshNonce(function (newNonce) {
-                        if (newNonce) {
-                            intersoccerCheckout.nonce = newNonce;
-                            console.log("Refreshed nonce after error: ", intersoccerCheckout.nonce);
-                        }
-                    });
-                });
-            });
-        });
-    }
-});
+})(jQuery);

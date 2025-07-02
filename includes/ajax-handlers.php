@@ -1,5 +1,4 @@
 <?php
-
 /**
  * File: ajax-handlers.php
  * Description: Handles AJAX requests for the InterSoccer Player Management plugin, including adding, editing, deleting players, refreshing nonces, fetching user roles, and retrieving player data. Supports all logged-in user roles and admin management. Includes event count and region for players.
@@ -151,7 +150,7 @@ add_action('wp_ajax_intersoccer_add_player', function () {
         return;
     }
     $dob_date = DateTime::createFromFormat('Y-m-d', $dob);
-    $today = new DateTime('2025-06-29');
+    $today = new DateTime();
     if (!$dob_date || $dob_date > $today) {
         error_log('InterSoccer: Invalid DOB date for intersoccer_add_player: ' . $dob);
         wp_send_json_error(['message' => 'Invalid date of birth']);
@@ -161,6 +160,12 @@ add_action('wp_ajax_intersoccer_add_player', function () {
     if ($age < 2 || $age > 13) {
         error_log('InterSoccer: Invalid age for intersoccer_add_player: ' . $age);
         wp_send_json_error(['message' => 'Player must be 2-13 years old']);
+        return;
+    }
+
+    if (!preg_match('/^(756\.\d{4}\.\d{4}\.\d{2}|0000|[A-Za-z0-9]{4,50})$/', $avs_number)) {
+        error_log('InterSoccer: Invalid AVS number format for intersoccer_add_player: ' . $avs_number);
+        wp_send_json_error(['message' => 'Invalid AVS number. Use at least 4 characters, "0000", or Swiss AVS format (756.XXXX.XXXX.XX).']);
         return;
     }
 
@@ -260,7 +265,7 @@ add_action('wp_ajax_intersoccer_edit_player', function () {
             return;
         }
         $dob_date = DateTime::createFromFormat('Y-m-d', $dob);
-        $today = new DateTime('2025-06-29');
+        $today = new DateTime();
         if (!$dob_date || $dob_date > $today) {
             error_log('InterSoccer: Invalid DOB date for intersoccer_edit_player: ' . $dob);
             wp_send_json_error(['message' => 'Invalid date of birth']);
@@ -272,6 +277,12 @@ add_action('wp_ajax_intersoccer_edit_player', function () {
             wp_send_json_error(['message' => 'Player must be 2-13 years old']);
             return;
         }
+    }
+
+    if (!preg_match('/^(756\.\d{4}\.\d{4}\.\d{2}|0000|[A-Za-z0-9]{4,50})$/', $avs_number)) {
+        error_log('InterSoccer: Invalid AVS number format for intersoccer_edit_player: ' . $avs_number);
+        wp_send_json_error(['message' => 'Invalid AVS number. Use at least 4 characters, "0000", or Swiss AVS format (756.XXXX.XXXX.XX).']);
+        return;
     }
 
     $players = get_user_meta($user_id, 'intersoccer_players', true) ?: [];
@@ -369,7 +380,11 @@ add_action('wp_ajax_intersoccer_delete_player', function () {
         return;
     }
 
+    error_log('InterSoccer: Pre-delete players array: ' . json_encode($players));
     array_splice($players, $index, 1);
+    $players = array_values($players); // Reindex array to prevent sparse arrays
+    error_log('InterSoccer: Post-delete players array: ' . json_encode($players));
+
     $update_result = update_user_meta($user_id, 'intersoccer_players', $players);
     if ($update_result === false) {
         error_log('InterSoccer: Failed to update intersoccer_players meta for user ' . $user_id);
@@ -511,5 +526,4 @@ add_action('woocommerce_checkout_create_order_line_item', function ($item, $cart
         $item->add_meta_data('intersoccer_player_index', $player_index, true);
     }
 }, 10, 4);
-
 ?>
