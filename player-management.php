@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Player Management
  * Description: Manages players for InterSoccer events, integrating with WooCommerce My Account page and providing an admin dashboard.
- * Version: 1.3.35
+ * Version: 1.3.45
  * Author: Jeremy Lee
  * Text Domain: player-management
  * Dependencies: WooCommerce, Elementor (optional for widgets), intersoccer-product-variations (optional)
