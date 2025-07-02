@@ -156,7 +156,7 @@ function intersoccer_render_players_form($is_admin = false, $settings = [])
         true
     );
 
-    // Enqueue Select2 for admin filters (only if needed, currently just for compatibility)
+    // Enqueue Select2 for admin filters
     if ($is_admin) {
         wp_enqueue_script('select2', admin_url('js/select2/select2.min.js'), ['jquery'], '4.0.13', true);
         wp_enqueue_style('select2', admin_url('css/select2.min.css'), [], '4.0.13');
@@ -236,6 +236,7 @@ function intersoccer_render_players_form($is_admin = false, $settings = [])
             100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
         .loading td { position: relative; }
+        .avs-instruction { font-size: 0.9em; color: #666; margin-top: 5px; display: block; }
     ';
     if (!empty($inline_css)) {
         wp_add_inline_style('intersoccer-player-management', $inline_css);
@@ -450,7 +451,8 @@ function intersoccer_render_players_form($is_admin = false, $settings = [])
                             <?php endif; ?>
                             <?php if ($show_avs_number) : ?>
                                 <td>
-                                    <input type="text" id="player_avs_number" name="player_avs_number" required aria-required="true" maxlength="16">
+                                    <input type="text" id="player_avs_number" name="player_avs_number" required aria-required="true" maxlength="50">
+                                    <span class="avs-instruction"><?php esc_html_e('No AVS? Enter foreign insurance number or "0000" and email us the insurance details.', 'intersoccer-player-management'); ?></span>
                                     <span class="error-message" style="display: none;"></span>
                                 </td>
                             <?php endif; ?>
