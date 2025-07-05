@@ -44,7 +44,7 @@
   position: sticky;
   top: 0;
   background: #7ab55c; /* Green to match "Book Now" button */
-  color: transparent; /* White text for contrast */
+  color: #ffffff; /* White text for contrast */
   z-index: 10;
 }
 

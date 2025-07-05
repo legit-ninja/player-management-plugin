@@ -1,0 +1,33 @@
+/* Loading spinner styles for InterSoccer Player Management plugin */
+.loading::before {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #7ab55c; /* Green to match "Book Now" button */
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.loading td {
+    position: relative;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 600px) {
+    .loading::before {
+        width: 16px;
+        height: 16px;
+        border-width: 2px;
+    }
+}
