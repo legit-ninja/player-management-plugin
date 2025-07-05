@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Player Management
  * Description: Manages players for InterSoccer events, integrating with WooCommerce My Account page and providing an admin dashboard.
- * Version: 1.3.45
+ * Version: 1.3.46
  * Author: Jeremy Lee
  * Text Domain: player-management
  * Dependencies: WooCommerce, Elementor (optional for widgets), intersoccer-product-variations (optional)
@@ -45,7 +45,6 @@ if (!is_plugin_active('intersoccer-product-variations/intersoccer-product-variat
         </div>
         <?php
     });
-    // Continue loading the plugin even if intersoccer-product-variations is not active
 }
 
 // Include core files
@@ -59,26 +58,13 @@ if (is_admin()) {
     require_once PLAYER_MANAGEMENT_PATH . 'includes/admin-advanced.php';
 }
 
-// Include Elementor widget only if Elementor is active
-add_action('plugins_loaded', function () {
-    if (is_plugin_active('elementor/elementor.php')) {
-        require_once PLAYER_MANAGEMENT_PATH . 'includes/elementor-widgets.php';
-    } else {
-        add_action('admin_notices', function () {
-            if (current_user_can('activate_plugins')) {
-                ?>
-                <div class="notice notice-warning">
-                    <p><?php esc_html_e('Player Management: Elementor is not active. The Attendee Management widget will not be available. Please activate Elementor to use this feature.', 'player-management'); ?></p>
-                </div>
-                <?php
-            }
-        });
-    }
-});
 
 // Add endpoint for manage-players
 add_action('init', function () {
     add_rewrite_endpoint('manage-players', EP_ROOT | EP_PAGES);
+    if (defined('WP_DEBUG') && WP_DEBUG) {
+        error_log('InterSoccer: Registered manage-players endpoint');
+    }
 });
 
 // Flush rewrite rules on activation
@@ -126,6 +112,84 @@ add_action('init', function () {
     if (get_option('player_management_flush_permalinks')) {
         flush_rewrite_rules();
         delete_option('player_management_flush_permalinks');
+    }
+});
+
+// Enqueue scripts and styles
+add_action('wp_enqueue_scripts', function () {
+    if (is_account_page() && (isset($_GET['manage-players']) || strpos($_SERVER['REQUEST_URI'], 'manage-players') !== false)) {
+        $user_id = get_current_user_id();
+        if ($user_id) {
+            // Fetch player data for preloading
+            $players = get_user_meta($user_id, 'intersoccer_players', true) ?: [];
+            $preload_players = [];
+            foreach ($players as $index => $player) {
+                $preload_players[$index] = [
+                    'first_name' => $player['first_name'] ?? 'N/A',
+                    'last_name' => $player['last_name'] ?? 'N/A',
+                    'dob' => $player['dob'] ?? 'N/A',
+                    'gender' => $player['gender'] ?? 'N/A',
+                    'avs_number' => $player['avs_number'] ?? 'N/A',
+                    'event_count' => intersoccer_get_player_event_count($user_id, $index) ?? 0,
+                    'medical_conditions' => $player['medical_conditions'] ?? '',
+                    'creation_timestamp' => $player['creation_timestamp'] ?? '',
+                    'user_id' => $user_id,
+                    'canton' => get_user_meta($user_id, 'billing_state', true) ?: '',
+                    'city' => get_user_meta($user_id, 'billing_city', true) ?: '',
+                    'past_events' => intersoccer_get_player_past_events($user_id, $index) ?? []
+                ];
+            }
+
+            // Enqueue styles
+            wp_enqueue_style(
+                'intersoccer-player-management',
+                plugin_dir_url(__FILE__) . 'css/player-management.css',
+                [],
+                '1.0.' . time()
+            );
+            wp_enqueue_style(
+                'intersoccer-loading',
+                plugin_dir_url(__FILE__) . 'css/loading.css',
+                [],
+                '1.0.' . time()
+            );
+
+            // Enqueue scripts
+            wp_enqueue_script(
+                'intersoccer-player-management-core',
+                plugin_dir_url(__FILE__) . 'js/player-management-core.js',
+                ['jquery'],
+                '1.0.' . time(),
+                true
+            );
+            wp_enqueue_script(
+                'intersoccer-player-management-actions',
+                plugin_dir_url(__FILE__) . 'js/player-management-actions.js',
+                ['intersoccer-player-management-core'],
+                '1.0.' . time(),
+                true
+            );
+
+            // Localize script
+            $localize_data = [
+                'ajax_url' => admin_url('admin-ajax.php'),
+                'nonce' => wp_create_nonce('intersoccer_player_nonce'),
+                'user_id' => $user_id,
+                'is_admin' => current_user_can('manage_options') ? '1' : '0',
+                'nonce_refresh_url' => admin_url('admin-ajax.php?action=intersoccer_refresh_nonce'),
+                'debug' => defined('WP_DEBUG') && WP_DEBUG ? '1' : '0',
+                'preload_players' => $preload_players,
+                'server_time' => current_time('mysql'),
+            ];
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('InterSoccer: Localizing intersoccerPlayer data: ' . json_encode($localize_data));
+            }
+            wp_localize_script(
+                'intersoccer-player-management-core',
+                'intersoccerPlayer',
+                $localize_data
+            );
+        }
     }
 });
 ?>

@@ -247,6 +247,14 @@ class Player_Management_Admin {
     }
 
     public function render_all_players_page() {
+        if (!current_user_can('manage_options')) {
+            wp_die(__('You do not have sufficient permissions to access this page.', 'intersoccer-player-management'));
+        }
+
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('InterSoccer: Rendering admin players page, endpoint: ' . (isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : 'unknown'));
+        }
+
         $users = get_users(['role__in' => ['customer', 'subscriber']]);
         $all_players = [];
         $total_players = 0;
@@ -327,17 +335,30 @@ class Player_Management_Admin {
         // Store all_players_data for use in render_overview_page
         $this->all_players_data = $all_players;
 
-        // Get users for dropdown
-        $user_options = '';
-        foreach ($users as $user) {
-            $user_players = get_user_meta($user->ID, 'intersoccer_players', true) ?: [];
-            $user_options .= sprintf(
-                '<option value="%d" %s>%s (%s)</option>',
-                esc_attr($user->ID),
-                empty($user_players) ? 'data-no-players="true"' : '',
-                esc_html($user->user_email),
-                esc_html($user->display_name)
-            );
+        // Initialize settings with explicit keys
+        $settings = [
+            'total_players' => $total_players,
+            'show_first_name' => 'yes',
+            'show_last_name' => 'yes',
+            'show_dob' => 'yes',
+            'show_gender' => 'yes',
+            'show_avs_number' => 'yes',
+            'show_events' => 'yes',
+            'show_add_button' => 'yes',
+            'show_form_title' => 'yes',
+            'first_name_heading' => __('First Name', 'player-management'),
+            'last_name_heading' => __('Last Name', 'player-management'),
+            'dob_heading' => __('DOB', 'player-management'),
+            'gender_heading' => __('Gender', 'player-management'),
+            'avs_number_heading' => __('AVS Number', 'player-management'),
+            'events_heading' => __('Events', 'player-management'),
+            'actions_heading' => __('Actions', 'player-management'),
+            'form_title_text' => __('Manage All Players', 'player-management')
+        ];
+
+        // Log settings for debugging
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('InterSoccer: Settings for intersoccer_render_players_form: ' . json_encode($settings));
         }
 
         $inline_css = '
@@ -346,12 +367,9 @@ class Player_Management_Admin {
             .quick-stats div h3 { margin: 0 0 5px; font-size: 14px; }
             .quick-stats div p { margin: 0; font-size: 16px; font-weight: bold; }
             .filter-section { margin-bottom: 15px; }
-            .user-select-section { margin-bottom: 15px; }
-            .user-select-section select { width: 300px; }
             @media (max-width: 600px) {
                 .quick-stats { flex-direction: column; }
                 .quick-stats div { margin-bottom: 10px; }
-                .user-select-section select { width: 100%; }
                 .intersoccer-player-management table, .intersoccer-player-management thead, .intersoccer-player-management tbody, .intersoccer-player-management th, .intersoccer-player-management td, .intersoccer-player-management tr {
                     display: block;
                 }
@@ -396,46 +414,14 @@ class Player_Management_Admin {
                 </div>
             </div>
 
-            <!-- User Selection for Adding Players -->
-            <div class="user-select-section">
-                <label for="user-select"><?php _e('Select User to Add Player:', 'player-management'); ?></label>
-                <select id="user-select" name="user_select">
-                    <option value=""><?php _e('Select a user', 'player-management'); ?></option>
-                    <?php echo $user_options; ?>
-                </select>
-                <button id="add-player-for-user" class="button button-primary"><?php _e('Add Player', 'player-management'); ?></button>
-            </div>
-
             <!-- Filter Section with Name Search -->
             <div class="filter-section">
                 <label for="player-search"><?php _e('Search by Name:', 'player-management'); ?></label>
                 <input type="text" id="player-search" placeholder="<?php _e('Enter player name...', 'player-management'); ?>" class="widefat">
             </div>
 
-            <?php echo intersoccer_render_players_form(true, ['total_players' => $total_players]); ?>
+            <?php echo intersoccer_render_players_form(true, $settings); ?>
         </div>
-        <script>
-            jQuery(document).ready(function($) {
-                $('#user-select').select2({
-                    placeholder: '<?php _e('Select a user', 'player-management'); ?>',
-                    allowClear: true,
-                    width: 'resolve'
-                });
-
-                $('#add-player-for-user').on('click', function(e) {
-                    e.preventDefault();
-                    const userId = $('#user-select').val();
-                    if (!userId) {
-                        alert('<?php _e('Please select a user.', 'player-management'); ?>');
-                        return;
-                    }
-                    $('.add-player-section').addClass('active');
-                    $('.toggle-add-player').attr('aria-expanded', 'true');
-                    $('#player_user_id').val(userId);
-                    $('#player_first_name').focus();
-                });
-            });
-        </script>
         <?php
     }
 

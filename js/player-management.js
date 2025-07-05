@@ -175,13 +175,13 @@
       player_last_name: $row.find("#player_last_name").val(),
       player_dob: `${$row.find("#player_dob_year").val()}-${$row.find("#player_dob_month").val()}-${$row.find("#player_dob_day").val()}`,
       player_gender: $row.find("#player_gender").val(),
-      player_avs_number: $row.find("#player_avs_number").val(),
+      player_avs_number: $row.find("#player_avs_number").val() || "0000",
       player_medical: $row.next(".add-player-medical").find("#player_medical").val() || "",
     };
 
     // Validate required fields
-    if (!playerData.player_first_name || !playerData.player_last_name || !playerData.player_dob || !playerData.player_gender || !playerData.player_avs_number) {
-      $message.text("All fields are required.").show();
+    if (!playerData.player_first_name || !playerData.player_last_name || !playerData.player_dob || !playerData.player_gender) {
+      $message.text("First name, last name, date of birth, and gender are required.").show();
       setTimeout(() => $message.hide(), 5000);
       intersoccerState.isProcessing = false;
       intersoccerState.isAdding = false;
@@ -208,6 +208,7 @@
         $spinner.hide();
         return;
       }
+      if (debugEnabled) console.log("InterSoccer: Sending add player request with data:", JSON.stringify(playerData));
       $.ajax({
         url: intersoccerPlayer.ajax_url,
         type: "POST",
@@ -223,11 +224,8 @@
           user_id: intersoccerPlayer.user_id,
         },
         contentType: "application/x-www-form-urlencoded; charset=UTF-8",
-        beforeSend: function () {
-          if (debugEnabled) console.log("InterSoccer: Sending add player request with data:", playerData);
-        },
         success: function (response) {
-          console.log("InterSoccer: Add player response:", response);
+          if (debugEnabled) console.log("InterSoccer: Add player response:", JSON.stringify(response));
           $spinner.hide();
           if (response.success) {
             $row.find("input, select, textarea").val("");
@@ -247,7 +245,7 @@
           }
         },
         error: function (xhr, status, error) {
-          console.error("InterSoccer: Add player error:", status, error, xhr.responseText);
+          console.error("InterSoccer: Add player error:", status, error, xhr.responseText, "Response JSON:", JSON.stringify(xhr.responseJSON));
           $message.text("Error adding player: " + (xhr.responseText || "Unknown error")).show();
           setTimeout(() => $message.hide(), 5000);
           refreshNonce(function (newNonce) {
@@ -291,12 +289,12 @@
         player_last_name: $('#player-last-name').val(),
         player_dob: $('#player-dob').val(),
         player_gender: $('#player-gender').val(),
-        player_avs_number: $('#player-avs-number').val(),
+        player_avs_number: $('#player-avs-number').val() || "0000",
         player_medical: $('#player-medical').val(),
       };
 
-      if (!playerData.player_first_name || !playerData.player_last_name || !playerData.player_dob || !playerData.player_gender || !playerData.player_avs_number) {
-        $message.text("All fields are required.").show();
+      if (!playerData.player_first_name || !playerData.player_last_name || !playerData.player_dob || !playerData.player_gender) {
+        $message.text("First name, last name, date of birth, and gender are required.").show();
         setTimeout(() => $message.hide(), 5000);
         return;
       }
@@ -308,6 +306,7 @@
           setTimeout(() => $message.hide(), 5000);
           return;
         }
+        if (debugEnabled) console.log("InterSoccer: Sending add player request for first login, data:", JSON.stringify(playerData));
         $.post(intersoccerPlayer.ajax_url, {
           action: 'intersoccer_add_player',
           nonce: newNonce || intersoccerPlayer.nonce,
@@ -319,6 +318,7 @@
           player_medical: playerData.player_medical,
           user_id: intersoccerPlayer.user_id,
         }, function (response) {
+          if (debugEnabled) console.log("InterSoccer: First login add player response:", JSON.stringify(response));
           if (response.success) {
             window.location.reload();
           } else {
@@ -330,7 +330,7 @@
             }
           }
         }).fail(function (xhr, status, error) {
-          console.error("InterSoccer: Add player error:", status, error, xhr.responseText);
+          console.error("InterSoccer: Add player error:", status, error, xhr.responseText, "Response JSON:", JSON.stringify(xhr.responseJSON));
           $message.text("Error adding player: " + (xhr.responseText || "Unknown error")).show();
           setTimeout(() => $message.hide(), 5000);
           refreshNonce(function (newNonce) {

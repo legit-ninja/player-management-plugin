@@ -1,7 +1,18 @@
 "use strict";
 (function ($) {
-  if (typeof intersoccerPlayer === "undefined" || typeof intersoccerValidateRow === "undefined") {
-    console.error("InterSoccer: Dependencies not loaded. Actions disabled.");
+  if (typeof $ === "undefined") {
+    console.error("InterSoccer: jQuery is not loaded. Player management actions disabled.");
+    return;
+  }
+
+  const debugEnabled = window.intersoccerPlayer && intersoccerPlayer.debug === "1";
+  if (!window.intersoccerPlayer || !intersoccerPlayer.ajax_url || !intersoccerPlayer.nonce || typeof intersoccerValidateRow === "undefined") {
+    console.error("InterSoccer: Dependencies not loaded. Actions disabled. Details:", {
+      intersoccerPlayer: typeof intersoccerPlayer !== "undefined" ? intersoccerPlayer : "undefined",
+      ajax_url: intersoccerPlayer ? intersoccerPlayer.ajax_url : "undefined",
+      nonce: intersoccerPlayer ? intersoccerPlayer.nonce : "undefined",
+      intersoccerValidateRow: typeof intersoccerValidateRow !== "undefined" ? "defined" : "undefined"
+    });
     return;
   }
 
@@ -9,7 +20,6 @@
   const $table = $("#player-table");
   const $message = $container.find(".intersoccer-message");
   const isAdmin = intersoccerPlayer.is_admin === "1";
-  const debugEnabled = intersoccerPlayer.debug === "1";
 
   // Fetch player data via AJAX
   function fetchPlayerData(userId, index, callback) {
@@ -54,9 +64,18 @@
 
   // Save player (add or edit)
   function savePlayer($row, isAdd = false) {
-    if (intersoccerState.isProcessing) return;
-    if (isAdd && intersoccerState.isAdding) return;
-    if (!intersoccerValidateRow($row, isAdd)) return;
+    if (intersoccerState.isProcessing) {
+      if (debugEnabled) console.log("InterSoccer: Save aborted, processing already in progress");
+      return;
+    }
+    if (isAdd && intersoccerState.isAdding) {
+      if (debugEnabled) console.log("InterSoccer: Save aborted, adding already in progress");
+      return;
+    }
+    if (!intersoccerValidateRow($row, isAdd)) {
+      if (debugEnabled) console.log("InterSoccer: Validation failed for savePlayer");
+      return;
+    }
 
     intersoccerState.isProcessing = true;
     if (isAdd) intersoccerState.isAdding = true;
@@ -64,7 +83,7 @@
     $submitLink.addClass("disabled").attr("aria-disabled", "true").find(".spinner").show();
 
     const index = isAdd ? "-1" : $row.data("player-index");
-    const userId = isAdmin && isAdd ? $row.find('[name="player_user_id"]').val().trim() : $row.data("user-id") || intersoccerPlayer.user_id;
+    const userId = intersoccerPlayer.user_id;
     const $medicalRow = isAdd ? $row.next(".add-player-medical") : $row.next(`.medical-row[data-player-index="${index}"]`);
     const firstName = $row.find('[name="player_first_name"]').val().trim();
     const lastName = $row.find('[name="player_last_name"]').val().trim();
@@ -73,14 +92,14 @@
     const dobYear = $row.find('[name="player_dob_year"]').val();
     const dob = dobDay && dobMonth && dobYear ? `${dobYear}-${dobMonth}-${dobDay}` : "";
     const gender = $row.find('[name="player_gender"]').val();
-    const avsNumber = $row.find('[name="player_avs_number"]').val().trim();
+    const avsNumber = $row.find('[name="player_avs_number"]').val().trim() || "0000";
     const medical = ($medicalRow.length ? $medicalRow.find('[name="player_medical"]').val() : "").trim();
 
     const action = isAdd ? "intersoccer_add_player" : "intersoccer_edit_player";
     const data = {
       action: action,
       nonce: intersoccerPlayer.nonce,
-      user_id: isAdmin ? userId : intersoccerPlayer.user_id,
+      user_id: userId,
       player_user_id: userId,
       player_first_name: firstName,
       player_last_name: lastName,
@@ -94,7 +113,7 @@
 
     const startTime = Date.now();
     if (debugEnabled) {
-      console.log("InterSoccer: Starting savePlayer AJAX at", new Date(startTime).toISOString(), "Data:", data);
+      console.log("InterSoccer: Starting savePlayer AJAX at", new Date(startTime).toISOString(), "Data:", JSON.stringify(data));
     }
 
     $.ajax({
@@ -105,6 +124,7 @@
         const endTime = Date.now();
         if (debugEnabled) {
           console.log("InterSoccer: savePlayer AJAX completed at", new Date(endTime).toISOString(), "Duration:", (endTime - startTime), "ms");
+          console.log("InterSoccer: savePlayer AJAX response:", JSON.stringify(response));
         }
 
         if (response.success) {
@@ -261,7 +281,6 @@
             $table.find(`.medical-row[data-player-index="${index}"]`).remove();
             intersoccerState.editingIndex = null;
             $table.find(".edit-player").removeClass("disabled").attr("aria-disabled", "false");
-            $row.removeClass("editing");
             if (isAdmin && typeof intersoccerApplyFilters === "function") {
               if (debugEnabled) console.log("InterSoccer: Applying filters after save");
               intersoccerApplyFilters();
@@ -271,20 +290,25 @@
           console.error("InterSoccer: AJAX response failure:", response.data?.message);
           $message.text(response.data.message || "Failed to save player.").show();
           setTimeout(() => $message.hide(), 10000);
+          if (response.data.new_nonce) {
+            intersoccerPlayer.nonce = response.data.new_nonce;
+            if (debugEnabled) console.log("InterSoccer: Updated nonce from server response:", intersoccerPlayer.nonce);
+          }
         }
       },
       error: (xhr) => {
-        console.error("InterSoccer: AJAX error:", xhr.status, "Response:", xhr.responseText);
+        const endTime = Date.now();
+        console.error("InterSoccer: AJAX error at", new Date(endTime).toISOString(), "Status:", xhr.status, "Response:", xhr.responseText, "Response JSON:", JSON.stringify(xhr.responseJSON));
         if (xhr.status === 403 && !intersoccerState.nonceRetryAttempted) {
-          if (debugEnabled) console.log("InterSoccer: 403 error, attempting nonce refresh (once)");
+          if (debugEnabled) console.log("InterSoccer: 403 error detected, attempting nonce refresh");
           intersoccerState.nonceRetryAttempted = true;
           intersoccerRefreshNonce().then(() => {
-            if (debugEnabled) console.log("InterSoccer: Retrying AJAX with new nonce:", intersoccerPlayer.nonce);
+            if (debugEnabled) console.log("InterSoccer: Retrying AJAX with refreshed nonce:", intersoccerPlayer.nonce);
             data.nonce = intersoccerPlayer.nonce;
-            $.ajax(this);
+            $.ajax(this); // Retry the AJAX request with the new nonce
           }).catch((error) => {
             console.error("InterSoccer: Nonce refresh failed:", error);
-            $message.text("Error: Failed to refresh security token.").show();
+            $message.text("Error: Failed to refresh security token. Please reload the page.").show();
             setTimeout(() => $message.hide(), 10000);
             intersoccerState.nonceRetryAttempted = false;
           });
@@ -298,6 +322,7 @@
         intersoccerState.isProcessing = false;
         if (isAdd) intersoccerState.isAdding = false;
         $submitLink.removeClass("disabled").attr("aria-disabled", "false").find(".spinner").hide();
+        if (debugEnabled) console.log("InterSoccer: Save operation completed");
       }
     });
   }
@@ -403,7 +428,7 @@
         <span class="error-message" style="display: none;"></span>
       `);
       $row.find("td").eq(colIndex++).html(`
-        <input type="text" name="player_avs_number" value="${avsNumber === "N/A" ? "" : avsNumber}" required aria-required="true" maxlength="50">
+        <input type="text" name="player_avs_number" value="${avsNumber === "N/A" ? "" : avsNumber}" aria-required="true" maxlength="50">
         <span class="avs-instruction">No AVS? Enter foreign insurance number or "0000" and email us the insurance details.</span>
         <span class="error-message" style="display: none;"></span>
       `);
@@ -516,7 +541,7 @@
           <span class="error-message" style="display: none;"></span>
         `);
         $row.find("td").eq(colIndex++).html(`
-          <input type="text" name="player_avs_number" value="${avsNumber === "N/A" ? "" : avsNumber}" required aria-required="true" maxlength="50">
+          <input type="text" name="player_avs_number" value="${avsNumber === "N/A" ? "" : avsNumber}" aria-required="true" maxlength="50">
           <span class="avs-instruction">No AVS? Enter foreign insurance number or "0000" and email us the insurance details.</span>
           <span class="error-message" style="display: none;"></span>
         `);
