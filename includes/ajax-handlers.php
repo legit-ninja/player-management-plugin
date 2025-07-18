@@ -184,11 +184,56 @@ function intersoccer_edit_player() {
 }
 
 // add_action('wp_ajax_intersoccer_refresh_nonce', 'intersoccer_refresh_nonce');
-// function intersoccer_refresh_nonce() {
-//     $nonce = wp_create_nonce('intersoccer_player_nonce');
-//     if (defined('WP_DEBUG') && WP_DEBUG) {
-//         error_log('InterSoccer: Refreshed nonce: ' . $nonce);
-//     }
-//     wp_send_json_success(['nonce' => $nonce]);
-// }
+// function intersoccer_refresh_nonce() defined in main plugin file
+
+// Add delete player handler
+add_action('wp_ajax_intersoccer_delete_player', 'intersoccer_delete_player');
+function intersoccer_delete_player() {
+    $nonce = isset($_POST['nonce']) ? sanitize_text_field($_POST['nonce']) : '';
+    $user_id = isset($_POST['user_id']) ? intval($_POST['user_id']) : 0;
+    $player_index = isset($_POST['player_index']) ? intval($_POST['player_index']) : -1;
+
+    if (defined('WP_DEBUG') && WP_DEBUG) {
+        error_log('InterSoccer: AJAX request received for delete_player, nonce: ' . $nonce . ', user_id: ' . $user_id . ', player_index: ' . $player_index);
+    }
+
+    if (!check_ajax_referer('intersoccer_player_nonce', 'nonce', false)) {
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('InterSoccer: Nonce verification failed for nonce: ' . $nonce);
+        }
+        wp_send_json_error(['message' => 'Security check failed'], 403);
+    }
+
+    if (!$user_id || $player_index < 0 || (!current_user_can('edit_users') && !current_user_can('edit_user', $user_id))) {
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('InterSoccer: Permission check failed for user_id: ' . $user_id . ', player_index: ' . $player_index);
+        }
+        wp_send_json_error(['message' => 'Invalid user, index, or insufficient permissions'], 403);
+    }
+
+    $players = get_user_meta($user_id, 'intersoccer_players', true) ?: [];
+
+    if (!isset($players[$player_index])) {
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('InterSoccer: Player not found at index: ' . $player_index . ' for user: ' . $user_id);
+        }
+        wp_send_json_error(['message' => 'Player not found'], 404);
+    }
+
+    unset($players[$player_index]);
+    $players = array_values($players); // Reindex array to prevent gaps
+    $updated = update_user_meta($user_id, 'intersoccer_players', $players);
+
+    if ($updated) {
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('InterSoccer: Player deleted for user ' . $user_id . ' at index ' . $player_index);
+        }
+        wp_send_json_success(['message' => 'Player deleted successfully']);
+    } else {
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('InterSoccer: Failed to update user meta for user ' . $user_id . ' at index ' . $player_index);
+        }
+        wp_send_json_error(['message' => 'Failed to delete player'], 500);
+    }
+}
 ?>

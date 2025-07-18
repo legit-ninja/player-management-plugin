@@ -23,15 +23,17 @@ function intersoccer_add_user_profile_players($user) {
     $is_admin = current_user_can('edit_users');
     wp_enqueue_script('flatpickr', 'https://cdn.jsdelivr.net/npm/flatpickr', [], '4.6.13', true);
     wp_enqueue_style('flatpickr', 'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css', [], '4.6.13');
-    // Corrected paths to point to plugin root directory
-    wp_enqueue_script('intersoccer-player-management-js', plugins_url('js/player-management.js', __FILE__), ['jquery', 'flatpickr'], '1.0.12', true);
-    if ($is_admin) {
-        wp_enqueue_script('intersoccer-admin-core-js', plugins_url('js/admin-core.js', __FILE__), ['jquery', 'intersoccer-player-management-js'], '1.0.12', true);
-        wp_enqueue_script('intersoccer-admin-actions-js', plugins_url('js/admin-actions.js', __FILE__), ['jquery', 'intersoccer-player-management-js', 'intersoccer-admin-core-js'], '1.0.12', true);
+    // Corrected paths to point to plugin root directory from includes/
+    wp_enqueue_script('intersoccer-player-management-js', plugins_url('../js/player-management.js', __FILE__), ['jquery', 'flatpickr'], '1.0.12', true);
+    // Enqueue player-management-actions.js for frontend-like form handling
+    wp_enqueue_script('intersoccer-player-management-actions-js', plugins_url('../js/player-management-actions.js', __FILE__), ['jquery', 'intersoccer-player-management-js'], '1.0.12', true);
+    wp_enqueue_style('intersoccer-player-management-css', plugins_url('../css/player-management.css', __FILE__), [], '1.0.12');
+
+    // Only enqueue admin JS if explicitly needed; skip for user profile to avoid inline edit conflicts
+    if ($is_admin && basename($_SERVER['SCRIPT_NAME']) !== 'profile.php' && basename($_SERVER['SCRIPT_NAME']) !== 'user-edit.php') {
+        wp_enqueue_script('intersoccer-admin-core-js', plugins_url('../js/admin-core.js', __FILE__), ['jquery', 'intersoccer-player-management-js'], '1.0.12', true);
+        wp_enqueue_script('intersoccer-admin-actions-js', plugins_url('../js/admin-actions.js', __FILE__), ['jquery', 'intersoccer-player-management-js', 'intersoccer-admin-core-js'], '1.0.12', true);
     }
-    // Enqueue player-management-actions.js for frontend
-    wp_enqueue_script('intersoccer-player-management-actions-js', plugins_url('js/player-management-actions.js', __FILE__), ['jquery', 'intersoccer-player-management-js'], '1.0.12', true);
-    wp_enqueue_style('intersoccer-player-management-css', plugins_url('css/player-management.css', __FILE__), [], '1.0.12');
 
     $localize_data = [
         'ajax_url' => admin_url('admin-ajax.php'),
@@ -88,24 +90,25 @@ function intersoccer_add_user_profile_players($user) {
                             data-gender="<?php echo esc_attr($player['gender'] ?? 'N/A'); ?>"
                             data-avs-number="<?php echo esc_attr($player['avs_number'] ?? 'N/A'); ?>"
                             data-medical-conditions="<?php echo esc_attr($player['medical_conditions'] ?? ''); ?>">
-                            <td class="display-first-name" data-label="First Name"><?php echo esc_html($player['first_name'] ?? 'N/A'); ?></td>
-                            <td class="display-last-name" data-label="Last Name"><?php echo esc_html($player['last_name'] ?? 'N/A'); ?></td>
-                            <td class="display-dob" data-label="DOB"><?php echo esc_html($player['dob'] ?? 'N/A'); ?></td>
-                            <td class="display-gender" data-label="Gender"><?php echo esc_html($player['gender'] ?? 'N/A'); ?></td>
-                            <td class="display-avs-number" data-label="AVS Number"><?php echo esc_html($player['avs_number'] ?? 'N/A'); ?></td>
-                            <td class="display-medical-conditions" data-label="Medical Conditions"><?php echo esc_html(substr($player['medical_conditions'] ?? '', 0, 20) . (strlen($player['medical_conditions'] ?? '') > 20 ? '...' : '')); ?></td>
+                            <td data-label="First Name"><?php echo esc_html($player['first_name'] ?? 'N/A'); ?></td>
+                            <td data-label="Last Name"><?php echo esc_html($player['last_name'] ?? 'N/A'); ?></td>
+                            <td data-label="DOB"><?php echo esc_html($player['dob'] ?? 'N/A'); ?></td>
+                            <td data-label="Gender"><?php echo esc_html($player['gender'] ?? 'N/A'); ?></td>
+                            <td data-label="AVS Number"><?php echo esc_html($player['avs_number'] ?? 'N/A'); ?></td>
+                            <td data-label="Medical Conditions"><?php echo esc_html(substr($player['medical_conditions'] ?? '', 0, 20) . (strlen($player['medical_conditions'] ?? '') > 20 ? '...' : '')); ?></td>
                             <?php if ($is_admin): ?>
-                                <td class="display-user-id" data-label="User ID"><?php echo esc_html($user->ID); ?></td>
-                                <td class="display-canton" data-label="Canton"><?php echo esc_html($player['canton'] ?? 'N/A'); ?></td>
-                                <td class="display-city" data-label="City"><?php echo esc_html($player['city'] ?? 'N/A'); ?></td>
+                                <td data-label="User ID"><?php echo esc_html($user->ID); ?></td>
+                                <td data-label="Canton"><?php echo esc_html($player['canton'] ?? 'N/A'); ?></td>
+                                <td data-label="City"><?php echo esc_html($player['city'] ?? 'N/A'); ?></td>
                                 <td class="actions" data-label="Actions">
                                     <a href="#" class="edit-player" data-index="<?php echo esc_attr($index); ?>">Edit</a>
                                     <a href="#" class="delete-player" data-index="<?php echo esc_attr($index); ?>">Delete</a>
                                 </td>
                             <?php else: ?>
-                                <td class="display-event-count" data-label="Events"><?php echo esc_html($player['event_count'] ?? 0); ?></td>
+                                <td data-label="Events"><?php echo esc_html($player['event_count'] ?? 0); ?></td>
                                 <td class="actions" data-label="Actions">
                                     <a href="#" class="edit-player" data-index="<?php echo esc_attr($index); ?>">Edit</a>
+                                    <a href="#" class="delete-player" data-index="<?php echo esc_attr($index); ?>">Delete</a>
                                 </td>
                             <?php endif; ?>
                         </tr>
@@ -113,7 +116,7 @@ function intersoccer_add_user_profile_players($user) {
                 <?php endif; ?>
             </tbody>
         </table>
-        <div class="add-player-section" style="display: none; margin-top: 20px;">
+        <div id="player-form" style="display: none; margin-top: 20px;">
             <input type="hidden" name="player_index" value="">
             <input type="hidden" name="player_user_id" value="<?php echo esc_attr($user->ID); ?>">
             <div class="form-row">
