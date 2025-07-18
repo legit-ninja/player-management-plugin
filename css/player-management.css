@@ -250,7 +250,7 @@
 .profile-players .actions a { margin-right: 10px; }
 .profile-players .error-message { color: red; display: none; }
 .editing { background-color: #fff3cd; }
-#player-form { margin-top: 20px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9; }
+#player-form { margin-top: 20px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background: transparent; }
 .form-row { margin-bottom: 15px; }
 .form-row label { display: block; margin-bottom: 5px; font-weight: bold; }
 .form-row input, .form-row select, .form-row textarea { width: 100%; box-sizing: border-box; padding: 10px; font-size: 16px; }
