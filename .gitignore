@@ -1,4 +1,67 @@
+# WordPress specific ignores
+wp-config.php
+wp-content/uploads/
+wp-content/upgrade/
+wp-content/themes/
+wp-content/plugins/*
+!wp-content/plugins/your-plugin-slug/  # Replace with actual plugin slug if needed
+
+# Ignore everything in the root except the plugin directory
+/*
+!wp-content/
+wp-content/*
+!wp-content/plugins/
+wp-content/plugins/*
+!wp-content/plugins/your-plugin-slug/  # Adjust to your plugin
+
+# General development ignores
+node_modules/
 vendor/
-debug.log
+composer.lock
+package-lock.json
+yarn.lock
+
+# Build and dist files
+dist/
+build/
+*.min.js
+*.min.css
+
+# Logs and debug files
 *.log
-*.txt
+debug.log
+error_log
+
+# Editor and IDE files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# Cache and temp files
+.cache/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.production
+
+# Testing and coverage
+coverage/
+cypress/videos/
+cypress/screenshots/
+
+# Miscellaneous
+*.sql
+*.zip
+*.tar.gz
