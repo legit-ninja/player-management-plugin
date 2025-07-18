@@ -393,64 +393,6 @@ class Player_Management_Admin {
             </div>
 
             <div class="intersoccer-player-management">
-                <div class="add-player-section">
-                    <h2><?php _e('Add New Player', 'player-management'); ?></h2>
-                    <tr class="add-player-section">
-                        <td>
-                            <select name="player_user_id">
-                                <?php foreach ($users as $user): ?>
-                                    <option value="<?php echo esc_attr($user->ID); ?>">
-                                        <?php echo esc_html($user->user_email); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </td>
-                        <td><input type="text" name="player_first_name" placeholder="First Name"></td>
-                        <td><input type="text" name="player_last_name" placeholder="Last Name"></td>
-                        <td>
-                            <select name="player_dob_day">
-                                <option value="">Day</option>
-                                <?php for ($i = 1; $i <= 31; $i++): ?>
-                                    <option value="<?php echo str_pad($i, 2, '0', STR_PAD_LEFT); ?>"><?php echo $i; ?></option>
-                                <?php endfor; ?>
-                            </select>
-                            <select name="player_dob_month">
-                                <option value="">Month</option>
-                                <?php for ($i = 1; $i <= 12; $i++): ?>
-                                    <option value="<?php echo str_pad($i, 2, '0', STR_PAD_LEFT); ?>">
-                                        <?php echo date('F', mktime(0, 0, 0, $i, 1)); ?>
-                                    </option>
-                                <?php endfor; ?>
-                            </select>
-                            <select name="player_dob_year">
-                                <option value="">Year</option>
-                                <?php for ($i = date('Y') - 13; $i <= date('Y') - 2; $i++): ?>
-                                    <option value="<?php echo $i; ?>"><?php echo $i; ?></option>
-                                <?php endfor; ?>
-                            </select>
-                        </td>
-                        <td>
-                            <select name="player_gender">
-                                <option value="">Select Gender</option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </td>
-                        <td><input type="text" name="player_avs_number" placeholder="AVS Number"></td>
-                        <td colspan="6">
-                            <button type="button" class="player-submit button">Add Player</button>
-                            <button type="button" class="cancel-add button">Cancel</button>
-                        </td>
-                    </tr>
-                    <tr class="add-player-medical">
-                        <td colspan="12">
-                            <label for="player_medical">Medical Conditions:</label>
-                            <textarea id="player_medical" name="player_medical" maxlength="500"></textarea>
-                        </td>
-                    </tr>
-                </div>
-
                 <table id="player-table" class="wp-list-table widefat fixed striped">
                     <thead>
                         <tr>
@@ -466,7 +408,7 @@ class Player_Management_Admin {
                             <th><?php _e('Medical Conditions', 'player-management'); ?></th>
                             <th><?php _e('Creation Date', 'player-management'); ?></th>
                             <th><?php _e('Past Events', 'player-management'); ?></th>
-                            <th><?php _e('Actions', 'player-management'); ?></th>
+                            
                         </tr>
                     </thead>
                     <tbody>
@@ -506,12 +448,7 @@ class Player_Management_Admin {
                                 <td class="display-past-events" data-label="Past Events">
                                     <?php echo esc_html(implode(', ', $player['past_events'])); ?>
                                 </td>
-                                <td class="actions" data-label="Actions">
-                                    <a href="#" class="edit-player" data-index="<?php echo esc_attr($player['index']); ?>" 
-                                       data-user-id="<?php echo esc_attr($player['user_id']); ?>">Edit</a>
-                                    <a href="#" class="delete-player" data-index="<?php echo esc_attr($player['index']); ?>" 
-                                       data-user-id="<?php echo esc_attr($player['user_id']); ?>">Delete</a>
-                                </td>
+                                
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
