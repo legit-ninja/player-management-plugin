@@ -1,1 +1,4 @@
 vendor/
+debug.log
+*.log
+*.txt
