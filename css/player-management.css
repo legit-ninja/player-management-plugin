@@ -320,3 +320,20 @@
     font-size: 16px;
   }
 }
+
+.woocommerce-edit-order .wc-order-item-player {
+    margin-top: 10px;
+    display: block !important;
+    visibility: visible !important;
+    position: relative !important;
+}
+.woocommerce-edit-order .wc-order-item-player label {
+    display: block !important;
+    font-weight: bold;
+}
+.woocommerce-edit-order .wc-order-item-player select {
+    width: 100% !important;
+    max-width: 200px;
+    display: block !important;
+    visibility: visible !important;
+}
