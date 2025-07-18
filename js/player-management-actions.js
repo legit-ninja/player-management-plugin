@@ -86,6 +86,8 @@ jQuery(document).ready(function($) {
             url: intersoccerPlayer.ajax_url,
             type: 'POST',
             data: data,
+            ontentType: "application/x-www-form-urlencoded; charset=UTF-8",
+            dataType: 'json',
             success: function(response) {
                 $('#save-player .spinner').hide();
                 if (response.success) {
