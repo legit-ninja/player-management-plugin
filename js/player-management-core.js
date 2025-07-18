@@ -62,32 +62,42 @@
     const avsNumber = $avsNumber?.val()?.trim() || "0000";
     const medical = $medical?.val()?.trim() || "";
 
+    // Log input values for debugging
+    if (debugEnabled) {
+      console.log("InterSoccer: Validating row with inputs:", { userId, firstName, lastName, dob: `${dobYear}-${dobMonth}-${dobDay}`, gender, avsNumber, medical });
+    }
+
+    // Validate user ID for admin
     if (isAdmin && isAdd && (!userId || userId <= 0)) {
       $userId.next(".error-message").text("Valid user ID required.").show();
       isValid = false;
     }
-    if (
-      !firstName ||
-      firstName.length > 50 ||
-      !/^[\p{L}\s-]+$/u.test(firstName)
-    ) {
+
+    // Validate first name
+    if (!firstName || firstName.length > 50 || !/^[A-Za-zÀ-ÿ\s-]+$/u.test(firstName)) {
       $firstName
         .next(".error-message")
-        .text("Valid first name required (max 50 chars, letters, spaces, hyphens allowed).")
+        .text("Valid first name required (max 50 chars, letters with accents, spaces, hyphens allowed).")
         .show();
       isValid = false;
+      if (debugEnabled) {
+        console.log("InterSoccer: First name validation failed:", firstName, "Regex test:", /^[A-Za-zÀ-ÿ\s-]+$/u.test(firstName));
+      }
     }
-    if (
-      !lastName ||
-      lastName.length > 50 ||
-      !/^[\p{L}\s-]+$/u.test(lastName)
-    ) {
+
+    // Validate last name
+    if (!lastName || lastName.length > 50 || !/^[A-Za-zÀ-ÿ\s-]+$/u.test(lastName)) {
       $lastName
         .next(".error-message")
-        .text("Valid last name required (max 50 chars, letters, spaces, hyphens allowed).")
+        .text("Valid last name required (max 50 chars, letters with accents, spaces, hyphens allowed).")
         .show();
       isValid = false;
+      if (debugEnabled) {
+        console.log("InterSoccer: Last name validation failed:", lastName, "Regex test:", /^[A-Za-zÀ-ÿ\s-]+$/u.test(lastName));
+      }
     }
+
+    // Validate DOB
     if (isAdd || (dobDay && dobMonth && dobYear)) {
       const dob = `${dobYear}-${dobMonth}-${dobDay}`;
       const dobDate = new Date(dob);
@@ -113,12 +123,16 @@
         }
       }
     }
+
+    // Validate gender
     if (isAdd || gender) {
       if (!["male", "female", "other"].includes(gender)) {
         $gender.next(".error-message").text("Invalid gender selection.").show();
         isValid = false;
       }
     }
+
+    // Validate AVS number
     if (avsNumber !== "0000" && !/^(756\.\d{4}\.\d{4}\.\d{2}|[A-Za-z0-9]{4,50})$/.test(avsNumber)) {
       $avsNumber
         .next(".error-message")
@@ -126,6 +140,8 @@
         .show();
       isValid = false;
     }
+
+    // Validate medical conditions
     if (medical && medical.length > 500) {
       $medical
         .next(".error-message")
@@ -135,7 +151,7 @@
     }
 
     if (debugEnabled) {
-      console.log("InterSoccer: Validated row:", { userId, firstName, lastName, dob: `${dobYear}-${dobMonth}-${dobDay}`, gender, avsNumber, medical, isValid });
+      console.log("InterSoccer: Validation result:", { isValid });
     }
 
     return isValid;
@@ -143,17 +159,17 @@
 
   // Toggle Add Attendee section
   $container.on("click", ".toggle-add-player", function (e) {
-    e.preventDefault();
+    e.preventDefault();  // Ensure no scroll
     e.stopPropagation();
     const $section = $(".add-player-section");
     const isVisible = $section.hasClass("active");
     $section.toggleClass("active", !isVisible);
     $(this).attr("aria-expanded", !isVisible);
     if (!isVisible) {
-      $("#player_first_name").focus();
+        $("#player_first_name").focus();
     } else {
-      $(".add-player-section input, .add-player-section select, .add-player-section textarea").val("");
-      $(".add-player-section .error-message").hide();
+        $(".add-player-section input, .add-player-section select, .add-player-section textarea").val("");
+        $(".add-player-section .error-message").hide();
     }
     if (debugEnabled) console.log("InterSoccer: Toggled add player section, visible:", !isVisible);
   });

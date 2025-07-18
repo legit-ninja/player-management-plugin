@@ -332,34 +332,7 @@ class Player_Management_Admin {
             }
         }
 
-        // Store all_players_data for use in render_overview_page
         $this->all_players_data = $all_players;
-
-        // Initialize settings with explicit keys
-        $settings = [
-            'total_players' => $total_players,
-            'show_first_name' => 'yes',
-            'show_last_name' => 'yes',
-            'show_dob' => 'yes',
-            'show_gender' => 'yes',
-            'show_avs_number' => 'yes',
-            'show_events' => 'yes',
-            'show_add_button' => 'yes',
-            'show_form_title' => 'yes',
-            'first_name_heading' => __('First Name', 'player-management'),
-            'last_name_heading' => __('Last Name', 'player-management'),
-            'dob_heading' => __('DOB', 'player-management'),
-            'gender_heading' => __('Gender', 'player-management'),
-            'avs_number_heading' => __('AVS Number', 'player-management'),
-            'events_heading' => __('Events', 'player-management'),
-            'actions_heading' => __('Actions', 'player-management'),
-            'form_title_text' => __('Manage All Players', 'player-management')
-        ];
-
-        // Log settings for debugging
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('InterSoccer: Settings for intersoccer_render_players_form: ' . json_encode($settings));
-        }
 
         $inline_css = '
             .quick-stats { display: flex; justify-content: space-between; margin-bottom: 15px; }
@@ -367,6 +340,7 @@ class Player_Management_Admin {
             .quick-stats div h3 { margin: 0 0 5px; font-size: 14px; }
             .quick-stats div p { margin: 0; font-size: 16px; font-weight: bold; }
             .filter-section { margin-bottom: 15px; }
+            .add-player-section select, .add-player-section input, .add-player-section button { margin: 5px 0; }
             @media (max-width: 600px) {
                 .quick-stats { flex-direction: column; }
                 .quick-stats div { margin-bottom: 10px; }
@@ -389,12 +363,11 @@ class Player_Management_Admin {
                 .intersoccer-player-management .actions a { display: block; margin: 5px 0; }
             }
         ';
-        wp_add_inline_style('intersoccer-player-management', $inline_css);
+        // wp_add_inline_style('intersoccer-player-management', $inline_css);
         ?>
         <div class="wrap">
             <h1><?php _e('All Players', 'player-management'); ?></h1>
 
-            <!-- Quick Stats with Total Players, Males, Females, and Users Without Players -->
             <div class="dashboard-section quick-stats">
                 <div>
                     <h3><?php _e('Total Players', 'player-management'); ?></h3>
@@ -414,13 +387,136 @@ class Player_Management_Admin {
                 </div>
             </div>
 
-            <!-- Filter Section with Name Search -->
             <div class="filter-section">
                 <label for="player-search"><?php _e('Search by Name:', 'player-management'); ?></label>
                 <input type="text" id="player-search" placeholder="<?php _e('Enter player name...', 'player-management'); ?>" class="widefat">
             </div>
 
-            <?php echo intersoccer_render_players_form(true, $settings); ?>
+            <div class="intersoccer-player-management">
+                <div class="add-player-section">
+                    <h2><?php _e('Add New Player', 'player-management'); ?></h2>
+                    <tr class="add-player-section">
+                        <td>
+                            <select name="player_user_id">
+                                <?php foreach ($users as $user): ?>
+                                    <option value="<?php echo esc_attr($user->ID); ?>">
+                                        <?php echo esc_html($user->user_email); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </td>
+                        <td><input type="text" name="player_first_name" placeholder="First Name"></td>
+                        <td><input type="text" name="player_last_name" placeholder="Last Name"></td>
+                        <td>
+                            <select name="player_dob_day">
+                                <option value="">Day</option>
+                                <?php for ($i = 1; $i <= 31; $i++): ?>
+                                    <option value="<?php echo str_pad($i, 2, '0', STR_PAD_LEFT); ?>"><?php echo $i; ?></option>
+                                <?php endfor; ?>
+                            </select>
+                            <select name="player_dob_month">
+                                <option value="">Month</option>
+                                <?php for ($i = 1; $i <= 12; $i++): ?>
+                                    <option value="<?php echo str_pad($i, 2, '0', STR_PAD_LEFT); ?>">
+                                        <?php echo date('F', mktime(0, 0, 0, $i, 1)); ?>
+                                    </option>
+                                <?php endfor; ?>
+                            </select>
+                            <select name="player_dob_year">
+                                <option value="">Year</option>
+                                <?php for ($i = date('Y') - 13; $i <= date('Y') - 2; $i++): ?>
+                                    <option value="<?php echo $i; ?>"><?php echo $i; ?></option>
+                                <?php endfor; ?>
+                            </select>
+                        </td>
+                        <td>
+                            <select name="player_gender">
+                                <option value="">Select Gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </td>
+                        <td><input type="text" name="player_avs_number" placeholder="AVS Number"></td>
+                        <td colspan="6">
+                            <button type="button" class="player-submit button">Add Player</button>
+                            <button type="button" class="cancel-add button">Cancel</button>
+                        </td>
+                    </tr>
+                    <tr class="add-player-medical">
+                        <td colspan="12">
+                            <label for="player_medical">Medical Conditions:</label>
+                            <textarea id="player_medical" name="player_medical" maxlength="500"></textarea>
+                        </td>
+                    </tr>
+                </div>
+
+                <table id="player-table" class="wp-list-table widefat fixed striped">
+                    <thead>
+                        <tr>
+                            <th><?php _e('User ID', 'player-management'); ?></th>
+                            <th><?php _e('Canton', 'player-management'); ?></th>
+                            <th><?php _e('City', 'player-management'); ?></th>
+                            <th><?php _e('First Name', 'player-management'); ?></th>
+                            <th><?php _e('Last Name', 'player-management'); ?></th>
+                            <th><?php _e('DOB', 'player-management'); ?></th>
+                            <th><?php _e('Gender', 'player-management'); ?></th>
+                            <th><?php _e('AVS Number', 'player-management'); ?></th>
+                            <th><?php _e('Event Count', 'player-management'); ?></th>
+                            <th><?php _e('Medical Conditions', 'player-management'); ?></th>
+                            <th><?php _e('Creation Date', 'player-management'); ?></th>
+                            <th><?php _e('Past Events', 'player-management'); ?></th>
+                            <th><?php _e('Actions', 'player-management'); ?></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($all_players as $player): ?>
+                            <tr data-player-index="<?php echo esc_attr($player['index']); ?>" 
+                                data-user-id="<?php echo esc_attr($player['user_id']); ?>"
+                                data-first-name="<?php echo esc_attr($player['first_name']); ?>"
+                                data-last-name="<?php echo esc_attr($player['last_name']); ?>"
+                                data-dob="<?php echo esc_attr($player['dob']); ?>"
+                                data-gender="<?php echo esc_attr($player['gender']); ?>"
+                                data-avs-number="<?php echo esc_attr($player['avs_number']); ?>"
+                                data-event-count="<?php echo esc_attr($player['event_count']); ?>"
+                                data-canton="<?php echo esc_attr($player['canton']); ?>"
+                                data-city="<?php echo esc_attr($player['city']); ?>"
+                                data-medical-conditions="<?php echo esc_attr($player['medical_conditions'] ?? ''); ?>"
+                                data-creation-timestamp="<?php echo esc_attr($player['creation_timestamp'] ?? ''); ?>"
+                                data-past-events="<?php echo esc_attr(json_encode($player['past_events'])); ?>">
+                                <td class="display-user-id" data-label="User ID">
+                                    <a href="/wp-admin/user-edit.php?user_id=<?php echo esc_attr($player['user_id']); ?>">
+                                        <?php echo esc_html($player['user_id']); ?>
+                                    </a>
+                                </td>
+                                <td class="display-canton" data-label="Canton"><?php echo esc_html($player['canton']); ?></td>
+                                <td class="display-city" data-label="City"><?php echo esc_html($player['city']); ?></td>
+                                <td class="display-first-name" data-label="First Name"><?php echo esc_html($player['first_name']); ?></td>
+                                <td class="display-last-name" data-label="Last Name"><?php echo esc_html($player['last_name']); ?></td>
+                                <td class="display-dob" data-label="DOB"><?php echo esc_html($player['dob']); ?></td>
+                                <td class="display-gender" data-label="Gender"><?php echo esc_html($player['gender']); ?></td>
+                                <td class="display-avs-number" data-label="AVS Number"><?php echo esc_html($player['avs_number']); ?></td>
+                                <td class="display-event-count" data-label="Event Count"><?php echo esc_html($player['event_count']); ?></td>
+                                <td class="display-medical-conditions" data-label="Medical Conditions">
+                                    <?php echo esc_html(substr($player['medical_conditions'] ?? '', 0, 20) . (strlen($player['medical_conditions'] ?? '') > 20 ? '...' : '')); ?>
+                                </td>
+                                <td class="display-creation-date" data-label="Creation Date">
+                                    <?php echo esc_html($player['creation_timestamp'] ? date('Y-m-d', $player['creation_timestamp']) : 'N/A'); ?>
+                                </td>
+                                <td class="display-past-events" data-label="Past Events">
+                                    <?php echo esc_html(implode(', ', $player['past_events'])); ?>
+                                </td>
+                                <td class="actions" data-label="Actions">
+                                    <a href="#" class="edit-player" data-index="<?php echo esc_attr($player['index']); ?>" 
+                                       data-user-id="<?php echo esc_attr($player['user_id']); ?>">Edit</a>
+                                    <a href="#" class="delete-player" data-index="<?php echo esc_attr($player['index']); ?>" 
+                                       data-user-id="<?php echo esc_attr($player['user_id']); ?>">Delete</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
         <?php
     }
@@ -439,7 +535,6 @@ class Player_Management_Admin {
     }
 }
 
-// Instantiate only if in admin
 if (is_admin()) {
     new Player_Management_Admin();
 }

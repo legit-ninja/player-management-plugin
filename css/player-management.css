@@ -40,14 +40,6 @@
   min-width: 80px;
 }
 
-.intersoccer-player-management th {
-  position: sticky;
-  top: 0;
-  background: #7ab55c; /* Green to match "Book Now" button */
-  color: #ffffff; /* White text for contrast */
-  z-index: 10;
-}
-
 .intersoccer-player-management textarea {
   max-width: 100%;
   width: 100%;
@@ -64,18 +56,19 @@
 
 .intersoccer-player-management input,
 .intersoccer-player-management select {
-  max-width: 100px;
+  max-width: 500px;
   width: 100%;
   font-size: 14px;
   padding: 4px;
 }
 
 .intersoccer-player-management input[name="player_avs_number"] {
-  max-width: 130px;
+  max-width: 300x;
+  width: 100%;
 }
 
 .intersoccer-player-management input[name="player_user_id"] {
-  max-width: 80px;
+  max-width: 300px;
 }
 
 .intersoccer-player-management .error-message {
@@ -157,11 +150,11 @@
   }
 
   .intersoccer-player-management input[name="player_avs_number"] {
-    max-width: 100px;
+    max-width: 300px;
   }
 
   .intersoccer-player-management input[name="player_user_id"] {
-    max-width: 60px;
+    max-width: 300px;
   }
 
   .intersoccer-player-management textarea {
@@ -191,7 +184,7 @@
   .intersoccer-player-management td {
     min-width: 40px;
     padding: 3px;
-    font-size: 11px;
+    font-size: 13px;
   }
 
   .intersoccer-player-management th.display-user-id,
@@ -212,20 +205,118 @@
 
   .intersoccer-player-management input,
   .intersoccer-player-management select {
-    max-width: 60px;
+    max-width: 200px;
     font-size: 11px;
     padding: 2px;
   }
 
   .intersoccer-player-management input[name="player_avs_number"] {
-    max-width: 90px;
+    max-width: 300px;
   }
 
   .intersoccer-player-management input[name="player_user_id"] {
-    max-width: 50px;
+    max-width: 300px;
   }
 
   .intersoccer-player-management .error-message {
     font-size: 0.7em;
+  }
+}
+
+.loading::before {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #7ab55c;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+}
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+.loading td { position: relative; }
+.avs-instruction { font-size: 0.9em; color: #666; margin-top: 5px; display: block; }
+.profile-players { margin-top: 20px; }
+.profile-players table { width: 100%; border-collapse: collapse; }
+.profile-players th, .profile-players td { border: 1px solid #ddd; padding: 8px; }
+.profile-players th { background: #7ab55c; color: #ffffff; }
+.profile-players .actions a { margin-right: 10px; }
+.profile-players .error-message { color: red; display: none; }
+.editing { background-color: #fff3cd; }
+#player-form { margin-top: 20px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9; }
+.form-row { margin-bottom: 15px; }
+.form-row label { display: block; margin-bottom: 5px; font-weight: bold; }
+.form-row input, .form-row select, .form-row textarea { width: 100%; box-sizing: border-box; padding: 10px; font-size: 16px; }
+.form-actions { text-align: right; }
+.form-actions .spinner { margin-left: 10px; }
+
+@media (max-width: 100%) {
+  .quick-stats { flex-direction: column; }
+  .quick-stats div { margin-bottom: 10px; }
+  .intersoccer-player-management table, .intersoccer-player-management thead, .intersoccer-player-management tbody, .intersoccer-player-management th, .intersoccer-player-management td, .intersoccer-player-management tr {
+    display: block;
+  }
+  .intersoccer-player-management thead tr { position: absolute; top: -9999px; left: -9999px; }
+  .intersoccer-player-management tr { margin-bottom: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); padding: 10px; background: #fff; } /* Card style */
+  .intersoccer-player-management td { border: none; position: relative; padding: 10px 0 10px 50%; font-size: 16px; min-height: 40px; } /* Larger text and touch areas */
+  .intersoccer-player-management td:before {
+    content: attr(data-label);
+    position: absolute;
+    left: 0;
+    width: 50%;
+    padding-right: 10px;
+    white-space: nowrap;
+    font-weight: bold;
+    color: #333;
+    font-size: 14px;
+  }
+  .intersoccer-player-management .actions { text-align: center; padding: 10px 0; border-top: 1px solid #eee; }
+  .intersoccer-player-management .actions a { display: inline-block; margin: 0 10px; padding: 8px 16px; background: #7ab55c; color: #fff; border-radius: 4px; font-size: 16px; min-width: 80px; text-align: center; } /* Larger buttons */
+  .intersoccer-player-management input, .intersoccer-player-management select, .intersoccer-player-management textarea { font-size: 16px; padding: 10px; width: 100%; box-sizing: border-box; } /* Larger inputs */
+  .intersoccer-player-management .form-row { margin-bottom: 20px; } /* Increased spacing for form on mobile */
+  .intersoccer-player-management .avs-instruction { font-size: 14px; }
+  .intersoccer-player-management .error-message { font-size: 14px; }
+  .intersoccer-player-management form, .intersoccer-player-management table { width: 100%; max-width: 100%; table-layout: fixed; }
+  body { touch-action: manipulation; -webkit-text-size-adjust: none; zoom: 1; } /* Prevent zoom on input focus */
+  input:focus, select:focus, textarea:focus { font-size: 16px; } /* Prevent iOS zoom */
+}
+
+.form-actions {
+  text-align: right; /* Ensure right-align if not already */
+  margin-top: 15px; /* Space above actions */
+}
+
+.form-actions a {
+  margin-right: 10px; /* Space between buttons */
+  padding: 8px 16px; /* Match Book Now padding for consistency */
+  background-color: #7ab55c; /* Green from header, or theme's primary */
+  color: #fff;
+  border-radius: 20px; /* Rounded like Book Now */
+  text-decoration: none;
+  font-size: 14px;
+  display: inline-block;
+  transition: background-color 0.3s ease; /* Smooth hover */
+}
+
+.form-actions a:hover {
+  background-color: #689c4b; /* Darker green on hover */
+}
+
+.form-actions a:last-child {
+  margin-right: 0; /* No margin on last (Cancel) */
+}
+
+@media (max-width: 600px) {
+  .form-actions a {
+    margin-right: 15px; /* Slightly more space for touch */
+    padding: 10px 20px; /* Larger tap area */
+    font-size: 16px;
   }
 }

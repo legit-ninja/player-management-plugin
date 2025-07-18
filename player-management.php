@@ -36,17 +36,6 @@ if (!is_plugin_active('woocommerce/woocommerce.php')) {
     return;
 }
 
-// Check if intersoccer-product-variations is active (optional)
-if (!is_plugin_active('intersoccer-product-variations/intersoccer-product-variations.php')) {
-    add_action('admin_notices', function () {
-        ?>
-        <div class="notice notice-warning">
-            <p><?php esc_html_e('InterSoccer Product Variations is not active. Some features of Player Management may be limited.', 'player-management'); ?></p>
-        </div>
-        <?php
-    });
-}
-
 // Include core files
 require_once PLAYER_MANAGEMENT_PATH . 'includes/player-management.php';
 require_once PLAYER_MANAGEMENT_PATH . 'includes/ajax-handlers.php';
@@ -56,8 +45,8 @@ require_once PLAYER_MANAGEMENT_PATH . 'includes/data-deletion.php';
 if (is_admin()) {
     require_once PLAYER_MANAGEMENT_PATH . 'includes/admin-players.php';
     require_once PLAYER_MANAGEMENT_PATH . 'includes/admin-advanced.php';
+    require_once PLAYER_MANAGEMENT_PATH . 'includes/user-profile-players.php';
 }
-
 
 // Add endpoint for manage-players
 add_action('init', function () {
@@ -136,7 +125,7 @@ add_action('wp_enqueue_scripts', function () {
                     'user_id' => $user_id,
                     'canton' => get_user_meta($user_id, 'billing_state', true) ?: '',
                     'city' => get_user_meta($user_id, 'billing_city', true) ?: '',
-                    'past_events' => intersoccer_get_player_past_events($user_id, $index) ?? []
+                    // 'past_events' => intersoccer_get_player_past_events($user_id, $index) ?? []
                 ];
             }
 
@@ -190,6 +179,43 @@ add_action('wp_enqueue_scripts', function () {
                 $localize_data
             );
         }
+    }
+});
+
+add_action('admin_enqueue_scripts', function($hook) {
+    if ($hook === 'user-edit.php' || $hook === 'profile.php') {
+        // Enqueue Flatpickr
+        wp_enqueue_script('flatpickr', 'https://cdn.jsdelivr.net/npm/flatpickr', [], '4.6.13', true);
+        wp_enqueue_style('flatpickr', 'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css', [], '4.6.13');
+        
+        // Enqueue core.js and player-management.js
+        wp_enqueue_script('intersoccer-player-core-js', plugins_url('js/player-management-core.js', __FILE__), ['jquery', 'flatpickr'], '1.0', true);
+        wp_enqueue_script('intersoccer-player-management-js', plugins_url('js/player-management.js', __FILE__), ['jquery', 'intersoccer-player-core-js'], '1.0', true);
+        
+        // Localize
+        $user_id = isset($_GET['user_id']) ? intval($_GET['user_id']) : get_current_user_id();
+        $localize_data = [
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('intersoccer_player_nonce'),
+            'user_id' => $user_id,
+            'is_admin' => '1',
+            'debug' => defined('WP_DEBUG') && WP_DEBUG ? '1' : '0',
+            'nonce_refresh_url' => admin_url('admin-ajax.php?action=intersoccer_refresh_nonce'),
+            'preload_players' => get_user_meta($user_id, 'intersoccer_players', true) ?: [],
+            'server_time' => current_time('mysql')
+        ];
+        wp_localize_script('intersoccer-player-management-js', 'intersoccerPlayer', $localize_data);
+        wp_localize_script('intersoccer-player-core-js', 'intersoccerPlayer', $localize_data);
+
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('InterSoccer: Enqueued flatpickr, core.js, and player-management.js on ' . $hook . ', user_id: ' . $user_id);
+        }
+    } elseif (strpos($hook, 'intersoccer-players') !== false) {
+        // Enqueue for dashboard
+        wp_enqueue_script('flatpickr', 'https://cdn.jsdelivr.net/npm/flatpickr', [], '4.6.13', true);
+        wp_enqueue_style('flatpickr', 'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css', [], '4.6.13');
+        wp_enqueue_script('intersoccer-admin-js', plugins_url('js/admin.js', __FILE__), ['jquery', 'intersoccer-player-core-js', 'flatpickr'], '1.0', true);
+        wp_localize_script('intersoccer-admin-js', 'intersoccerPlayer', $localize_data);
     }
 });
 ?>
