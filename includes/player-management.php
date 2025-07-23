@@ -454,7 +454,7 @@ function intersoccer_render_user_profile_players($user) {
                 </select>
                 <select name="player_dob_year" required>
                     <option value=""><?php esc_html_e('Year', 'player-management'); ?></option>
-                    <?php for ($y = date('Y') - 13; $y >= date('Y') - 2; $y--) echo '<option value="' . $y . '">' . $y . '</option>'; ?>
+                    <?php for ($y = date('Y') - 13; $y >= date('Y') - 3; $y--) echo '<option value="' . $y . '">' . $y . '</option>'; ?>
                 </select>
                 <span class="error-message" style="display: none;"></span>
             </div>
