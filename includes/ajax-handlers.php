@@ -37,6 +37,14 @@ function intersoccer_add_player() {
         wp_send_json_error(['message' => 'Invalid date of birth format'], 400);
     }
 
+    // Server-side age validation (3-13 years)
+    $dob_time = strtotime($dob);
+    $current_time = current_time('timestamp');
+    $age = date('Y', $current_time) - date('Y', $dob_time) - ((date('m', $current_time) < date('m', $dob_time)) || (date('m', $current_time) == date('m', $dob_time) && date('d', $current_time) < date('d', $dob_time)) ? 1 : 0);
+    if ($age < 3 || $age > 13) {
+        wp_send_json_error(['message' => 'Player must be between 3 and 13 years old.'], 400);
+    }
+
     $players = get_user_meta($user_id, 'intersoccer_players', true) ?: [];
     if (defined('WP_DEBUG') && WP_DEBUG) {
         error_log('InterSoccer: Checking for duplicate player, user_id: ' . $user_id . ', existing players: ' . json_encode($players));
@@ -128,6 +136,14 @@ function intersoccer_edit_player() {
 
     if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $dob) || !strtotime($dob)) {
         wp_send_json_error(['message' => 'Invalid date of birth format'], 400);
+    }
+
+    // Server-side age validation (3-13 years)
+    $dob_time = strtotime($dob);
+    $current_time = current_time('timestamp');
+    $age = date('Y', $current_time) - date('Y', $dob_time) - ((date('m', $current_time) < date('m', $dob_time)) || (date('m', $current_time) == date('m', $dob_time) && date('d', $current_time) < date('d', $dob_time)) ? 1 : 0);
+    if ($age < 3 || $age > 13) {
+        wp_send_json_error(['message' => 'Player must be between 3 and 13 years old.'], 400);
     }
 
     $players = get_user_meta($user_id, 'intersoccer_players', true) ?: [];
