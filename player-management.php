@@ -1,12 +1,17 @@
 <?php
 /**
- * Plugin Name: Player Management
- * Description: Manages players for InterSoccer events, integrating with WooCommerce My Account page and providing an admin dashboard.
- * Version: 1.3.96
+ * Plugin Name: InterSoccer Player Management
+ * Plugin URI: https://github.com/legit-ninja/player-management-plugin
+ * Description: Manages players for InterSoccer events, including registration, metadata storage (e.g., DOB, gender, medical/dietary), and integration with WooCommerce orders for rosters.
+ * Version: 1.3.125  // Bump via 'task version'
  * Author: Jeremy Lee
+ * Author URI: https://underdogunlimited.com
+ * License: GPL-2.0-or-later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: player-management
- * Dependencies: WooCommerce, Elementor (optional for widgets), intersoccer-product-variations (optional)
+ * Domain Path: /languages
  */
+
 
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
