@@ -1,9 +1,16 @@
 <?php
 /**
- * File: user-profile-players.php
- * Description: Adds player management section to WordPress user profile for admin UI and frontend My Account page.
+ * Plugin Name: InterSoccer Player Management
+ * Plugin URI: https://github.com/legit-ninja/player-management-plugin
+ * Description: Manages players for InterSoccer events, including registration, metadata storage (e.g., DOB, gender, medical/dietary), and integration with WooCommerce orders for rosters.
+ * Version: 1.3.96
+ * Author: Jeremy Lee
+ * Author URI: https://underdogunlimited.com
+ * License: GPL-2.0-or-later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * Text Domain: intersoccer-player-management
+ * Domain Path: /languages
  */
-
 if (!defined('ABSPATH')) exit;
 
 function intersoccer_add_user_profile_players($user) {
@@ -13,6 +20,8 @@ function intersoccer_add_user_profile_players($user) {
     if (!is_array($players)) {
         $players = $players ? (array) maybe_unserialize($players) : [];
     }
+    // Ensure sequential indices for rendering
+    $players = array_values($players);
     if (defined('WP_DEBUG') && WP_DEBUG) {
         error_log('InterSoccer: Rendering user profile players for user ' . $user->ID . ', players: ' . json_encode($players));
         error_log('InterSoccer: Raw metadata for user ' . $user->ID . ': ' . print_r(get_user_meta($user->ID, 'intersoccer_players', true), true));
@@ -25,8 +34,6 @@ function intersoccer_add_user_profile_players($user) {
     wp_enqueue_style('flatpickr', 'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css', [], '4.6.13');
     // Corrected paths to point to plugin root directory from includes/
     wp_enqueue_script('intersoccer-player-management-js', plugins_url('../js/player-management.js', __FILE__), ['jquery', 'flatpickr'], '1.0.12', true);
-    // Enqueue player-management-actions.js for frontend-like form handling
-    wp_enqueue_script('intersoccer-player-management-actions-js', plugins_url('../js/player-management-actions.js', __FILE__), ['jquery', 'intersoccer-player-management-js'], '1.0.12', true);
     wp_enqueue_style('intersoccer-player-management-css', plugins_url('../css/player-management.css', __FILE__), [], '1.0.12');
 
     // Only enqueue admin JS if explicitly needed; skip for user profile to avoid inline edit conflicts
@@ -116,7 +123,7 @@ function intersoccer_add_user_profile_players($user) {
                 <?php endif; ?>
             </tbody>
         </table>
-        <div id="player-form" style="display: none; margin-top: 20px;">
+        <div id="player-form" class="add-player-section" style="display: none; margin-top: 20px;">
             <input type="hidden" name="player_index" value="">
             <input type="hidden" name="player_user_id" value="<?php echo esc_attr($user->ID); ?>">
             <div class="form-row">
