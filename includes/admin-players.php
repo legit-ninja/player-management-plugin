@@ -606,6 +606,13 @@ class Player_Management_Admin {
      * OPTIMIZED: Fixed the memory issue in render_all_players_page
      */
     public function render_all_players_page() {
+
+        // Temporarily suppress warnings for production
+        $old_error_reporting = error_reporting();
+        if (!defined('WP_DEBUG') || !WP_DEBUG) {
+            error_reporting(E_ERROR | E_PARSE); // Only show fatal errors
+        }
+
         if (!current_user_can('manage_options')) {
             wp_die(__('You do not have sufficient permissions to access this page.', 'intersoccer-player-management'));
         }
@@ -1117,6 +1124,8 @@ class Player_Management_Admin {
         
         <?php
         $this->log_memory('render_complete');
+
+        error_reporting($old_error_reporting);
     }
 
     private function is_date_past($end_date, $today) {

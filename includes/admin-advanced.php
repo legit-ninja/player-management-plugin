@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: InterSoccer Player Management
+ * Plugin Name: Player Management
  * Plugin URI: https://github.com/legit-ninja/player-management-plugin
  * Description: Manages players for InterSoccer events, including registration, metadata storage (e.g., DOB, gender, medical/dietary), and integration with WooCommerce orders for rosters.
  * Version: 1.3.96
