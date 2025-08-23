@@ -120,6 +120,3 @@ class Player_Management_Admin {
 if (is_admin()) {
     new Player_Management_Admin();
 }
-
-// Include the order item functions
-require_once plugin_dir_path(__FILE__) . 'order-item-functions.php';
