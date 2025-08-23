@@ -3,7 +3,7 @@
  * Plugin Name: InterSoccer Player Management
  * Plugin URI: https://github.com/legit-ninja/player-management-plugin
  * Description: Manages players for InterSoccer events, including registration, metadata storage (e.g., DOB, gender, medical/dietary), and integration with WooCommerce orders for rosters.
- * Version: 1.3.96
+ * Version: 1.3.130
  * Author: Jeremy Lee
  * Author URI: https://underdogunlimited.com
  * License: GPL-2.0-or-later
@@ -19,18 +19,71 @@ if (!defined('ABSPATH')) {
 if (!function_exists('intersoccer_get_player_event_count')) {
     function intersoccer_get_player_event_count($user_id, $player_index) {
         $count = 0;
+        $players = get_user_meta($user_id, 'intersoccer_players', true) ?: [];
+        
+        if (!isset($players[$player_index])) {
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('InterSoccer: Player not found at index ' . $player_index . ' for user ' . $user_id);
+            }
+            return 0;
+        }
+        
+        $player = $players[$player_index];
+        $full_name = trim(($player['first_name'] ?? '') . ' ' . ($player['last_name'] ?? ''));
+        
+        if (empty($full_name)) {
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('InterSoccer: Empty full name for player index ' . $player_index . ' user ' . $user_id);
+            }
+            return 0;
+        }
+        
         $orders = wc_get_orders([
             'customer_id' => $user_id,
-            'status' => ['wc-completed', 'wc-processing'],
+            'status' => ['wc-completed', 'wc-processing', 'wc-on-hold', 'wc-pending'], // Expanded statuses
+            'limit' => -1
         ]);
+        
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('InterSoccer: Counting events for user ' . $user_id . ', player_index: ' . $player_index . ', full_name: "' . $full_name . '"');
+            error_log('InterSoccer: Found ' . count($orders) . ' orders for user ' . $user_id);
+        }
+        
         foreach ($orders as $order) {
-            foreach ($order->get_items() as $item) {
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('InterSoccer: Order ID ' . $order->get_id() . ', Status: ' . $order->get_status());
+            }
+            
+            foreach ($order->get_items() as $item_id => $item) {
+                // Primary: Match by name
+                $attendee = trim($item->get_meta('Assigned Attendee') ?? '');
+                
+                // Fallback: Check index if name doesn't match
                 $player_index_meta = $item->get_meta('intersoccer_player_index');
-                if ($player_index_meta == $player_index) {
+                
+                $name_match = ($attendee === $full_name);
+                $index_match = ($player_index_meta == $player_index); // Loose comparison
+                
+                if ($name_match || $index_match) {
+                    if (defined('WP_DEBUG') && WP_DEBUG) {
+                        error_log('InterSoccer: Match found for item ID ' . $item_id . 
+                                ' - Name: "' . $attendee . '" (match: ' . ($name_match ? 'yes' : 'no') . 
+                                '), Index: ' . print_r($player_index_meta, true) . ' (match: ' . ($index_match ? 'yes' : 'no') . ')');
+                    }
                     $count++;
+                } else {
+                    if (defined('WP_DEBUG') && WP_DEBUG) {
+                        error_log('InterSoccer: No match for item ID ' . $item_id . 
+                                ' - Attendee: "' . $attendee . '", Index: ' . print_r($player_index_meta, true));
+                    }
                 }
             }
         }
+        
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('InterSoccer: Final event count for player_index ' . $player_index . ' ("' . $full_name . '"): ' . $count);
+        }
+        
         return $count;
     }
 }
@@ -133,24 +186,24 @@ function intersoccer_render_players_form($is_admin = false, $settings = []) {
             wp_cache_set($cache_key, $players, 'intersoccer', 3600);
         }
 
-        // Deduplicate players based on first_name, last_name, and dob (case-insensitive)
+        // Deduplicate and compute event_count
         $unique_players = [];
         $seen = [];
         foreach ($players as $index => $player) {
             $key = strtolower($player['first_name']) . '|' . strtolower($player['last_name']) . '|' . $player['dob'];
-            if (!in_array($key, $seen)) {
-                $seen[] = $key;
+            if (!isset($seen[$key])) {
+                $seen[$key] = true;
                 $player['event_count'] = intersoccer_get_player_event_count($user_id, $index);
-                $player['creation_date'] = !empty($player['creation_timestamp']) ? date('Y-m-d', $player['creation_timestamp']) : 'N/A';
-                $player['medical_conditions_display'] = !empty($player['medical_conditions']) ? substr($player['medical_conditions'], 0, 20) . (strlen($player['medical_conditions']) > 20 ? '...' : '') : '';
-                $unique_players[] = $player;
-            } else {
-                if (defined('WP_DEBUG') && WP_DEBUG) {
-                    error_log('InterSoccer: Removed duplicate player for user ' . $user_id . ': ' . $key);
-                }
+                $unique_players[$index] = $player;
             }
         }
         $players = $unique_players;
+
+        // Compute event_count for each player (total bookings in completed/processing orders)
+        foreach ($players as $index => &$player) {
+            $player['event_count'] = intersoccer_get_player_event_count($user_id, $index);
+        }
+        unset($player); // Unset reference to avoid issues
     }
 
     // Calculate colspan for table rows
