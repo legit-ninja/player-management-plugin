@@ -1,63 +1,125 @@
 # InterSoccer Player Management Plugin
 
 ## Overview
-The `player-management-plugin` enables InterSoccer Switzerland customers to manage their children (players) within their WooCommerce (WooComm) profile and assign them to soccer camps, courses, or birthday events during the booking process. This plugin is a core component of InterSoccer’s event booking system, built on WordPress (WP) and WooComm, designed to streamline parent and coach experiences.
+The InterSoccer Player Management plugin provides comprehensive player registration and management capabilities for InterSoccer Switzerland's sports programs. It enables parents to manage their children's profiles through the WooCommerce My Account interface and provides administrators with powerful tools for player oversight, analytics, and event tracking. The plugin integrates seamlessly with WooCommerce orders and supports advanced features like medical information tracking, event history, and Elementor widget integration.
 
-**Author**: Jeremy Lee
+## Version
+- **Current Version:** 1.10.9
+- **Release Date:** October 9, 2025
 
-## Features
-- **Player Profiles**:
-  - Customers can add, edit, and delete children’s profiles under "Manage Players" in their WooCommerce account.
-  - Stores player details like name, age, and other relevant data for event assignments.
-- **Dynamic Assignment**:
-  - Integrates with `intersoccer-product-variations` to allow parents to assign players to events when adding products to the cart.
-  - Displays dynamic forms for player selection during checkout.
-- **Roster Generation**:
-  - Provides coaches and organizers with real-time access to event rosters via integration with the `reports-rosters` plugin.
-- **User Role Support**:
-  - Supports custom roles (`coach`, `event organizer`) for accessing player data securely.
+## Core Features
 
-## Installation
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/legit-ninja/player-management-plugin.git
-   ```
-2. **Install Dependencies**:
-   Copy the plugin folder to `wp-content/plugins/`. Ensure WordPress, WooCommerce, and `intersoccer-product-variations` are installed.
-3. **Activate Plugin**:
-   In the WordPress admin panel, activate "InterSoccer Player Management".
-4. **Configure User Roles**:
-   Ensure custom roles (`coach`, `event organizer`, `customer`) are set up in WordPress.
+### Player Profile Management
+- **Parent Interface**: User-friendly "Manage Players" section in WooCommerce My Account
+- **Comprehensive Data**: Stores player information including name, date of birth, gender, AVS number, medical conditions, and dietary requirements
+- **Dynamic Forms**: AJAX-powered add/edit/delete functionality with real-time validation
+- **Event Tracking**: Automatic counting and display of player's event participation history
+- **Medical & Safety**: Dedicated fields for medical conditions and emergency contact information
 
-## Usage
-1. **Parent Workflow**:
-   - Parents navigate to their WooCommerce account > "Manage Players" to add children.
-   - During event booking, select a player from a dropdown to assign them to the camp, course, or birthday.
-   - Player data is attached to the order and visible in confirmation emails.
-2. **Coach/Organizer Workflow**:
-   - Coaches access rosters via the `reports-rosters` plugin or admin dashboard to view assigned players for events.
-3. **Admin Workflow**:
-   - Shop managers can view and manage player assignments in WooCommerce orders.
+### Administrative Dashboard
+- **Player Overview**: Comprehensive analytics dashboard with Chart.js visualizations
+- **Player List Management**: Advanced table interface with filtering, sorting, and bulk operations
+- **User Profile Integration**: Admin access to edit player data directly from user profiles
+- **Caching System**: Performance-optimized data caching with manual refresh capabilities
+- **Role-Based Access**: Support for custom roles (coach, organizer) with appropriate permissions
 
-## Development
-- **Dependencies**: Requires WordPress, WooCommerce, and `intersoccer-product-variations`.
-- **Testing**: Cypress tests are planned to validate player assignment and roster generation.
-- **Code Structure**:
-  - `includes/`: Logic for player profile management and assignment.
-  - `assets/`: JS and CSS for frontend player forms.
-  - `admin/`: Admin interfaces for managing player data.
+### WooCommerce Integration
+- **Order Integration**: Automatic player assignment to WooCommerce orders
+- **Event Counting**: Real-time calculation of player event participation
+- **Cart Assignment**: Dynamic player selection during checkout process
+- **Order Metadata**: Player information attached to order records for roster generation
 
-## Contribution
-1. Fork the repository.
-2. Create a feature branch (`git checkout -b feature/YourFeature`).
-3. Commit changes (`git commit -m 'Add YourFeature'`).
-4. Push to the branch (`git push origin feature/YourFeature`).
-5. Open a Pull Request.
+### Advanced Features
+- **Elementor Widgets**: Custom widgets for player lists and management interfaces
+- **Background Processing**: Asynchronous operations using WP Background Processing
+- **PDF Generation**: Player data export capabilities using DomPDF
+- **Excel Export**: Spreadsheet export functionality using PhpSpreadsheet
+- **Data Validation**: Comprehensive input validation and sanitization
 
-Follow WordPress coding standards and include tests for new features.
+### Database Architecture
+- **User Meta Storage**: Player data stored in WordPress user meta tables
+- **Future Gamification**: Prepared database tables for event tracking and points systems
+- **Indexing**: Optimized database queries with proper indexing
+- **Migration Support**: Version-based database upgrades and data migration
 
-## Issues
-Report bugs or suggest features via the [GitHub Issues](https://github.com/legit-ninja/player-management-plugin/issues) page.
+## Technical Architecture
+
+### AJAX-Powered Interface
+- **Real-time Updates**: Asynchronous player management without page refreshes
+- **Security**: Nonce-based request validation and user permission checks
+- **Error Handling**: Comprehensive error logging and user feedback
+- **Performance**: Optimized queries and caching for large player datasets
+
+### User Roles & Permissions
+- **Administrator**: Full access to all player data and administrative functions
+- **Coach**: Read-only access to player information and basic management
+- **Organizer**: Event organization permissions with player assignment capabilities
+- **Customer/Parent**: Access to manage their own children's profiles
+
+### Integration Points
+- **WooCommerce**: Seamless integration with orders, cart, and checkout
+- **Elementor**: Widget support for page builders
+- **WordPress Users**: Leverages WordPress user system for authentication
+- **Reports & Rosters**: Data synchronization with roster management system
+
+## Dependencies
+- **Required Plugins**:
+  - WooCommerce (core e-commerce functionality)
+- **PHP Libraries**:
+  - PhpSpreadsheet (^1.29) - Excel export functionality
+  - DomPDF (^2.0) - PDF generation
+  - WP Background Processing (^1.0) - Asynchronous processing
+- **JavaScript Libraries**:
+  - Chart.js (3.9.1) - Analytics visualizations
+  - Flatpickr (4.6.13) - Date picker functionality
+
+## Installation & Setup
+1. Upload plugin files to `/wp-content/plugins/player-management/`
+2. Activate through WordPress admin
+3. Ensure WooCommerce is installed and active
+4. Plugin automatically creates required database tables
+5. Configure user roles and permissions as needed
+
+## Configuration
+- **User Roles**: Custom roles are automatically registered (coach, organizer)
+- **My Account Menu**: "Manage Players" endpoint added to WooCommerce account menu
+- **Admin Menus**: Player management menu added to WordPress admin
+- **Caching**: Overview data cached for 30 minutes with manual refresh option
+
+## Development Workflow
+- **Local Development**: Code locally, test on development environment
+- **Version Control**: Commit to `github.com/legit-ninja/player-management-plugin`
+- **Testing**: PHPUnit unit tests and integration testing
+- **Code Quality**: Task runner for linting and automated checks
+- **Dependencies**: Composer for PHP dependencies, npm for build processes
+
+## Key Metrics & Monitoring
+- Player registration completion rates
+- Event participation tracking accuracy
+- Admin dashboard performance
+- AJAX response times and error rates
+
+## Future Enhancements
+- Gamification system with points and achievements
+- Advanced reporting and analytics
+- Mobile app integration
+- API endpoints for external systems
+- Enhanced parent communication features
+
+## Troubleshooting
+- **Debug Mode**: Enable `WP_DEBUG` for detailed error logging
+- **AJAX Issues**: Check nonce validation and user permissions
+- **Performance**: Monitor database queries and caching effectiveness
+- **Integration**: Verify WooCommerce hooks and order processing
+
+## Security Features
+- **Input Sanitization**: All user inputs validated and sanitized
+- **Permission Checks**: Role-based access control throughout
+- **Nonce Validation**: CSRF protection on all AJAX requests
+- **Data Validation**: Comprehensive validation of player data fields
 
 ## License
-GPLv2 or later, compatible with WordPress.
+GPL-2.0-or-later - See LICENSE file for details.
+
+## Contributors
+- Jeremy Lee (Lead Developer)
