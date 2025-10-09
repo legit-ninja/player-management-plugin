@@ -3,7 +3,7 @@
  * Plugin Name: Player Management
  * Plugin URI: https://github.com/legit-ninja/player-management-plugin
  * Description: Manages players for InterSoccer events, integrating with WooCommerce My Account page and providing an admin dashboard.
- * Version: 1.3.130
+ * Version: 1.10.9
  * Author: Jeremy Lee
  * Author URI: https://underdogunlimited.com
  * License: GPL-2.0-or-later
@@ -23,7 +23,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('PLAYER_MANAGEMENT_VERSION', '1.3.125');
+define('PLAYER_MANAGEMENT_VERSION', '1.10.9');
 define('PLAYER_MANAGEMENT_PATH', plugin_dir_path(__FILE__));
 define('PLAYER_MANAGEMENT_URL', plugin_dir_url(__FILE__));
 
@@ -319,41 +319,9 @@ add_action('wp_enqueue_scripts', function () {
 });
 
 add_action('admin_enqueue_scripts', function($hook) {
-    if ($hook === 'user-edit.php' || $hook === 'profile.php') {
-        // Enqueue Flatpickr
-        wp_enqueue_script('flatpickr', 'https://cdn.jsdelivr.net/npm/flatpickr', [], '4.6.13', true);
-        wp_enqueue_style('flatpickr', 'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css', [], '4.6.13');
-        
-        // Enqueue core.js and player-management.js (check if they exist)
-        if (file_exists(PLAYER_MANAGEMENT_PATH . 'js/player-management-core.js')) {
-            wp_enqueue_script('intersoccer-player-core-js', PLAYER_MANAGEMENT_URL . 'js/player-management-core.js', ['jquery', 'flatpickr'], PLAYER_MANAGEMENT_VERSION, true);
-        }
-        
-        if (file_exists(PLAYER_MANAGEMENT_PATH . 'js/player-management.js')) {
-            wp_enqueue_script('intersoccer-player-management-js', PLAYER_MANAGEMENT_URL . 'js/player-management.js', ['jquery', 'intersoccer-player-core-js'], PLAYER_MANAGEMENT_VERSION, true);
-        }
-        
-        // Localize
-        $user_id = isset($_GET['user_id']) ? intval($_GET['user_id']) : get_current_user_id();
-        $localize_data = [
-            'ajax_url' => admin_url('admin-ajax.php'),
-            'nonce' => wp_create_nonce('intersoccer_player_nonce'),
-            'user_id' => $user_id,
-            'is_admin' => '1',
-            'debug' => defined('WP_DEBUG') && WP_DEBUG ? '1' : '0',
-            'nonce_refresh_url' => admin_url('admin-ajax.php?action=intersoccer_refresh_nonce'),
-            'preload_players' => get_user_meta($user_id, 'intersoccer_players', true) ?: [],
-            'server_time' => current_time('mysql'),
-            'version' => PLAYER_MANAGEMENT_VERSION
-        ];
-        
-        wp_localize_script('intersoccer-player-management-js', 'intersoccerPlayer', $localize_data);
-        wp_localize_script('intersoccer-player-core-js', 'intersoccerPlayer', $localize_data);
-
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('InterSoccer: Enqueued scripts on ' . $hook . ', user_id: ' . $user_id);
-        }
-    } elseif (strpos($hook, 'intersoccer-players') !== false) {
+    // Only load scripts for admin dashboard pages, not user profile pages
+    // User profile pages are handled by user-profile-players.php
+    if (strpos($hook, 'intersoccer-players') !== false) {
         // Enqueue for dashboard
         wp_enqueue_script('flatpickr', 'https://cdn.jsdelivr.net/npm/flatpickr', [], '4.6.13', true);
         wp_enqueue_style('flatpickr', 'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css', [], '4.6.13');
