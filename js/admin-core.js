@@ -1,6 +1,6 @@
 jQuery(document).ready(function($) {
   const debugEnabled = window.intersoccerPlayer && intersoccerPlayer.debug === "1";
-  if (!window.intersoccerPlayer || !intersoccerPlayer.ajax_url || !intersoccerPlayer.nonce || typeof intersoccerValidateRow === "undefined" || typeof intersoccerApplyFilters === "undefined") {
+  if (!window.intersoccerPlayer || !intersoccerPlayer.ajax_url || !intersoccerPlayer.nonce || typeof intersoccerValidateRow === "undefined") {
     console.error("InterSoccer: Dependencies not loaded for admin actions. Details:", {
       intersoccerPlayer: typeof intersoccerPlayer !== "undefined" ? intersoccerPlayer : "undefined",
       ajax_url: intersoccerPlayer ? intersoccerPlayer.ajax_url : "undefined",
@@ -146,7 +146,7 @@ jQuery(document).ready(function($) {
   }
 
   // Initial fetch for admin
-  if (intersoccerPlayer.is_admin === "1") {
+  if (intersoccerPlayer.is_admin === "1" && intersoccerPlayer.context !== "user_profile") {
     if (debugEnabled) console.log("InterSoccer: Admin context confirmed, rendering full table");
     populatePlayers();
   }

@@ -32,8 +32,8 @@ jQuery(document).ready(function($) {
     const $submitLink = $row.find(".player-submit");
     $submitLink.addClass("disabled").attr("aria-disabled", "true").find(".spinner").show();
 
-    const index = isAdd ? "-1" : $row.data("player-index");
-    const userId = $row.data("user-id") || intersoccerPlayer.user_id;
+    const index = isAdd ? "-1" : ($row.data("player-index") || $row.attr("data-player-index"));
+    const userId = $row.data("user-id") || $row.attr("data-user-id") || intersoccerPlayer.user_id;
     const $medicalRow = isAdd ? $row.next(".add-player-medical") : $row.next(`.medical-row[data-player-index="${index}"]`);
     const firstName = $row.find('[name="player_first_name"]').val().trim();
     const lastName = $row.find('[name="player_last_name"]').val().trim();
@@ -163,6 +163,7 @@ jQuery(document).ready(function($) {
                   <td class="display-gender">${player.gender || "N/A"}</td>
                   <td class="display-avs-number">${player.avs_number || "N/A"}</td>
                   <td class="display-medical-conditions">${(player.medical_conditions || '').substring(0, 20) + ((player.medical_conditions || '').length > 20 ? '...' : '')}</td>
+                  <td class="display-event-count">${player.event_count || 0}</td>
                   <td class="actions">
                       <a href="#" class="edit-player" data-index="${player.player_index || newIndex}" data-user-id="${player.user_id || userId}" aria-label="Edit player ${player.first_name || ""}" aria-expanded="false">Edit</a>
                       <a href="#" class="delete-player" data-index="${player.player_index || newIndex}" data-user-id="${player.user_id || userId}" aria-label="Delete player ${player.first_name || ""}">Delete</a>
@@ -338,10 +339,10 @@ jQuery(document).ready(function($) {
       <span class="avs-instruction">No AVS? Enter foreign insurance number or "0000" and email us the insurance details.</span>
       <span class="error-message" style="display: none;"></span>
     `);
-    $row.find(".display-event-count").html(`<span class="display-event-count">${eventCount}</span>`);
     $row.find(".display-medical-conditions").html(`
       <span class="display-medical-conditions">${decodeURIComponent(medical).substring(0, 20) + (decodeURIComponent(medical).length > 20 ? "..." : "")}</span>
     `);
+    $row.find(".display-event-count").html(`<span class="display-event-count">${eventCount}</span>`);
     $row.find(".display-creation-date").html(`
       <span class="display-creation-date">${creationTimestamp ? new Date(creationTimestamp * 1000).toISOString().split("T")[0] : "N/A"}</span>
     `);
@@ -358,7 +359,7 @@ jQuery(document).ready(function($) {
     if (intersoccerState.editingIndex === index) {
       const $medicalRow = $(`
         <tr class="medical-row active" data-player-index="${index}">
-          <td colspan="10">
+          <td colspan="11">
             <label for="player_medical_${index}">Medical Conditions:</label>
             <textarea id="player_medical_${index}" name="player_medical" maxlength="500" aria-describedby="medical-instructions-${index}">${decodeURIComponent(medical)}</textarea>
             <span id="medical-instructions-${index}" class="screen-reader-text">Optional field for medical conditions.</span>
@@ -373,7 +374,7 @@ jQuery(document).ready(function($) {
     // Disable edit buttons on other rows and focus on first input
     $table.find(`tr[data-player-index]`).not($row).each(function () {
       const $otherRow = $(this);
-      const otherIndex = $otherRow.data("player-index");
+      const otherIndex = $otherRow.data("player-index") || $otherRow.attr("data-player-index");
       if (parseInt(otherIndex) !== parseInt(index)) {
         $otherRow.find(".edit-player").addClass("disabled").attr("aria-disabled", "true");
       }
@@ -425,8 +426,8 @@ jQuery(document).ready(function($) {
         $row.find(".display-dob").html(`<span class="display-dob">${dob}</span>`);
         $row.find(".display-gender").html(`<span class="display-gender">${gender}</span>`);
         $row.find(".display-avs-number").html(`<span class="display-avs-number">${avsNumber}</span>`);
-        $row.find(".display-event-count").html(`<span class="display-event-count">${eventCount}</span>`);
         $row.find(".display-medical-conditions").html(`<span class="display-medical-conditions">${decodeURIComponent(medical).substring(0, 20) + (decodeURIComponent(medical).length > 20 ? "..." : "") || ""}</span>`);
+        $row.find(".display-event-count").html(`<span class="display-event-count">${eventCount}</span>`);
         $row.find(".display-creation-date").html(`<span class="display-creation-date">${creationTimestamp ? new Date(creationTimestamp * 1000).toISOString().split("T")[0] : "N/A"}</span>`);
         $row.find(".display-past-events").html(`<span class="display-past-events">${pastEvents}</span>`);
         $row.find(".actions").html(`
@@ -472,8 +473,8 @@ jQuery(document).ready(function($) {
           $row.find(".display-dob").html(`<span class="display-dob">${dob}</span>`);
           $row.find(".display-gender").html(`<span class="display-gender">${gender}</span>`);
           $row.find(".display-avs-number").html(`<span class="display-avs-number">${avsNumber}</span>`);
-          $row.find(".display-event-count").html(`<span class="display-event-count">${eventCount}</span>`);
           $row.find(".display-medical-conditions").html(`<span class="display-medical-conditions">${decodeURIComponent(medical).substring(0, 20) + (decodeURIComponent(medical).length > 20 ? "..." : "") || ""}</span>`);
+          $row.find(".display-event-count").html(`<span class="display-event-count">${eventCount}</span>`);
           $row.find(".display-creation-date").html(`<span class="display-creation-date">${creationTimestamp ? new Date(creationTimestamp * 1000).toISOString().split("T")[0] : "N/A"}</span>`);
           $row.find(".display-past-events").html(`<span class="display-past-events">${pastEvents}</span>`);
           $row.find(".actions").html(`
@@ -503,8 +504,19 @@ jQuery(document).ready(function($) {
     }
 
     const $row = $(this).closest("tr");
-    const index = $row.data("player-index");
-    const userId = $row.data("user-id") || intersoccerPlayer.user_id;
+    let index = $row.data("player-index") || $row.attr("data-player-index");
+    
+    // Fallback: try to get index from the button itself
+    if (index === undefined || index === null) {
+      index = $(this).data("index") || $(this).attr("data-index");
+    }
+    
+    if (index === undefined || index === null) {
+      console.error("InterSoccer: Could not find player-index for row", $row, "or button", this);
+      return;
+    }
+    const indexStr = String(index);
+    const userId = $row.data("user-id") || $row.attr("data-user-id") || intersoccerPlayer.user_id;
 
     if (!confirm("Are you sure you want to delete this player?")) {
       if (debugEnabled) console.log("InterSoccer: Delete canceled by user");
@@ -537,7 +549,7 @@ jQuery(document).ready(function($) {
 
           // Update table state
           if ($table.find("tr[data-player-index]").length === 0) {
-            $table.append('<tr class="no-players"><td colspan="10">No players added yet.</td></tr>');
+            $table.append('<tr class="no-players"><td colspan="11">No players added yet.</td></tr>');
           }
         } else {
           console.error("InterSoccer: Failed to delete player:", response.data?.message);
@@ -574,7 +586,7 @@ jQuery(document).ready(function($) {
                   $message.text(response.data.message).show();
                   setTimeout(() => $message.hide(), 10000);
                   if ($table.find("tr[data-player-index]").length === 0) {
-                    $table.append('<tr class="no-players"><td colspan="10">No players added yet.</td></tr>');
+                    $table.append('<tr class="no-players"><td colspan="11">No players added yet.</td></tr>');
                   }
                   if (debugEnabled) console.log("InterSoccer: Player deleted successfully after nonce refresh:", response.data);
                 } else {
@@ -736,20 +748,31 @@ jQuery(document).ready(function($) {
     }
 
     const $row = $(this).closest("tr");
-    const index = $row.data("player-index").toString();
-    const userId = $row.data("user-id") || intersoccerPlayer.user_id;
-    intersoccerState.editingIndex = index;
+    let index = $row.data("player-index") || $row.attr("data-player-index");
+    
+    // Fallback: try to get index from the button itself
+    if (index === undefined || index === null) {
+      index = $(this).data("index") || $(this).attr("data-index");
+    }
+    
+    if (index === undefined || index === null) {
+      console.error("InterSoccer: Could not find player-index for row", $row, "or button", this);
+      return;
+    }
+    const indexStr = String(index);
+    const userId = $row.data("user-id") || $row.attr("data-user-id") || intersoccerPlayer.user_id;
+    intersoccerState.editingIndex = indexStr;
 
     if (debugEnabled) {
-      console.log("InterSoccer: Initiating edit for player index:", index, "userId:", userId);
+      console.log("InterSoccer: Initiating edit for player index:", indexStr, "userId:", userId);
     }
 
-    if (intersoccerPlayer.preload_players && intersoccerPlayer.preload_players[index]) {
-      populateEditForm($row, intersoccerPlayer.preload_players[index], index);
+    if (intersoccerPlayer.preload_players && intersoccerPlayer.preload_players[indexStr]) {
+      populateEditForm($row, intersoccerPlayer.preload_players[indexStr], indexStr);
     } else {
-      window.fetchPlayerData(userId, index, (player) => {
+      window.fetchPlayerData(userId, indexStr, (player) => {
         if (player) {
-          populateEditForm($row, player, index);
+          populateEditForm($row, player, indexStr);
         }
       });
     }
@@ -758,8 +781,14 @@ jQuery(document).ready(function($) {
   $container.on("click", ".cancel-edit", function (e) {
     e.preventDefault();
     const $row = $(this).closest("tr");
-    const index = $row.data("player-index");
-    const userId = $row.data("user-id") || intersoccerPlayer.user_id;
+    let index = $row.data("player-index") || $row.attr("data-player-index");
+    
+    // Fallback: try to get index from the button itself
+    if (index === undefined || index === null) {
+      index = $(this).data("index") || $(this).attr("data-index");
+    }
+    
+    const userId = $row.data("user-id") || $row.attr("data-user-id") || intersoccerPlayer.user_id;
     cancelEdit($row, index, userId);
   });
 

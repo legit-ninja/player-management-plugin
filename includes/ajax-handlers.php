@@ -264,4 +264,52 @@ function intersoccer_delete_player() {
         wp_send_json_error(['message' => 'Failed to delete player'], 500);
     }
 }
+
+add_action('wp_ajax_intersoccer_get_player', 'intersoccer_get_player');
+function intersoccer_get_player() {
+    $nonce = isset($_POST['nonce']) ? sanitize_text_field($_POST['nonce']) : '';
+    $user_id = isset($_POST['user_id']) ? intval($_POST['user_id']) : 0;
+    $player_index = isset($_POST['player_index']) ? intval($_POST['player_index']) : -1;
+
+    if (defined('WP_DEBUG') && WP_DEBUG) {
+        error_log('InterSoccer: AJAX request received for get_player, nonce: ' . $nonce . ', user_id: ' . $user_id . ', player_index: ' . $player_index);
+    }
+
+    if (!check_ajax_referer('intersoccer_player_nonce', 'nonce', false)) {
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('InterSoccer: Nonce verification failed for nonce: ' . $nonce);
+        }
+        wp_send_json_error(['message' => 'Security check failed'], 403);
+    }
+
+    if (!$user_id || $player_index < 0 || (!current_user_can('edit_users') && !current_user_can('edit_user', $user_id))) {
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('InterSoccer: Permission check failed for user_id: ' . $user_id . ', player_index: ' . $player_index);
+        }
+        wp_send_json_error(['message' => 'Invalid user, index, or insufficient permissions'], 403);
+    }
+
+    $players = get_user_meta($user_id, 'intersoccer_players', true) ?: [];
+
+    if (!isset($players[$player_index])) {
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('InterSoccer: Player not found at index: ' . $player_index . ' for user: ' . $user_id);
+        }
+        wp_send_json_error(['message' => 'Player not found'], 404);
+    }
+
+    $player = $players[$player_index];
+    $player['user_id'] = $user_id;
+    $player['player_index'] = $player_index;
+    $player['event_count'] = intersoccer_get_player_event_count($user_id, $player_index);
+    $player['canton'] = $player['canton'] ?? get_user_meta($user_id, 'billing_state', true) ?: '';
+    $player['city'] = $player['city'] ?? get_user_meta($user_id, 'billing_city', true) ?: '';
+    $player['creation_timestamp'] = $player['creation_timestamp'] ?? '';
+
+    if (defined('WP_DEBUG') && WP_DEBUG) {
+        error_log('InterSoccer: Returning player data for user ' . $user_id . ' at index ' . $player_index . ': ' . json_encode($player));
+    }
+
+    wp_send_json_success(['player' => $player]);
+}
 ?>
