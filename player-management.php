@@ -140,9 +140,36 @@ add_action('init', function () {
 
 // Add content rendering for all endpoint language versions
 function intersoccer_render_manage_players_content() {
+    // Prevent duplicate rendering with static flag
+    static $already_rendered = false;
+    
+    if (defined('WP_DEBUG') && WP_DEBUG) {
+        error_log(sprintf(
+            'InterSoccer Player Management: Endpoint content called | Already rendered: %s | Current URL: %s',
+            $already_rendered ? 'YES' : 'no',
+            $_SERVER['REQUEST_URI'] ?? 'unknown'
+        ));
+    }
+    
+    if ($already_rendered) {
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('InterSoccer Player Management: Content already rendered, skipping duplicate.');
+        }
+        return;
+    }
+    
+    $already_rendered = true;
+    
+    if (defined('WP_DEBUG') && WP_DEBUG) {
+        error_log('InterSoccer Player Management: Rendering player management form via endpoint hook.');
+    }
+    
     if (function_exists('intersoccer_render_players_form')) {
         echo intersoccer_render_players_form();
     } else {
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('InterSoccer Player Management: ERROR - intersoccer_render_players_form() function not found!');
+        }
         echo '<p>Player management functionality is not available.</p>';
     }
 }
@@ -151,6 +178,10 @@ function intersoccer_render_manage_players_content() {
 add_action('woocommerce_account_manage-players_endpoint', 'intersoccer_render_manage_players_content');
 add_action('woocommerce_account_gerer-participants_endpoint', 'intersoccer_render_manage_players_content');
 add_action('woocommerce_account_teilnehmer-verwalten_endpoint', 'intersoccer_render_manage_players_content');
+
+if (defined('WP_DEBUG') && WP_DEBUG) {
+    error_log('InterSoccer Player Management: Registered endpoint content hooks for: manage-players, gerer-participants, teilnehmer-verwalten');
+}
 
 // Flush rewrite rules on activation
 register_activation_hook(__FILE__, function () {
@@ -473,7 +504,15 @@ add_action('wp_enqueue_scripts', function () {
                 'debug' => defined('WP_DEBUG') && WP_DEBUG ? '1' : '0',
                 'preload_players' => $preload_players,
                 'server_time' => current_time('mysql'),
-                'version' => PLAYER_MANAGEMENT_VERSION
+                'version' => PLAYER_MANAGEMENT_VERSION,
+                // Gender translations for JavaScript
+                'i18n' => [
+                    'gender' => [
+                        'male' => __('Male', 'player-management'),
+                        'female' => __('Female', 'player-management'),
+                        'other' => __('Other', 'player-management'),
+                    ],
+                ],
             ];
             
             if (defined('WP_DEBUG') && WP_DEBUG) {
