@@ -573,13 +573,12 @@ function intersoccer_render_user_profile_players($user) {
 <?php
 }
 
-// Hook form to manage-players endpoint
-add_action('woocommerce_account_manage-players_endpoint', function () {
-    if (defined('WP_DEBUG') && WP_DEBUG) {
-        error_log('InterSoccer: Triggered woocommerce_account_manage-players_endpoint');
-    }
-    echo intersoccer_render_players_form();
-});
+/**
+ * NOTE: Endpoint content rendering is now handled in player-management.php
+ * for all language versions (manage-players, gerer-participants, teilnehmer-verwalten).
+ * This duplicate hook has been removed to prevent double rendering.
+ * See: player-management.php lines 141-175
+ */
 
 // Display assigned attendee in frontend order details (My Account > Orders)
 function intersoccer_display_order_item_attendee( $item_id, $item, $order, $plain_text = false ) {

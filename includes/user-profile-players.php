@@ -207,6 +207,11 @@ function intersoccer_add_user_profile_players($user) {
 }
 add_action('show_user_profile', 'intersoccer_add_user_profile_players');
 add_action('edit_user_profile', 'intersoccer_add_user_profile_players');
-// Add support for WooCommerce My Account endpoint
-add_action('woocommerce_account_manage-players_endpoint', 'intersoccer_add_user_profile_players');
+
+/**
+ * NOTE: WooCommerce My Account endpoint rendering is now handled in player-management.php
+ * The user-profile-players.php file is ONLY for admin user profile pages.
+ * Removed duplicate hook to prevent double rendering on My Account page.
+ * See: player-management.php lines 141-175
+ */
 ?>
