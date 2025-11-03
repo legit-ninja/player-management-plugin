@@ -131,7 +131,7 @@ function intersoccer_add_user_profile_players($user) {
                             <td class="display-first-name" data-label="First Name"><?php echo esc_html($player['first_name'] ?? 'N/A'); ?></td>
                             <td class="display-last-name" data-label="Last Name"><?php echo esc_html($player['last_name'] ?? 'N/A'); ?></td>
                             <td class="display-dob" data-label="DOB"><?php echo esc_html($player['dob'] ?? 'N/A'); ?></td>
-                            <td class="display-gender" data-label="Gender"><?php echo esc_html($player['gender'] ?? 'N/A'); ?></td>
+                            <td class="display-gender" data-label="Gender"><?php echo esc_html(intersoccer_translate_gender($player['gender'] ?? 'N/A')); ?></td>
                             <td class="display-avs-number" data-label="AVS Number"><?php echo esc_html($player['avs_number'] ?? 'N/A'); ?></td>
                             <td class="display-medical-conditions" data-label="Medical Conditions"><?php echo esc_html(substr($player['medical_conditions'] ?? '', 0, 20) . (strlen($player['medical_conditions'] ?? '') > 20 ? '...' : '')); ?></td>
                             <td class="display-event-count" data-label="Events">

@@ -15,6 +15,33 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+/**
+ * Helper function to translate gender value for display
+ * Stores gender as English in database, displays in user's language
+ */
+if (!function_exists('intersoccer_translate_gender')) {
+    function intersoccer_translate_gender($gender_value) {
+        if (empty($gender_value) || $gender_value === 'N/A') {
+            return 'N/A';
+        }
+        
+        // Normalize to lowercase for comparison
+        $gender_normalized = strtolower($gender_value);
+        
+        // Translate based on stored value
+        switch ($gender_normalized) {
+            case 'male':
+                return __('Male', 'player-management');
+            case 'female':
+                return __('Female', 'player-management');
+            case 'other':
+                return __('Other', 'player-management');
+            default:
+                return $gender_value; // Return as-is if not recognized
+        }
+    }
+}
+
 // Helper function to count events for a player
 if (!function_exists('intersoccer_get_player_event_count')) {
     function intersoccer_get_player_event_count($user_id, $player_index) {
@@ -299,7 +326,7 @@ function intersoccer_render_players_form($is_admin = false, $settings = []) {
                                         <td class="display-dob" data-label="<?php echo esc_attr($dob_heading); ?>"><?php echo esc_html($player['dob'] ?? 'N/A'); ?></td>
                                     <?php endif; ?>
                                     <?php if ($show_gender) : ?>
-                                        <td class="display-gender" data-label="<?php echo esc_attr($gender_heading); ?>"><?php echo esc_html($player['gender'] ?? 'N/A'); ?></td>
+                                        <td class="display-gender" data-label="<?php echo esc_attr($gender_heading); ?>"><?php echo esc_html(intersoccer_translate_gender($player['gender'] ?? 'N/A')); ?></td>
                                     <?php endif; ?>
                                     <?php if ($show_avs_number) : ?>
                                         <td class="display-avs-number" data-label="<?php echo esc_attr($avs_number_heading); ?>"><?php echo esc_html($player['avs_number'] ?? 'N/A'); ?></td>
@@ -476,7 +503,7 @@ function intersoccer_render_user_profile_players($user) {
                             <td class="display-first-name"><?php echo esc_html($player['first_name'] ?? 'N/A'); ?></td>
                             <td class="display-last-name"><?php echo esc_html($player['last_name'] ?? 'N/A'); ?></td>
                             <td class="display-dob"><?php echo esc_html($player['dob'] ?? 'N/A'); ?></td>
-                            <td class="display-gender"><?php echo esc_html($player['gender'] ?? 'N/A'); ?></td>
+                            <td class="display-gender"><?php echo esc_html(intersoccer_translate_gender($player['gender'] ?? 'N/A')); ?></td>
                             <td class="display-avs-number"><?php echo esc_html($player['avs_number'] ?? 'N/A'); ?></td>
                             <td class="display-medical-conditions"><?php echo esc_html(substr($player['medical_conditions'] ?? '', 0, 20) . (strlen($player['medical_conditions'] ?? '') > 20 ? '...' : '')); ?></td>
                             <td class="actions">

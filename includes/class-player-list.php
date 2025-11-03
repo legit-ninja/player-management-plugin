@@ -256,7 +256,7 @@ class Player_Management_List {
                                     <td class="display-first-name" data-label="First Name"><?php echo esc_html($player['first_name'] ?? ''); ?></td>
                                     <td class="display-last-name" data-label="Last Name"><?php echo esc_html($player['last_name'] ?? ''); ?></td>
                                     <td class="display-dob" data-label="DOB"><?php echo esc_html($player['dob'] ?? ''); ?></td>
-                                    <td class="display-gender" data-label="Gender"><?php echo esc_html($player['gender'] ?? ''); ?></td>
+                                    <td class="display-gender" data-label="Gender"><?php echo esc_html(intersoccer_translate_gender($player['gender'] ?? '')); ?></td>
                                     <td class="display-avs-number" data-label="AVS Number"><?php echo esc_html($player['avs_number'] ?? ''); ?></td>
                                     <td class="display-age" data-label="Age"><?php echo esc_html($player['age'] ?? 'N/A'); ?></td>
                                     <td class="display-medical-conditions" data-label="Medical Conditions">
