@@ -14,6 +14,18 @@
     const $message = $managePlayers.find(".intersoccer-message");
     const debugEnabled = intersoccerPlayer.debug === "1";
 
+    /**
+     * Translate gender value for display
+     */
+    function translateGender(genderValue) {
+        if (!genderValue || genderValue === 'N/A') {
+            return 'N/A';
+        }
+        const genderNormalized = genderValue.toLowerCase();
+        const translations = intersoccerPlayer.i18n && intersoccerPlayer.i18n.gender ? intersoccerPlayer.i18n.gender : {};
+        return translations[genderNormalized] || genderValue;
+    }
+
     // Initialize Flatpickr
     try {
         flatpickr(".date-picker", {
@@ -100,7 +112,7 @@
                         <td class="display-first-name">${player.first_name || 'N/A'}</td>
                         <td class="display-last-name">${player.last_name || 'N/A'}</td>
                         <td class="display-dob">${player.dob || 'N/A'}</td>
-                        <td class="display-gender">${player.gender || 'N/A'}</td>
+                        <td class="display-gender">${translateGender(player.gender || 'N/A')}</td>
                         <td class="display-avs-number">${player.avs_number || 'N/A'}</td>
                         <td class="display-medical-conditions">${(player.medical_conditions || '').substring(0, 20) + ((player.medical_conditions || '').length > 20 ? '...' : '')}</td>
                         <td class="display-event-count">${player.event_count || 0}</td>
@@ -378,7 +390,7 @@
         $row.find(".display-first-name").html(`<span>${player.first_name || 'N/A'}</span>`);
         $row.find(".display-last-name").html(`<span>${player.last_name || 'N/A'}</span>`);
         $row.find(".display-dob").html(`<span>${player.dob || 'N/A'}</span>`);
-        $row.find(".display-gender").html(`<span>${player.gender || 'N/A'}</span>`);
+        $row.find(".display-gender").html(`<span>${translateGender(player.gender || 'N/A')}</span>`);
         $row.find(".display-avs-number").html(`<span>${player.avs_number || 'N/A'}</span>`);
         $row.find(".display-event-count").html(`<span>${player.event_count || 0}</span>`);
         $row.find(".display-medical-conditions").html(`<span>${(player.medical_conditions || '').substring(0, 20) + ((player.medical_conditions || '').length > 20 ? '...' : '')}</span>`);
