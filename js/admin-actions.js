@@ -5,6 +5,18 @@ jQuery(document).ready(function($) {
   const $message = $container.find(".intersoccer-message");
   const intersoccerState = window.intersoccerState || {};
 
+  /**
+   * Translate gender value for display
+   */
+  function translateGender(genderValue) {
+    if (!genderValue || genderValue === 'N/A') {
+      return 'N/A';
+    }
+    const genderNormalized = genderValue.toLowerCase();
+    const translations = intersoccerPlayer.i18n && intersoccerPlayer.i18n.gender ? intersoccerPlayer.i18n.gender : {};
+    return translations[genderNormalized] || genderValue;
+  }
+
   // Save player (edit or add) with debounce
   function savePlayer($row, isAdd = false) {
     if (intersoccerState.isProcessing) {
@@ -160,7 +172,7 @@ jQuery(document).ready(function($) {
                   <td class="display-first-name">${player.first_name || "N/A"}</td>
                   <td class="display-last-name">${player.last_name || "N/A"}</td>
                   <td class="display-dob">${player.dob || "N/A"}</td>
-                  <td class="display-gender">${player.gender || "N/A"}</td>
+                  <td class="display-gender">${translateGender(player.gender || "N/A")}</td>
                   <td class="display-avs-number">${player.avs_number || "N/A"}</td>
                   <td class="display-medical-conditions">${(player.medical_conditions || '').substring(0, 20) + ((player.medical_conditions || '').length > 20 ? '...' : '')}</td>
                   <td class="display-event-count">${player.event_count || 0}</td>
@@ -220,7 +232,7 @@ jQuery(document).ready(function($) {
               $row.find(".display-first-name").text(player.first_name || "N/A");
               $row.find(".display-last-name").text(player.last_name || "N/A");
               $row.find(".display-dob").text(player.dob || "N/A");
-              $row.find(".display-gender").text(player.gender || "N/A");
+              $row.find(".display-gender").text(translateGender(player.gender || "N/A"));
               $row.find(".display-avs-number").text(player.avs_number || "N/A");
               $row.find(".display-medical-conditions").text((player.medical_conditions || '').substring(0, 20) + ((player.medical_conditions || '').length > 20 ? '...' : ''));
               $row.find(".display-creation-date").text(player.creation_timestamp ? new Date(player.creation_timestamp * 1000).toISOString().split("T")[0] : "N/A");

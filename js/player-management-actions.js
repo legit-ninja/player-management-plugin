@@ -5,6 +5,21 @@ jQuery(document).ready(function($) {
     const isAdmin = intersoccerPlayer.is_admin === '1';
     const debugEnabled = intersoccerPlayer.debug === '1';
 
+    /**
+     * Translate gender value for display
+     * Converts database value (english) to translated display value
+     */
+    function translateGender(genderValue) {
+        if (!genderValue || genderValue === 'N/A') {
+            return 'N/A';
+        }
+        
+        const genderNormalized = genderValue.toLowerCase();
+        const translations = intersoccerPlayer.i18n && intersoccerPlayer.i18n.gender ? intersoccerPlayer.i18n.gender : {};
+        
+        return translations[genderNormalized] || genderValue;
+    }
+
     // Initialize form state (remove old checks)
     function initializeFormState() {
         if (debugEnabled) console.log('InterSoccer: Initializing form state');
@@ -115,6 +130,7 @@ jQuery(document).ready(function($) {
     function updateTable(player, index) {
         const name = (player.first_name || 'N/A') + ' ' + (player.last_name || '');
         const medicalDisplay = player.medical_conditions ? player.medical_conditions.substring(0, 20) + (player.medical_conditions.length > 20 ? '...' : '') : '';
+        const translatedGender = translateGender(player.gender || 'N/A');
         const html = `
             <tr data-player-index="${player.player_index}" data-user-id="${player.user_id || intersoccerPlayer.user_id}"
                 data-first-name="${player.first_name || 'N/A'}" data-last-name="${player.last_name || 'N/A'}" data-dob="${player.dob || 'N/A'}"
@@ -123,7 +139,7 @@ jQuery(document).ready(function($) {
                 <!-- Admin columns if needed -->
                 <td class="display-name" data-label="Name">${name}</td>
                 <td class="display-dob" data-label="DOB">${player.dob || 'N/A'}</td>
-                <td class="display-gender" data-label="Gender">${player.gender || 'N/A'}</td>
+                <td class="display-gender" data-label="Gender">${translatedGender}</td>
                 <td class="display-avs-number" data-label="AVS Number">${player.avs_number || 'N/A'}</td>
                 <td class="display-event-count" data-label="Events">${player.event_count || 0}</td>
                 <!-- Admin medical/creation/past -->
