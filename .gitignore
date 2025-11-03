@@ -56,6 +56,9 @@ tmp/
 .env.development
 .env.production
 
+# Deployment configuration (contains credentials)
+deploy.local.sh
+
 # Testing and coverage
 coverage/
 cypress/videos/
