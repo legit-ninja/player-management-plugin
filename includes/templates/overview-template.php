@@ -101,7 +101,7 @@ echo '<style>' . $inline_css . '</style>';
         <?php _e('Refresh Data', 'player-management'); ?>
     </a>
     <hr class="wp-header-end">
-    
+
     <!-- Cache Information -->
     <div class="cache-info <?php echo isset($data['error']) ? 'error' : ''; ?>">
         <strong><?php _e('Data Status:', 'player-management'); ?></strong>
@@ -116,58 +116,58 @@ echo '<style>' . $inline_css . '</style>';
     
     <?php if (isset($data['error'])): ?>
         <div class="notice notice-error">
-            <p><strong><?php _e('Warning:', 'player-management'); ?></strong> 
+            <p><strong><?php _e('Warning:', 'player-management'); ?></strong>
             <?php _e('The overview data could not be fully generated due to an error. Showing partial or fallback data.', 'player-management'); ?>
             <?php _e('Please check the debug logs or try refreshing the data.', 'player-management'); ?></p>
         </div>
     <?php endif; ?>
-    
+
     <div class="dashboard-grid">
         <!-- Total Players -->
         <div class="dashboard-card <?php echo ($data['total_players'] == 0 && isset($data['error'])) ? 'error-card' : ''; ?>">
             <h3><?php _e('Total Players', 'player-management'); ?></h3>
             <p><?php echo esc_html($data['total_players']); ?></p>
         </div>
-        
+
         <!-- Users Without Players -->
         <div class="dashboard-card">
             <h3><?php _e('Users Without Players', 'player-management'); ?></h3>
             <p><?php echo esc_html($data['users_without_players']); ?></p>
         </div>
-        
+
         <!-- Assigned vs Unassigned -->
         <div class="dashboard-card">
             <h3><?php _e('Assigned vs Unassigned', 'player-management'); ?></h3>
             <div class="chart-container">
                 <canvas id="assignedChart"></canvas>
-                <div id="assignedChart-error" class="chart-error" style="display: none;">Chart loading failed</div>
+                <div id="assignedChart-error" class="chart-error" style="display: none;"><?php _e('Chart loading failed', 'player-management'); ?></div>
             </div>
         </div>
-        
+
         <!-- Gender Breakdown -->
         <div class="dashboard-card">
             <h3><?php _e('Gender Breakdown', 'player-management'); ?></h3>
             <div class="chart-container">
                 <canvas id="genderChart"></canvas>
-                <div id="genderChart-error" class="chart-error" style="display: none;">Chart loading failed</div>
+                <div id="genderChart-error" class="chart-error" style="display: none;"><?php _e('Chart loading failed', 'player-management'); ?></div>
             </div>
         </div>
-        
+
         <!-- Players by Canton -->
         <div class="dashboard-card">
             <h3><?php _e('Players by Canton', 'player-management'); ?></h3>
             <div class="chart-container">
                 <canvas id="cantonChart"></canvas>
-                <div id="cantonChart-error" class="chart-error" style="display: none;">Chart loading failed</div>
+                <div id="cantonChart-error" class="chart-error" style="display: none;"><?php _e('Chart loading failed', 'player-management'); ?></div>
             </div>
         </div>
-        
+
         <!-- Top 5 Cantons -->
         <div class="dashboard-card">
             <h3><?php _e('Top 5 Cantons', 'player-management'); ?></h3>
             <div class="chart-container">
                 <canvas id="topCantonsChart"></canvas>
-                <div id="topCantonsChart-error" class="chart-error" style="display: none;">Chart loading failed</div>
+                <div id="topCantonsChart-error" class="chart-error" style="display: none;"><?php _e('Chart loading failed', 'player-management'); ?></div>
             </div>
         </div>
     </div>
@@ -210,11 +210,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Validate chart data
     if (!chartData.cantonLabels || chartData.cantonLabels.length === 0) {
-        chartData.cantonLabels = ['No Data'];
+        chartData.cantonLabels = [intersoccerChartLabels.noData];
         chartData.cantonValues = [0];
     }
     if (!chartData.topCantonLabels || chartData.topCantonLabels.length === 0) {
-        chartData.topCantonLabels = ['No Data'];
+        chartData.topCantonLabels = [intersoccerChartLabels.noData];
         chartData.topCantonValues = [0];
     }
 
@@ -232,7 +232,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Chart.js failed to load after 5 seconds');
                 document.querySelectorAll('.chart-error').forEach(function(el) {
                     el.style.display = 'block';
-                    el.textContent = 'Chart.js library failed to load';
+                    el.textContent = intersoccerChartLabels.chartLoadingFailed;
                 });
                 return;
             }
@@ -292,7 +292,7 @@ document.addEventListener('DOMContentLoaded', function() {
         };
 
         // Render charts with WordPress styling
-        
+
         // Assigned Chart
         try {
             const assignedCtx = document.getElementById('assignedChart');
@@ -300,7 +300,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 new Chart(assignedCtx, {
                     type: 'pie',
                     data: {
-                        labels: ['Assigned', 'Unassigned'],
+                        labels: [intersoccerChartLabels.assigned, intersoccerChartLabels.unassigned],
                         datasets: [{
                             data: [chartData.assigned, chartData.unassigned],
                             backgroundColor: [wpColors.success, wpColors.neutral],
@@ -308,18 +308,18 @@ document.addEventListener('DOMContentLoaded', function() {
                             borderColor: '#fff'
                         }]
                     },
-                    options: { 
-                        ...commonOptions, 
-                        plugins: { 
-                            legend: { 
-                                position: 'bottom', 
-                                labels: { 
+                    options: {
+                        ...commonOptions,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
                                     color: '#1d2327',
                                     padding: 15,
                                     usePointStyle: true
-                                } 
-                            } 
-                        } 
+                                }
+                            }
+                        }
                     }
                 });
             }
@@ -335,7 +335,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 new Chart(genderCtx, {
                     type: 'pie',
                     data: {
-                        labels: ['Male', 'Female', 'Other'],
+                        labels: [intersoccerChartLabels.male, intersoccerChartLabels.female, intersoccerChartLabels.other],
                         datasets: [{
                             data: [chartData.genderData.male, chartData.genderData.female, chartData.genderData.other],
                             backgroundColor: [wpColors.primary, wpColors.accent, wpColors.neutral],
@@ -343,18 +343,18 @@ document.addEventListener('DOMContentLoaded', function() {
                             borderColor: '#fff'
                         }]
                     },
-                    options: { 
-                        ...commonOptions, 
-                        plugins: { 
-                            legend: { 
-                                position: 'bottom', 
-                                labels: { 
+                    options: {
+                        ...commonOptions,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
                                     color: '#1d2327',
                                     padding: 15,
                                     usePointStyle: true
-                                } 
-                            } 
-                        } 
+                                }
+                            }
+                        }
                     }
                 });
             }

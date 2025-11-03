@@ -27,7 +27,7 @@ class Player_Management_List {
         }
 
         if (!current_user_can('manage_options')) {
-            wp_die(__('You do not have sufficient permissions to access this page.', 'intersoccer-player-management'));
+            wp_die(__('You do not have sufficient permissions to access this page.', 'player-management'));
         }
 
         $this->utils->log_memory('render_all_players_page_start');

@@ -314,6 +314,17 @@ class Player_Management_Overview {
      * Render the HTML for the overview page
      */
     private function render_html($data) {
+        // Localize script for chart labels
+        wp_localize_script('chart-js', 'intersoccerChartLabels', [
+            'assigned' => __('Assigned', 'player-management'),
+            'unassigned' => __('Unassigned', 'player-management'),
+            'male' => __('Male', 'player-management'),
+            'female' => __('Female', 'player-management'),
+            'other' => __('Other', 'player-management'),
+            'noData' => __('No Data', 'player-management'),
+            'chartLoadingFailed' => __('Chart loading failed', 'player-management'),
+        ]);
+
         // Include the HTML rendering
         include plugin_dir_path(__FILE__) . 'templates/overview-template.php';
     }
