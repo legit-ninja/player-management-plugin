@@ -8,7 +8,7 @@
  * Author URI: https://underdogunlimited.com
  * License: GPL-2.0-or-later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain: intersoccer-player-management
+ * Text Domain: player-management
  * Domain Path: /languages
  */
 if (!defined('ABSPATH')) {
@@ -480,8 +480,8 @@ function intersoccer_render_user_profile_players($user) {
                             <td class="display-avs-number"><?php echo esc_html($player['avs_number'] ?? 'N/A'); ?></td>
                             <td class="display-medical-conditions"><?php echo esc_html(substr($player['medical_conditions'] ?? '', 0, 20) . (strlen($player['medical_conditions'] ?? '') > 20 ? '...' : '')); ?></td>
                             <td class="actions">
-                                <a href="#" class="edit-player" data-index="<?php echo esc_attr($index); ?>">Edit</a>
-                                <a href="#" class="delete-player" data-index="<?php echo esc_attr($index); ?>">Delete</a>
+                                <a href="#" class="edit-player" data-index="<?php echo esc_attr($index); ?>"><?php esc_html_e('Edit', 'player-management'); ?></a>
+                                <a href="#" class="delete-player" data-index="<?php echo esc_attr($index); ?>"><?php esc_html_e('Delete', 'player-management'); ?></a>
                             </td>
                         </tr>
                     <?php endforeach; ?>
