@@ -8,7 +8,7 @@
  * Author URI: https://underdogunlimited.com
  * License: GPL-2.0-or-later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain: intersoccer-player-management
+ * Text Domain: player-management
  * Domain Path: /languages
  * Requires at least: 5.0
  * Tested up to: 6.3
@@ -29,7 +29,24 @@ define('PLAYER_MANAGEMENT_URL', plugin_dir_url(__FILE__));
 
 // Load translation
 add_action('init', function () {
-    load_plugin_textdomain('intersoccer-player-management', false, dirname(plugin_basename(__FILE__)) . '/languages/');
+    $locale = determine_locale();
+    $mofile = sprintf('%s-%s.mo', 'player-management', $locale);
+    
+    // Try to load from plugin directory first
+    $plugin_mofile = PLAYER_MANAGEMENT_PATH . 'languages/' . $mofile;
+    
+    if (file_exists($plugin_mofile)) {
+        load_textdomain('player-management', $plugin_mofile);
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('InterSoccer: Loaded translation from plugin directory | Locale: ' . $locale . ' | File: ' . $plugin_mofile);
+        }
+    } else {
+        // Fallback to standard loading (checks global dir)
+        load_plugin_textdomain('player-management', false, dirname(plugin_basename(__FILE__)) . '/languages/');
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('InterSoccer: Translation file NOT found in plugin directory | Locale: ' . $locale . ' | Checked: ' . $plugin_mofile);
+        }
+    }
 });
 
 // Check if WooCommerce is active (required)
@@ -41,7 +58,7 @@ if (!is_plugin_active('woocommerce/woocommerce.php')) {
     add_action('admin_notices', function () {
         ?>
         <div class="notice notice-error">
-            <p><?php esc_html_e('Player Management requires WooCommerce to be installed and active.', 'intersoccer-player-management'); ?></p>
+            <p><?php esc_html_e('Player Management requires WooCommerce to be installed and active.', 'player-management'); ?></p>
         </div>
         <?php
     });
@@ -88,17 +105,60 @@ if (is_admin()) {
     }
 }
 
-// Add endpoint for manage-players
+// Add endpoint for manage-players with WPML support
 add_action('init', function () {
-    add_rewrite_endpoint('manage-players', EP_ROOT | EP_PAGES);
-    if (defined('WP_DEBUG') && WP_DEBUG) {
-        error_log('InterSoccer: Registered manage-players endpoint');
+    // Register the slug string with WPML for translation
+    if (function_exists('icl_register_string')) {
+        icl_register_string('WordPress', 'URL manage-players slug', 'manage-players');
+    }
+    
+    // Register ALL language versions of the endpoint, not just current language
+    // This is critical for WordPress to recognize the endpoint in all languages
+    $endpoint_slugs = [
+        'en' => 'manage-players',
+        'fr' => 'gerer-participants',
+        'de' => 'teilnehmer-verwalten',
+    ];
+    
+    // Get current language from WPML
+    $current_lang = apply_filters('wpml_current_language', null);
+    
+    // Register all endpoint slugs
+    foreach ($endpoint_slugs as $lang => $slug) {
+        add_rewrite_endpoint($slug, EP_ROOT | EP_PAGES);
+        
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log(sprintf(
+                'InterSoccer Player Management: Registered endpoint | Lang: %s | Slug: %s | Current: %s',
+                $lang,
+                $slug,
+                $lang === $current_lang ? 'YES' : 'no'
+            ));
+        }
     }
 });
 
+// Add content rendering for all endpoint language versions
+function intersoccer_render_manage_players_content() {
+    if (function_exists('intersoccer_render_players_form')) {
+        echo intersoccer_render_players_form();
+    } else {
+        echo '<p>Player management functionality is not available.</p>';
+    }
+}
+
+// Hook content rendering to all language versions of the endpoint
+add_action('woocommerce_account_manage-players_endpoint', 'intersoccer_render_manage_players_content');
+add_action('woocommerce_account_gerer-participants_endpoint', 'intersoccer_render_manage_players_content');
+add_action('woocommerce_account_teilnehmer-verwalten_endpoint', 'intersoccer_render_manage_players_content');
+
 // Flush rewrite rules on activation
 register_activation_hook(__FILE__, function () {
-    add_rewrite_endpoint('manage-players', EP_ROOT | EP_PAGES);
+    // Register all language versions of the endpoint
+    $endpoint_slugs = ['manage-players', 'gerer-participants', 'teilnehmer-verwalten'];
+    foreach ($endpoint_slugs as $slug) {
+        add_rewrite_endpoint($slug, EP_ROOT | EP_PAGES);
+    }
     flush_rewrite_rules();
     
     // Set version option
@@ -113,36 +173,121 @@ register_deactivation_hook(__FILE__, function () {
     flush_rewrite_rules();
 });
 
-// Add manage-players to My Account menu
+// Add manage-players to My Account menu with translated slug
 add_filter('woocommerce_account_menu_items', function ($items) {
+    // Get current language from WPML
+    $current_lang = apply_filters('wpml_current_language', null);
+    
+    // Get translated slug for current language
+    $endpoint_slug = apply_filters('wpml_translate_single_string', 'manage-players', 'WordPress', 'URL manage-players slug');
+    
+    // Manual fallback for known translations
+    if ($endpoint_slug === 'manage-players' && $current_lang) {
+        $manual_translations = [
+            'fr' => 'gerer-participants',
+            'de' => 'teilnehmer-verwalten',
+            'en' => 'manage-players',
+        ];
+        if (isset($manual_translations[$current_lang])) {
+            $endpoint_slug = $manual_translations[$current_lang];
+        }
+    }
+    
     $new_items = [];
     $inserted = false;
     foreach ($items as $key => $label) {
         $new_items[$key] = $label;
         if ($key === 'dashboard' && !$inserted) {
-            $new_items['manage-players'] = __('Manage Players', 'intersoccer-player-management');
+            $new_items[$endpoint_slug] = __('Manage Players', 'player-management');
             $inserted = true;
         }
     }
     if (!$inserted) {
-        $new_items['manage-players'] = __('Manage Players', 'intersoccer-player-management');
+        $new_items[$endpoint_slug] = __('Manage Players', 'player-management');
     }
+    
+    if (defined('WP_DEBUG') && WP_DEBUG) {
+        error_log(sprintf(
+            'InterSoccer Player Management: Menu item added | Language: %s | Slug: %s | Label: %s',
+            $current_lang ?: 'default',
+            $endpoint_slug,
+            __('Manage Players', 'player-management')
+        ));
+    }
+    
     return $new_items;
 }, 10);
+
+// Add endpoint title for translated page title
+function intersoccer_player_management_endpoint_title($title, $post_id = null) {
+    // Prevent recursion with static flag
+    static $is_filtering = false;
+    if ($is_filtering) {
+        return $title;
+    }
+    
+    global $wp_query;
+    
+    // Get current language from WPML
+    $current_lang = apply_filters('wpml_current_language', null);
+    
+    // Get translated slug for current language
+    $endpoint_slug = apply_filters('wpml_translate_single_string', 'manage-players', 'WordPress', 'URL manage-players slug');
+    
+    // Manual fallback for known translations
+    if ($endpoint_slug === 'manage-players' && $current_lang) {
+        $manual_translations = [
+            'fr' => 'gerer-participants',
+            'de' => 'teilnehmer-verwalten',
+            'en' => 'manage-players',
+        ];
+        if (isset($manual_translations[$current_lang])) {
+            $endpoint_slug = $manual_translations[$current_lang];
+        }
+    }
+    
+    // Check if we're on the manage-players endpoint (check both translated and default)
+    if (is_wc_endpoint_url($endpoint_slug) || 
+        is_wc_endpoint_url('manage-players') || 
+        (isset($wp_query->query_vars[$endpoint_slug])) ||
+        (isset($wp_query->query_vars['manage-players']))) {
+        
+        $is_filtering = true;
+        $title = __('Manage Your Attendees', 'player-management');
+        $is_filtering = false;
+    }
+    
+    return $title;
+}
+add_filter('the_title', 'intersoccer_player_management_endpoint_title', 10, 2);
 
 // Add custom roles
 add_action('init', function () {
     if (!get_role('coach')) {
-        add_role('coach', __('Coach', 'intersoccer-player-management'), ['read' => true, 'edit_posts' => true]);
+        add_role('coach', __('Coach', 'player-management'), ['read' => true, 'edit_posts' => true]);
     }
     if (!get_role('organizer')) {
-        add_role('organizer', __('Organizer', 'intersoccer-player-management'), ['read' => true, 'edit_posts' => true]);
+        add_role('organizer', __('Organizer', 'player-management'), ['read' => true, 'edit_posts' => true]);
     }
 });
 
-// Ensure endpoint is recognized by Elementor
+// Ensure endpoint is recognized by Elementor and WooCommerce with translated slug
 add_filter('woocommerce_get_query_vars', function ($query_vars) {
-    $query_vars['manage-players'] = 'manage-players';
+    // Register ALL language versions so WooCommerce recognizes them all
+    $endpoint_slugs = [
+        'en' => 'manage-players',
+        'fr' => 'gerer-participants',
+        'de' => 'teilnehmer-verwalten',
+    ];
+    
+    foreach ($endpoint_slugs as $lang => $slug) {
+        $query_vars[$slug] = $slug;
+    }
+    
+    if (defined('WP_DEBUG') && WP_DEBUG) {
+        error_log('InterSoccer Player Management: Registered query vars for all languages: ' . implode(', ', array_values($endpoint_slugs)));
+    }
+    
     return $query_vars;
 });
 
@@ -230,7 +375,33 @@ if (!function_exists('intersoccer_get_player_event_count')) {
 
 // Enqueue scripts and styles
 add_action('wp_enqueue_scripts', function () {
-    if (is_account_page() && (isset($_GET['manage-players']) || strpos($_SERVER['REQUEST_URI'], 'manage-players') !== false)) {
+    // Get current language from WPML
+    $current_lang = apply_filters('wpml_current_language', null);
+    
+    // Get translated slug for current language
+    $endpoint_slug = apply_filters('wpml_translate_single_string', 'manage-players', 'WordPress', 'URL manage-players slug');
+    
+    // Manual fallback for known translations
+    if ($endpoint_slug === 'manage-players' && $current_lang) {
+        $manual_translations = [
+            'fr' => 'gerer-participants',
+            'de' => 'teilnehmer-verwalten',
+            'en' => 'manage-players',
+        ];
+        if (isset($manual_translations[$current_lang])) {
+            $endpoint_slug = $manual_translations[$current_lang];
+        }
+    }
+    
+    // Check for both translated slug and default slug
+    $is_manage_players_page = is_account_page() && (
+        isset($_GET[$endpoint_slug]) || 
+        isset($_GET['manage-players']) ||
+        strpos($_SERVER['REQUEST_URI'], $endpoint_slug) !== false ||
+        strpos($_SERVER['REQUEST_URI'], 'manage-players') !== false
+    );
+    
+    if ($is_manage_players_page) {
         $user_id = get_current_user_id();
         if ($user_id) {
             // Fetch player data for preloading
@@ -339,7 +510,7 @@ add_action('admin_enqueue_scripts', function($hook) {
 
 // Add settings link to plugins page
 add_filter('plugin_action_links_' . plugin_basename(__FILE__), function($links) {
-    $settings_link = '<a href="' . admin_url('admin.php?page=intersoccer-players') . '">' . __('Settings', 'intersoccer-player-management') . '</a>';
+    $settings_link = '<a href="' . admin_url('admin.php?page=intersoccer-players') . '">' . __('Settings', 'player-management') . '</a>';
     array_unshift($links, $settings_link);
     return $links;
 });
@@ -364,7 +535,7 @@ add_action('admin_notices', function() {
         if (!empty($missing_files)) {
             ?>
             <div class="notice notice-warning">
-                <p><strong>Player Management:</strong> Missing files detected: <?php echo implode(', ', $missing_files); ?></p>
+                <p><strong><?php esc_html_e('Player Management:', 'player-management'); ?></strong> <?php printf(esc_html__('Missing files detected: %s', 'player-management'), implode(', ', $missing_files)); ?></p>
             </div>
             <?php
         }

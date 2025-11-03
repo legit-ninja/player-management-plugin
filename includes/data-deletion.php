@@ -8,7 +8,7 @@
  * Author URI: https://underdogunlimited.com
  * License: GPL-2.0-or-later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain: intersoccer-player-management
+ * Text Domain: player-management
  * Domain Path: /languages
  */
 defined('ABSPATH') or die('No script kiddies please!');
@@ -21,21 +21,21 @@ add_action('init', function () {
 function intersoccer_data_deletion_shortcode()
 {
     if (!is_user_logged_in()) {
-        return '<p>' . esc_html__('Please log in to request data deletion.', 'intersoccer-player-management') . '</p>';
+        return '<p>' . esc_html__('Please log in to request data deletion.', 'player-management') . '</p>';
     }
 
     ob_start();
 ?>
     <div class="intersoccer-data-deletion">
-        <h2><?php _e('Request Data Deletion', 'intersoccer-player-management'); ?></h2>
+        <h2><?php _e('Request Data Deletion', 'player-management'); ?></h2>
         <form id="data-deletion-form" method="post">
             <?php wp_nonce_field('intersoccer_data_deletion', 'data_deletion_nonce'); ?>
             <p>
-                <label for="deletion_reason"><?php _e('Reason for Deletion (optional):', 'intersoccer-player-management'); ?></label>
+                <label for="deletion_reason"><?php _e('Reason for Deletion (optional):', 'player-management'); ?></label>
                 <textarea id="deletion_reason" name="deletion_reason"></textarea>
             </p>
             <p>
-                <input type="submit" class="button" value="<?php _e('Submit Request', 'intersoccer-player-management'); ?>">
+                <input type="submit" class="button" value="<?php _e('Submit Request', 'player-management'); ?>">
             </p>
         </form>
     </div>
@@ -57,10 +57,10 @@ function intersoccer_data_deletion_shortcode()
         if ($request_id) {
             wp_mail(
                 get_option('admin_email'),
-                __('New Data Deletion Request', 'intersoccer-player-management'),
-                sprintf(__('A user (ID: %d) has requested data deletion. Reason: %s. Review in admin.', 'intersoccer-player-management'), $user_id, $reason)
+                __('New Data Deletion Request', 'player-management'),
+                sprintf(__('A user (ID: %d) has requested data deletion. Reason: %s. Review in admin.', 'player-management'), $user_id, $reason)
             );
-            echo '<div class="notice notice-success"><p>' . esc_html__('Your request has been submitted.', 'intersoccer-player-management') . '</p></div>';
+            echo '<div class="notice notice-success"><p>' . esc_html__('Your request has been submitted.', 'player-management') . '</p></div>';
         }
     }
 
@@ -70,9 +70,9 @@ function intersoccer_data_deletion_shortcode()
 function intersoccer_data_deletion_admin_menu()
 {
     add_submenu_page(
-        'intersoccer-player-management',
-        __('Data Deletion Requests', 'intersoccer-player-management'),
-        __('Data Deletion', 'intersoccer-player-management'),
+        'player-management',
+        __('Data Deletion Requests', 'player-management'),
+        __('Data Deletion', 'player-management'),
         'manage_options',
         'intersoccer-data-deletion',
         'intersoccer_data_deletion_admin_page'
@@ -82,7 +82,7 @@ function intersoccer_data_deletion_admin_menu()
 function intersoccer_data_deletion_admin_page()
 {
     if (!current_user_can('manage_options')) {
-        wp_die(__('You do not have permission to access this page.', 'intersoccer-player-management'));
+        wp_die(__('You do not have permission to access this page.', 'player-management'));
     }
 
     if (isset($_POST['process_deletion']) && wp_verify_nonce($_POST['deletion_nonce'], 'intersoccer_process_deletion')) {
@@ -94,7 +94,7 @@ function intersoccer_data_deletion_admin_page()
             wp_delete_user($user_id);
             wp_update_post(['ID' => $request_id, 'post_status' => 'completed']);
             error_log(sprintf('Data deletion completed for user ID %d on %s', $user_id, current_time('mysql')));
-            echo '<div class="notice notice-success"><p>' . esc_html__('User data deleted.', 'intersoccer-player-management') . '</p></div>';
+            echo '<div class="notice notice-success"><p>' . esc_html__('User data deleted.', 'player-management') . '</p></div>';
         }
     }
 
@@ -106,13 +106,13 @@ function intersoccer_data_deletion_admin_page()
 
     ?>
     <div class="wrap">
-        <h1><?php _e('Data Deletion Requests', 'intersoccer-player-management'); ?></h1>
+        <h1><?php _e('Data Deletion Requests', 'player-management'); ?></h1>
         <table class="wp-list-table widefat fixed striped">
             <thead>
                 <tr>
-                    <th><?php _e('User ID', 'intersoccer-player-management'); ?></th>
-                    <th><?php _e('Reason', 'intersoccer-player-management'); ?></th>
-                    <th><?php _e('Actions', 'intersoccer-player-management'); ?></th>
+                    <th><?php _e('User ID', 'player-management'); ?></th>
+                    <th><?php _e('Reason', 'player-management'); ?></th>
+                    <th><?php _e('Actions', 'player-management'); ?></th>
                 </tr>
             </thead>
             <tbody>
@@ -125,7 +125,7 @@ function intersoccer_data_deletion_admin_page()
                             <form method="post">
                                 <?php wp_nonce_field('intersoccer_process_deletion', 'deletion_nonce'); ?>
                                 <input type="hidden" name="request_id" value="<?php echo esc_attr($request->ID); ?>">
-                                <input type="submit" name="process_deletion" class="button" value="<?php _e('Process', 'intersoccer-player-management'); ?>">
+                                <input type="submit" name="process_deletion" class="button" value="<?php _e('Process', 'player-management'); ?>">
                             </form>
                         </td>
                     </tr>
