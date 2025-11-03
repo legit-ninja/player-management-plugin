@@ -54,7 +54,7 @@ class Player_Management_Admin {
             'intersoccer-players',
             [$this, 'render_overview_page']
         );
-        
+
         add_submenu_page(
             'intersoccer-players',
             __('All Players', 'player-management'),
@@ -63,7 +63,7 @@ class Player_Management_Admin {
             'intersoccer-players-all',
             [$this, 'render_all_players_page']
         );
-        
+
         add_submenu_page(
             'intersoccer-players',
             __('Advanced', 'player-management'),
