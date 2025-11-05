@@ -59,6 +59,9 @@ tmp/
 # Deployment configuration (contains credentials)
 deploy.local.sh
 
+# Documentation folder (tracked in git, excluded by deploy.sh)
+# docs/ folder will be excluded by deploy.sh but kept in git
+
 # Testing and coverage
 coverage/
 cypress/videos/
