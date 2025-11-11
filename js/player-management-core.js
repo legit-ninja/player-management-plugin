@@ -26,12 +26,10 @@
   const debugEnabled = window.intersoccerPlayer ? intersoccerPlayer.debug === "1" : false;
 
   if (!window.intersoccerPlayer || !intersoccerPlayer.ajax_url || !intersoccerPlayer.nonce) {
-    console.error("InterSoccer: intersoccerPlayer data not initialized. Required properties missing:", {
-      intersoccerPlayer: window.intersoccerPlayer,
-      ajax_url: window.intersoccerPlayer ? intersoccerPlayer.ajax_url : undefined,
-      nonce: window.intersoccerPlayer ? intersoccerPlayer.nonce : undefined
-    });
-    // Continue with limited functionality
+    if (window.console && console.debug) {
+      console.debug("InterSoccer: player-management-core skipping initialization; intersoccerPlayer data missing.", window.intersoccerPlayer || {});
+    }
+    return;
   }
 
   // Validation moved to player-management.js for consolidation
@@ -42,15 +40,21 @@
     e.preventDefault();  // Ensure no scroll
     e.stopPropagation();
     const $section = $(".add-player-section");
+    const $medicalSection = $(".add-player-medical");
     const isVisible = $section.hasClass("active");
-    $section.toggleClass("active", !isVisible);
-    $(this).attr("aria-expanded", !isVisible);
+
     if (!isVisible) {
+        $section.addClass("active").show();
+        $medicalSection.addClass("active").show();
         $("#player_first_name").focus();
     } else {
+        $section.removeClass("active").hide();
+        $medicalSection.removeClass("active").hide();
         $(".add-player-section input, .add-player-section select, .add-player-section textarea").val("");
         $(".add-player-section .error-message").hide();
     }
+
+    $(this).attr("aria-expanded", !isVisible);
     if (debugEnabled) console.log("InterSoccer: Toggled add player section, visible:", !isVisible);
   });
 

@@ -602,9 +602,9 @@
                 const age = serverDate.getFullYear() - dobDate.getFullYear() - 
                     (serverDate.getMonth() < dobDate.getMonth() || 
                      (serverDate.getMonth() === dobDate.getMonth() && serverDate.getDate() < dobDate.getDate()) ? 1 : 0);
-                if (age < 3 || age > 13) {
+                if (age < 3 || age > 18) {
                     $section.find('[name="player_dob"]').next(".error-message")
-                        .text("Player must be 2-13 years old.")
+                        .text("Player must be 3-18 years old.")
                         .show();
                     isValid = false;
                 }
