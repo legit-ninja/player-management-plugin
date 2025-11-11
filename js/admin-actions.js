@@ -1,9 +1,19 @@
 jQuery(document).ready(function($) {
   const debugEnabled = window.intersoccerPlayer && intersoccerPlayer.debug === "1";
+  const context = window.intersoccerPlayer && intersoccerPlayer.context ? intersoccerPlayer.context : "admin";
   const $container = $(".intersoccer-player-management");
   const $table = $("#player-table");
   const $message = $container.find(".intersoccer-message");
   const intersoccerState = window.intersoccerState || {};
+
+  // When editing a user profile, the slimmer front-end script is responsible
+  // for DOM updates. Avoid duplicating rows with the admin layout.
+  if (context === "user_profile") {
+    if (debugEnabled) {
+      console.log("InterSoccer: admin-actions.js running in user_profile context; exiting to avoid duplicate rows");
+    }
+    return;
+  }
 
   /**
    * Translate gender value for display
