@@ -224,17 +224,39 @@ add_filter('woocommerce_account_menu_items', function ($items) {
         }
     }
     
+    // Get the menu label and register/translate it with WPML
+    $label = __('Manage Players', 'player-management');
+    
+    // Register the string with WPML for translation
+    if (function_exists('icl_register_string') || (defined('ICL_SITEPRESS_VERSION') && ICL_SITEPRESS_VERSION)) {
+        do_action(
+            'wpml_register_single_string',
+            'Player Management',
+            'woocommerce_account_menu_manage_players',
+            $label
+        );
+        
+        // Get the translated label
+        $label = apply_filters(
+            'wpml_translate_single_string',
+            $label,
+            'Player Management',
+            'woocommerce_account_menu_manage_players'
+        );
+    }
+    
     $new_items = [];
     $inserted = false;
-    foreach ($items as $key => $label) {
-        $new_items[$key] = $label;
+    foreach ($items as $key => $item_label) {
+        // Preserve original labels - don't modify them
+        $new_items[$key] = $item_label;
         if ($key === 'dashboard' && !$inserted) {
-            $new_items[$endpoint_slug] = __('Manage Players', 'player-management');
+            $new_items[$endpoint_slug] = $label;
             $inserted = true;
         }
     }
     if (!$inserted) {
-        $new_items[$endpoint_slug] = __('Manage Players', 'player-management');
+        $new_items[$endpoint_slug] = $label;
     }
     
     if (defined('WP_DEBUG') && WP_DEBUG) {
@@ -242,7 +264,7 @@ add_filter('woocommerce_account_menu_items', function ($items) {
             'InterSoccer Player Management: Menu item added | Language: %s | Slug: %s | Label: %s',
             $current_lang ?: 'default',
             $endpoint_slug,
-            __('Manage Players', 'player-management')
+            $label
         ));
     }
     
