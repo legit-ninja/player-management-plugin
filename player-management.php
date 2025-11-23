@@ -279,6 +279,26 @@ function intersoccer_player_management_endpoint_title($title, $post_id = null) {
         return $title;
     }
     
+    // CRITICAL: Don't filter menu item titles - only filter actual page/post titles
+    // Check if this is being called from a menu context
+    $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10);
+    foreach ($backtrace as $trace) {
+        // If called from wp_nav_menu, wp_list_pages, or menu-related functions, skip
+        if (isset($trace['function']) && (
+            strpos($trace['function'], 'nav_menu') !== false ||
+            strpos($trace['function'], 'menu') !== false ||
+            strpos($trace['function'], 'walker') !== false ||
+            (isset($trace['class']) && strpos($trace['class'], 'Walker') !== false)
+        )) {
+            return $title; // Don't modify menu item titles
+        }
+    }
+    
+    // Only filter if we're actually on the WooCommerce account page
+    if (!is_account_page()) {
+        return $title;
+    }
+    
     global $wp_query;
     
     // Get current language from WPML
