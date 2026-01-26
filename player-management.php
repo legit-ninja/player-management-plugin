@@ -180,7 +180,12 @@ add_action('woocommerce_account_gerer-participants_endpoint', 'intersoccer_rende
 add_action('woocommerce_account_teilnehmer-verwalten_endpoint', 'intersoccer_render_manage_players_content');
 
 if (defined('WP_DEBUG') && WP_DEBUG) {
-    error_log('InterSoccer Player Management: Registered endpoint content hooks for: manage-players, gerer-participants, teilnehmer-verwalten');
+    // Avoid noisy repeated logs on every request.
+    static $pm_logged_content_hooks = false;
+    if (!$pm_logged_content_hooks) {
+        error_log('InterSoccer Player Management: Registered endpoint content hooks for: manage-players, gerer-participants, teilnehmer-verwalten');
+        $pm_logged_content_hooks = true;
+    }
 }
 
 // Flush rewrite rules on activation
@@ -358,7 +363,12 @@ add_filter('woocommerce_get_query_vars', function ($query_vars) {
     }
     
     if (defined('WP_DEBUG') && WP_DEBUG) {
-        error_log('InterSoccer Player Management: Registered query vars for all languages: ' . implode(', ', array_values($endpoint_slugs)));
+        // WooCommerce may call this filter many times per request; log only once to reduce noise.
+        static $pm_logged_query_vars = false;
+        if (!$pm_logged_query_vars) {
+            error_log('InterSoccer Player Management: Registered query vars for all languages: ' . implode(', ', array_values($endpoint_slugs)));
+            $pm_logged_query_vars = true;
+        }
     }
     
     return $query_vars;
