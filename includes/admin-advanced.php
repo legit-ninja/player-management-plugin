@@ -15,6 +15,17 @@ if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
 
+/**
+ * Prevent CSV formula injection by prefixing cells that start with
+ * formula-triggering characters (=, +, -, @) with a tab character.
+ */
+function intersoccer_sanitize_csv_cell(string $value): string {
+    if ($value !== '' && in_array($value[0], ['=', '+', '-', '@'], true)) {
+        return "\t" . $value;
+    }
+    return $value;
+}
+
 // Define background process class only if library is available
 if (class_exists('WP_Background_Process')) {
     class Player_Management_Attribute_Process extends WP_Background_Process {
@@ -163,7 +174,9 @@ function intersoccer_cleanup_empty_users() {
                 require_once(ABSPATH . 'wp-admin/includes/user.php');
             }
             
-            wp_delete_user($user->ID);
+            // Pass 0 so WordPress deletes posts; these accounts have no
+            // meaningful activity so content deletion is intentional.
+            wp_delete_user($user->ID, 0);
             $deleted_count++;
         } else {
             // Preserve user due to activity
@@ -320,6 +333,13 @@ function player_management_render_advanced_tab() {
 
     if (isset($_POST['import_camp_terms']) && wp_verify_nonce($_POST['advanced_nonce'], 'player_management_advanced_actions')) {
         if (!empty($_FILES['csv_file']['tmp_name'])) {
+            $csv_ext  = strtolower(pathinfo($_FILES['csv_file']['name'], PATHINFO_EXTENSION));
+            $finfo    = new finfo(FILEINFO_MIME_TYPE);
+            $csv_mime = $finfo->file($_FILES['csv_file']['tmp_name']);
+            $allowed_csv_mimes = ['text/csv', 'text/plain', 'application/csv', 'application/vnd.ms-excel'];
+            if ($csv_ext !== 'csv' || !in_array($csv_mime, $allowed_csv_mimes, true)) {
+                $message .= __('Invalid file type. Only CSV files are allowed.', 'player-management') . '<br>';
+            } else {
             $csv_data = file_get_contents($_FILES['csv_file']['tmp_name']);
             $lines = explode("\n", $csv_data);
             $terms = [];
@@ -333,6 +353,7 @@ function player_management_render_advanced_tab() {
                 wp_insert_term($term, 'pa_camp-terms', ['slug' => sanitize_title($term)]);
             }
             $message .= __('Camp terms imported successfully.', 'player-management') . '<br>';
+            } // end else (valid file type)
         } else {
             $message .= __('No CSV file uploaded.', 'player-management') . '<br>';
         }
@@ -340,6 +361,13 @@ function player_management_render_advanced_tab() {
 
     if (isset($_POST['import_users_players']) && wp_verify_nonce($_POST['advanced_nonce'], 'player_management_advanced_actions')) {
         if (!empty($_FILES['csv_file']['tmp_name'])) {
+            $imp_ext  = strtolower(pathinfo($_FILES['csv_file']['name'], PATHINFO_EXTENSION));
+            $finfo    = new finfo(FILEINFO_MIME_TYPE);
+            $imp_mime = $finfo->file($_FILES['csv_file']['tmp_name']);
+            $allowed_csv_mimes = ['text/csv', 'text/plain', 'application/csv', 'application/vnd.ms-excel'];
+            if ($imp_ext !== 'csv' || !in_array($imp_mime, $allowed_csv_mimes, true)) {
+                $message .= __('Invalid file type. Only CSV files are allowed.', 'player-management') . '<br>';
+            } else {
             $csv_data = file_get_contents($_FILES['csv_file']['tmp_name']);
             $lines = explode("\n", $csv_data);
             $header = str_getcsv(array_shift($lines));
@@ -361,7 +389,8 @@ function player_management_render_advanced_tab() {
                     if (!is_wp_error($user_id)) {
                         wp_update_user(['ID' => $user_id, 'first_name' => $first_name, 'last_name' => $last_name]);
                         update_user_meta($user_id, 'billing_region', $region);
-                        add_user_to_role($user_id, 'customer');
+                        $new_user_obj = new WP_User($user_id);
+                        $new_user_obj->set_role('customer');
                     }
                 } else {
                     $user_id = $user->ID;
@@ -370,6 +399,9 @@ function player_management_render_advanced_tab() {
 
                 // Add player
                 if ($player_name && $user_id) {
+                    $age = $player_dob
+                        ? (int) floor((time() - strtotime($player_dob)) / 31536000)
+                        : 0;
                     $players = get_user_meta($user_id, 'intersoccer_players', true) ?: [];
                     $players[] = [
                         'name' => $player_name,
@@ -381,6 +413,7 @@ function player_management_render_advanced_tab() {
                 }
             }
             $message .= __('Users and players imported successfully.', 'player-management') . '<br>';
+            } // end else (valid file type)
         } else {
             $message .= __('No CSV file uploaded for import.', 'player-management') . '<br>';
         }
@@ -400,13 +433,13 @@ function player_management_render_advanced_tab() {
             $players = get_user_meta($user->ID, 'intersoccer_players', true) ?: [];
             foreach ($players as $player) {
                 fputcsv($output, [
-                    $user->user_email,
-                    $first_name,
-                    $last_name,
-                    $region,
-                    $player['name'] ?? '',
-                    $player['dob'] ?? '',
-                    $player['gender'] ?? 'Other'
+                    intersoccer_sanitize_csv_cell($user->user_email),
+                    intersoccer_sanitize_csv_cell($first_name),
+                    intersoccer_sanitize_csv_cell($last_name),
+                    intersoccer_sanitize_csv_cell($region),
+                    intersoccer_sanitize_csv_cell($player['name'] ?? ''),
+                    intersoccer_sanitize_csv_cell($player['dob'] ?? ''),
+                    intersoccer_sanitize_csv_cell($player['gender'] ?? 'Other'),
                 ]);
             }
         }

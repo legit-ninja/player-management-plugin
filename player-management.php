@@ -144,10 +144,11 @@ function intersoccer_render_manage_players_content() {
     static $already_rendered = false;
     
     if (defined('WP_DEBUG') && WP_DEBUG) {
+        $safe_uri = sanitize_text_field(wp_unslash($_SERVER['REQUEST_URI'] ?? 'unknown'));
         error_log(sprintf(
             'InterSoccer Player Management: Endpoint content called | Already rendered: %s | Current URL: %s',
             $already_rendered ? 'YES' : 'no',
-            $_SERVER['REQUEST_URI'] ?? 'unknown'
+            $safe_uri
         ));
     }
     
@@ -283,23 +284,10 @@ function intersoccer_player_management_endpoint_title($title, $post_id = null) {
     if ($is_filtering) {
         return $title;
     }
-    
-    // CRITICAL: Don't filter menu item titles - only filter actual page/post titles
-    // Check if this is being called from a menu context
-    $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10);
-    foreach ($backtrace as $trace) {
-        // If called from wp_nav_menu, wp_list_pages, or menu-related functions, skip
-        if (isset($trace['function']) && (
-            strpos($trace['function'], 'nav_menu') !== false ||
-            strpos($trace['function'], 'menu') !== false ||
-            strpos($trace['function'], 'walker') !== false ||
-            (isset($trace['class']) && strpos($trace['class'], 'Walker') !== false)
-        )) {
-            return $title; // Don't modify menu item titles
-        }
-    }
-    
-    // Only filter if we're actually on the WooCommerce account page
+
+    // Only filter if we're actually on the WooCommerce account page.
+    // This also implicitly excludes nav-menu and widget contexts which
+    // do not run inside a singular account-page request.
     if (!is_account_page()) {
         return $title;
     }
@@ -477,11 +465,12 @@ add_action('wp_enqueue_scripts', function () {
     }
     
     // Check for both translated slug and default slug
+    $request_uri = sanitize_text_field(wp_unslash($_SERVER['REQUEST_URI'] ?? ''));
     $is_manage_players_page = is_account_page() && (
-        isset($_GET[$endpoint_slug]) || 
+        isset($_GET[$endpoint_slug]) ||
         isset($_GET['manage-players']) ||
-        strpos($_SERVER['REQUEST_URI'], $endpoint_slug) !== false ||
-        strpos($_SERVER['REQUEST_URI'], 'manage-players') !== false
+        strpos($request_uri, $endpoint_slug) !== false ||
+        strpos($request_uri, 'manage-players') !== false
     );
     
     if ($is_manage_players_page) {
@@ -568,7 +557,7 @@ add_action('wp_enqueue_scripts', function () {
             ];
             
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('InterSoccer: Localizing intersoccerPlayer data: ' . json_encode($localize_data));
+                error_log('InterSoccer: Localizing intersoccerPlayer data for user ' . $user_id . ', player count: ' . count($preload_players));
             }
             
             wp_localize_script(

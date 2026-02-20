@@ -23,10 +23,7 @@ function intersoccer_add_user_profile_players($user) {
     // Ensure sequential indices for rendering
     $players = array_values($players);
     if (defined('WP_DEBUG') && WP_DEBUG) {
-        error_log('InterSoccer: Rendering user profile players for user ' . $user->ID . ', players: ' . json_encode($players));
-        error_log('InterSoccer: Raw metadata for user ' . $user->ID . ': ' . print_r(get_user_meta($user->ID, 'intersoccer_players', true), true));
-        error_log('InterSoccer: Pre-localize players for user ' . $user->ID . ': ' . json_encode($players));
-        error_log('InterSoccer: User role for user ' . $user->ID . ': ' . wp_get_current_user()->roles[0]);
+        error_log('InterSoccer: Rendering user profile players for user ' . $user->ID . ', player count: ' . count($players));
     }
 
     $is_admin = current_user_can('edit_users');
@@ -86,8 +83,7 @@ function intersoccer_add_user_profile_players($user) {
     ];
     wp_localize_script('intersoccer-player-management-js', 'intersoccerPlayer', $localize_data);
     if (defined('WP_DEBUG') && WP_DEBUG) {
-        error_log('InterSoccer: Localized intersoccerPlayer data for user profile: ' . json_encode($localize_data));
-        error_log('InterSoccer: Nonce generated for user ' . $user->ID . ': ' . $localize_data['nonce']);
+        error_log('InterSoccer: Localized intersoccerPlayer data for user profile, user: ' . $user->ID . ', player count: ' . count($players));
     }
 
     $colspan = $is_admin ? 11 : 8; // Adjust colspan for admin (11 columns) vs non-admin (8 columns)
