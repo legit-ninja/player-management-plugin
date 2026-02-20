@@ -91,7 +91,9 @@ function intersoccer_data_deletion_admin_page()
         if ($user_id) {
             delete_user_meta($user_id, 'intersoccer_players');
             delete_user_meta($user_id, 'intersoccer_achievements');
-            wp_delete_user($user_id);
+            // Pass 0 as the reassign ID so WordPress deletes the user's posts
+            // rather than reassigning them — intentional for GDPR erasure.
+            wp_delete_user($user_id, 0);
             wp_update_post(['ID' => $request_id, 'post_status' => 'completed']);
             error_log(sprintf('Data deletion completed for user ID %d on %s', $user_id, current_time('mysql')));
             echo '<div class="notice notice-success"><p>' . esc_html__('User data deleted.', 'player-management') . '</p></div>';

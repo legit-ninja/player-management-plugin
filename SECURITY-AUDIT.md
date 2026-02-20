@@ -178,7 +178,7 @@ function sanitize_csv_cell(string $value): string {
 
 ---
 
-### [MEDIUM] External Scripts Loaded Without Subresource Integrity (SRI)
+### [MEDIUM] External Scripts Loaded Without Subresource Integrity (SRI) — **Pending: requires online hash computation**
 
 **Files:**
 - `includes/admin-advanced.php:237–239` (CodeMirror from cdnjs.cloudflare.com)
@@ -197,7 +197,26 @@ wp_enqueue_script('codemirror',
 
 If either CDN is compromised or suffers a supply-chain attack, malicious JavaScript would be executed in WordPress admin pages.
 
-**Fix:** Generate SRI hashes and add them via the `wp_script_add_data` filter, or self-host these assets in the `vendor/` or `js/` directory.
+**Fix:** Generate SRI hashes for each asset and add them via the `script_loader_tag` / `style_loader_tag` filters, or self-host the assets.
+
+To generate hashes once network access is available:
+```bash
+curl -s <url> | openssl dgst -sha384 -binary | openssl enc -base64 -A
+# prefix result with "sha384-"
+```
+
+Then add the integrity attribute in WordPress:
+```php
+add_filter('script_loader_tag', function($tag, $handle, $src) {
+    $sri = ['codemirror' => 'sha384-<hash>', 'flatpickr' => 'sha384-<hash>'];
+    if (isset($sri[$handle])) {
+        return str_replace(' src=', ' integrity="' . $sri[$handle] . '" crossorigin="anonymous" src=', $tag);
+    }
+    return $tag;
+}, 10, 3);
+```
+
+**Status:** Infrastructure not added in this patch — incorrect hashes would silently break the admin interface. Hashes must be verified before deploying.
 
 ---
 
