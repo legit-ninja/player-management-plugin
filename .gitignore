@@ -9,6 +9,7 @@ wp-content/plugins/*
 # Ignore everything in the root except the plugin directory
 /*
 !wp-content/
+!SECURITY-AUDIT.md
 wp-content/*
 !wp-content/plugins/
 wp-content/plugins/*

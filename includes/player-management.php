@@ -118,7 +118,8 @@ if (!function_exists('intersoccer_get_player_event_count')) {
 // Render player management form
 function intersoccer_render_players_form($is_admin = false, $settings = []) {
     if (defined('WP_DEBUG') && WP_DEBUG) {
-        error_log('InterSoccer: Rendering player management form, is_admin: ' . ($is_admin ? 'true' : 'false') . ', endpoint: ' . (isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : 'unknown'));
+        $safe_uri = sanitize_text_field(wp_unslash($_SERVER['REQUEST_URI'] ?? 'unknown'));
+        error_log('InterSoccer: Rendering player management form, is_admin: ' . ($is_admin ? 'true' : 'false') . ', endpoint: ' . $safe_uri);
     }
 
     if (!is_user_logged_in()) {
@@ -461,7 +462,7 @@ function intersoccer_render_user_profile_players($user) {
         'server_time' => current_time('mysql'),
     ];
     if (defined('WP_DEBUG') && WP_DEBUG) {
-        error_log('InterSoccer: Localizing intersoccerPlayer data for user profile: ' . json_encode($localize_data));
+        error_log('InterSoccer: Localizing intersoccerPlayer data for user profile, user: ' . $user->ID . ', player count: ' . count($players));
     }
     wp_localize_script(
         'intersoccer-player-management-js',

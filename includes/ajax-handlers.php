@@ -59,12 +59,7 @@ function intersoccer_add_player() {
 
     $players = get_user_meta($user_id, 'intersoccer_players', true) ?: [];
     if (defined('WP_DEBUG') && WP_DEBUG) {
-        error_log('InterSoccer: Checking for duplicate player, user_id: ' . $user_id . ', existing players: ' . json_encode($players));
-        global $wpdb;
-        $order_meta = $wpdb->get_results($wpdb->prepare(
-            "SELECT meta_value FROM {$wpdb->prefix}woocommerce_order_itemmeta WHERE meta_key = 'intersoccer_player_index' AND meta_value != ''"
-        ));
-        error_log('InterSoccer: Order item metadata for intersoccer_player_index: ' . json_encode($order_meta));
+        error_log('InterSoccer: Checking for duplicate player, user_id: ' . $user_id . ', existing player count: ' . count($players));
     }
 
     foreach ($players as $index => $player) {
@@ -93,7 +88,7 @@ function intersoccer_add_player() {
 
     if ($updated) {
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('InterSoccer: Player added for user ' . $user_id . ': ' . json_encode($new_player));
+            error_log('InterSoccer: Player added for user ' . $user_id . ' (dob: ' . $new_player['dob'] . ')');
         }
         wp_send_json_success([
             'message' => __('Player added successfully', 'player-management'),
@@ -193,7 +188,7 @@ function intersoccer_edit_player() {
 
     if ($updated) {
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('InterSoccer: Player edited for user ' . $user_id . ' at index ' . $player_index . ': ' . json_encode($updated_player));
+            error_log('InterSoccer: Player edited for user ' . $user_id . ' at index ' . $player_index);
         }
         wp_send_json_success([
             'message' => __('Player updated successfully', 'player-management'),
@@ -307,7 +302,7 @@ function intersoccer_get_player() {
     $player['creation_timestamp'] = $player['creation_timestamp'] ?? '';
 
     if (defined('WP_DEBUG') && WP_DEBUG) {
-        error_log('InterSoccer: Returning player data for user ' . $user_id . ' at index ' . $player_index . ': ' . json_encode($player));
+        error_log('InterSoccer: Returning player data for user ' . $user_id . ' at index ' . $player_index);
     }
 
     wp_send_json_success(['player' => $player]);
