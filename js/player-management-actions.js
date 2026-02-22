@@ -126,33 +126,61 @@ jQuery(document).ready(function($) {
         });
     }
 
+    // Encode a value for safe insertion into HTML text/attribute context
+    function escHtml(s) {
+        return String(s === null || s === undefined ? '' : s)
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+    }
+
     // Update/add table row after save
     function updateTable(player, index) {
-        const name = (player.first_name || 'N/A') + ' ' + (player.last_name || '');
-        const medicalDisplay = player.medical_conditions ? player.medical_conditions.substring(0, 20) + (player.medical_conditions.length > 20 ? '...' : '') : '';
-        const translatedGender = translateGender(player.gender || 'N/A');
-        const html = `
-            <tr data-player-index="${player.player_index}" data-user-id="${player.user_id || intersoccerPlayer.user_id}"
-                data-first-name="${player.first_name || 'N/A'}" data-last-name="${player.last_name || 'N/A'}" data-dob="${player.dob || 'N/A'}"
-                data-gender="${player.gender || 'N/A'}" data-avs-number="${player.avs_number || 'N/A'}"
-                data-medical-conditions="${player.medical_conditions || ''}" data-event-count="${player.event_count || 0}">
-                <!-- Admin columns if needed -->
-                <td class="display-name" data-label="Name">${name}</td>
-                <td class="display-dob" data-label="DOB">${player.dob || 'N/A'}</td>
-                <td class="display-gender" data-label="Gender">${translatedGender}</td>
-                <td class="display-avs-number" data-label="AVS Number">${player.avs_number || 'N/A'}</td>
-                <td class="display-event-count" data-label="Events">${player.event_count || 0}</td>
-                <!-- Admin medical/creation/past -->
-                <td class="actions" data-label="Actions">
-                    <a href="#" class="edit-player" data-index="${player.player_index}" aria-label="Edit ${player.first_name || ''}">Edit</a>
-                </td>
-            </tr>
-        `;
+        const firstName  = player.first_name  || 'N/A';
+        const lastName   = player.last_name   || '';
+        const dob        = player.dob         || 'N/A';
+        const gender     = player.gender      || 'N/A';
+        const avsNumber  = player.avs_number  || 'N/A';
+        const medical    = player.medical_conditions || '';
+        const eventCount = player.event_count || 0;
+        const playerIdx  = player.player_index;
+        const userId     = player.user_id || intersoccerPlayer.user_id;
+
+        const name = firstName + ' ' + lastName;
+        const translatedGender = translateGender(gender);
+
+        const $row = $('<tr>')
+            .attr('data-player-index',       playerIdx)
+            .attr('data-user-id',            userId)
+            .attr('data-first-name',         firstName)
+            .attr('data-last-name',          lastName)
+            .attr('data-dob',                dob)
+            .attr('data-gender',             gender)
+            .attr('data-avs-number',         avsNumber)
+            .attr('data-medical-conditions', medical)
+            .attr('data-event-count',        eventCount);
+
+        $row.append($('<td>').addClass('display-name').attr('data-label', 'Name').text(name));
+        $row.append($('<td>').addClass('display-dob').attr('data-label', 'DOB').text(dob));
+        $row.append($('<td>').addClass('display-gender').attr('data-label', 'Gender').text(translatedGender));
+        $row.append($('<td>').addClass('display-avs-number').attr('data-label', 'AVS Number').text(avsNumber));
+        $row.append($('<td>').addClass('display-event-count').attr('data-label', 'Events').text(eventCount));
+
+        const $editLink = $('<a>')
+            .attr('href', '#')
+            .addClass('edit-player')
+            .attr('data-index', playerIdx)
+            .attr('aria-label', 'Edit ' + escHtml(firstName))
+            .text('Edit');
+        $row.append($('<td>').addClass('actions').attr('data-label', 'Actions').append($editLink));
+
         if (index === '-1') {
-            $table.append(html);
-            $('.no-players').remove();  // Remove no players row if present
+            $table.append($row);
+            $('.no-players').remove();
         } else {
-            $table.find(`tr[data-player-index="${index}"]`).replaceWith(html);
+            $table.find('tr[data-player-index="' + escHtml(String(index)) + '"]').replaceWith($row);
         }
     }
 
