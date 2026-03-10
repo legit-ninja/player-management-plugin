@@ -3,7 +3,7 @@
  * Plugin Name: Player Management
  * Plugin URI: https://github.com/legit-ninja/player-management-plugin
  * Description: Manages players for InterSoccer events, integrating with WooCommerce My Account page and providing an admin dashboard.
- * Version: 2.1.26
+ * Version: 2.2.22
  * Author: Jeremy Lee
  * Author URI: https://underdogunlimited.com
  * License: GPL-2.0-or-later
@@ -474,6 +474,24 @@ add_action('wp_enqueue_scripts', function () {
     );
     
     if ($is_manage_players_page) {
+        // Enqueue styles whenever we're on manage-players so CSS applies (even if user_id check differs elsewhere).
+        if (file_exists(PLAYER_MANAGEMENT_PATH . 'css/player-management.css')) {
+            wp_enqueue_style(
+                'intersoccer-player-management',
+                PLAYER_MANAGEMENT_URL . 'css/player-management.css',
+                [],
+                PLAYER_MANAGEMENT_VERSION
+            );
+        }
+        if (file_exists(PLAYER_MANAGEMENT_PATH . 'css/loading.css')) {
+            wp_enqueue_style(
+                'intersoccer-loading',
+                PLAYER_MANAGEMENT_URL . 'css/loading.css',
+                [],
+                PLAYER_MANAGEMENT_VERSION
+            );
+        }
+
         $user_id = get_current_user_id();
         if ($user_id) {
             // Fetch player data for preloading
@@ -493,25 +511,6 @@ add_action('wp_enqueue_scripts', function () {
                     'canton' => get_user_meta($user_id, 'billing_state', true) ?: '',
                     'city' => get_user_meta($user_id, 'billing_city', true) ?: '',
                 ];
-            }
-
-            // Enqueue styles (check if files exist)
-            if (file_exists(PLAYER_MANAGEMENT_PATH . 'css/player-management.css')) {
-                wp_enqueue_style(
-                    'intersoccer-player-management',
-                    PLAYER_MANAGEMENT_URL . 'css/player-management.css',
-                    [],
-                    PLAYER_MANAGEMENT_VERSION
-                );
-            }
-            
-            if (file_exists(PLAYER_MANAGEMENT_PATH . 'css/loading.css')) {
-                wp_enqueue_style(
-                    'intersoccer-loading',
-                    PLAYER_MANAGEMENT_URL . 'css/loading.css',
-                    [],
-                    PLAYER_MANAGEMENT_VERSION
-                );
             }
 
             // Enqueue scripts (check if files exist)
