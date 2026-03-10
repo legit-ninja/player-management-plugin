@@ -4,6 +4,47 @@
   -webkit-overflow-scrolling: touch;
 }
 
+/* Match customer-referral-system customer dashboard header.
+   Target both .dashboard-header h2 and direct h2.intersoccer-form-title (rendered markup may omit wrapper). */
+.intersoccer-player-management .dashboard-header {
+  text-align: center;
+  padding-top: 20px;
+  margin: 0 0 30px 0;
+  overflow: visible;
+}
+
+.intersoccer-player-management .dashboard-header h2,
+.intersoccer-player-management h2.intersoccer-form-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: #1e3a8a; /* fallback if text-fill-color unsupported */
+}
+
+/* When no wrapper: add top padding and bottom margin to the title itself */
+.intersoccer-player-management h2.intersoccer-form-title {
+  padding-top: 20px;
+  margin: 0 0 30px 0;
+}
+
+/* When inside .dashboard-header: wrapper provides spacing, reset h2 spacing */
+.intersoccer-player-management .dashboard-header h2 {
+  padding-top: 0;
+  margin: 0;
+}
+
+@media (max-width: 600px) {
+  .intersoccer-player-management .dashboard-header h2,
+  .intersoccer-player-management h2.intersoccer-form-title {
+    font-size: 1.9rem;
+  }
+}
+
 .intersoccer-player-management table {
   table-layout: auto;
   width: 100%;

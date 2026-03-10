@@ -242,7 +242,9 @@ function intersoccer_render_players_form($is_admin = false, $settings = []) {
     <div class="intersoccer-player-management" role="region" aria-label="<?php esc_attr_e('Attendee Management Dashboard', 'player-management'); ?>">
         <form accept-charset="UTF-8" style="width: 100%; max-width: 100%;">
             <?php if ($show_form_title) : ?>
-                <h2 class="intersoccer-form-title"><?php echo esc_html($form_title_text); ?></h2>
+                <div class="dashboard-header" aria-hidden="false">
+                    <h2 class="intersoccer-form-title"><?php echo esc_html($form_title_text); ?></h2>
+                </div>
             <?php endif; ?>
             <div class="intersoccer-message" style="display: none;" role="alert" aria-live="polite"></div>
 
