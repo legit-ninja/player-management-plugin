@@ -158,6 +158,18 @@ class Player_Management_List {
         <div class="wrap">
             <h1><?php _e('All Players', 'player-management'); ?></h1>
 
+            <?php
+            $export_url = add_query_arg(
+                array_filter([
+                    'action' => 'intersoccer_players_export',
+                    'search' => $pagination_info['search_term'] ?? '',
+                ], static fn($v) => $v !== ''),
+                admin_url('admin-post.php')
+            );
+            $export_url = wp_nonce_url($export_url, 'intersoccer_players_export');
+
+            ?>
+
             <!-- Search Form -->
             <form method="get" class="search-form">
                 <input type="hidden" name="page" value="intersoccer-players-all">
@@ -166,6 +178,9 @@ class Player_Management_List {
                         placeholder="<?php _e('Search by name, email, or AVS number...', 'player-management'); ?>"
                         style="width: 300px;">
                     <input type="submit" class="button button-primary" value="<?php _e('Search', 'player-management'); ?>">
+                    <a href="<?php echo esc_url($export_url); ?>" class="button button-secondary">
+                        <?php _e('Export to Excel', 'player-management'); ?>
+                    </a>
                     <?php if (!empty($pagination_info['search_term'])): ?>
                         <a href="<?php echo admin_url('admin.php?page=intersoccer-players-all'); ?>" class="button">
                             <?php _e('Clear Search', 'player-management'); ?>
@@ -219,6 +234,7 @@ class Player_Management_List {
                     <thead>
                         <tr>
                             <th><?php _e('User ID', 'player-management'); ?></th>
+                            <th><?php _e('User Email', 'player-management'); ?></th>
                             <th><?php _e('Canton', 'player-management'); ?></th>
                             <th><?php _e('City', 'player-management'); ?></th>
                             <th><?php _e('First Name', 'player-management'); ?></th>
@@ -234,7 +250,7 @@ class Player_Management_List {
                     <tbody>
                         <?php if (empty($all_players)): ?>
                             <tr>
-                                <td colspan="11" style="text-align: center; padding: 40px;">
+                                <td colspan="12" style="text-align: center; padding: 40px;">
                                     <?php if ($pagination_info['has_search']): ?>
                                         <?php _e('No players found matching your search.', 'player-management'); ?>
                                     <?php else: ?>
@@ -251,6 +267,7 @@ class Player_Management_List {
                                             <?php echo esc_html($player['user_id']); ?>
                                         </a>
                                     </td>
+                                    <td class="display-user-email" data-label="User Email"><?php echo esc_html($player['user_email'] ?? ''); ?></td>
                                     <td class="display-canton" data-label="Canton"><?php echo esc_html($player['canton']); ?></td>
                                     <td class="display-city" data-label="City"><?php echo esc_html($player['city']); ?></td>
                                     <td class="display-first-name" data-label="First Name"><?php echo esc_html($player['first_name'] ?? ''); ?></td>
@@ -298,11 +315,14 @@ class Player_Management_List {
             
             // Add search highlighting
             var searchTerm = '<?php echo esc_js($pagination_info['search_term']); ?>';
+            function escapeRegExp(str) {
+                return String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            }
             if (searchTerm) {
                 $('#player-table tbody tr').each(function() {
                     var $row = $(this);
                     var html = $row.html();
-                    var regex = new RegExp('(' + searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\        $this->utils->log_memory('') + ')', 'gi');
+                    var regex = new RegExp('(' + escapeRegExp(searchTerm) + ')', 'gi');
                     html = html.replace(regex, '<mark style="background-color: yellow;">$1</mark>');
                     $row.html(html);
                 });

@@ -13,6 +13,7 @@
   overflow: visible;
 }
 
+/* Basic gradient text styling for both wrapped and unwrapped h2 */
 .intersoccer-player-management .dashboard-header h2,
 .intersoccer-player-management h2.intersoccer-form-title {
   font-size: 2.5rem;
