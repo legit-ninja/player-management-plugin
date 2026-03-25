@@ -238,7 +238,7 @@ class Player_Management_Admin {
                         $creation_date = gmdate('Y-m-d', (int)$ts);
                     }
 
-                    fputcsv($out, [
+                    $row = [
                         intersoccer_sanitize_csv_cell((string)$user->ID),
                         intersoccer_sanitize_csv_cell((string)($user->user_email ?? '')),
                         intersoccer_sanitize_csv_cell((string)$canton),
@@ -251,7 +251,9 @@ class Player_Management_Admin {
                         intersoccer_sanitize_csv_cell((string)$age),
                         intersoccer_sanitize_csv_cell($medical),
                         intersoccer_sanitize_csv_cell($creation_date),
-                    ]);
+                    ];
+
+                    fputcsv($out, $row);
                 }
             }
 
