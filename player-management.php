@@ -273,7 +273,7 @@ add_filter('woocommerce_account_menu_items', function ($items) {
             $label
         ));
     }
-    
+
     return $new_items;
 }, 10);
 
@@ -286,12 +286,31 @@ function intersoccer_player_management_endpoint_title($title, $post_id = null) {
     }
 
     // Only filter if we're actually on the WooCommerce account page.
-    // This also implicitly excludes nav-menu and widget contexts which
-    // do not run inside a singular account-page request.
     if (!is_account_page()) {
         return $title;
     }
     
+    // Avoid clobbering titles for nav menu items, widgets, elementor entities, etc.
+    // On account pages, WordPress may call `the_title` for many post types while
+    // building menus and other UI. We only want to replace the *account page* title.
+    if (!function_exists('wc_get_page_id')) {
+        return $title;
+    }
+
+    $account_page_id = (int) wc_get_page_id('myaccount');
+    $post_id_int = (int) ($post_id ?? 0);
+
+    // Require the My Account page itself, plus main loop/main query where possible.
+    if ($post_id_int <= 0 || $account_page_id <= 0 || $post_id_int !== $account_page_id) {
+        return $title;
+    }
+    if (function_exists('in_the_loop') && !in_the_loop()) {
+        return $title;
+    }
+    if (function_exists('is_main_query') && !is_main_query()) {
+        return $title;
+    }
+
     global $wp_query;
     
     // Get current language from WPML
