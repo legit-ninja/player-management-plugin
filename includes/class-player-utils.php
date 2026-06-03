@@ -34,46 +34,121 @@ class Player_Management_Utils {
     }
     
     /**
-     * Count matching players for search functionality
+     * Users with stored players, fetched in chunks (stable ID order).
      */
-    public function count_matching_players($search_term) {
-        $all_users = get_users([
+    private function get_users_with_players_chunk(int $number, int $offset): array {
+        return get_users([
             'role__in' => ['customer', 'subscriber'],
-            'fields' => ['ID'],
+            'orderby' => 'ID',
+            'order' => 'ASC',
+            'number' => $number,
+            'offset' => $offset,
+            'fields' => ['ID', 'user_email'],
             'meta_query' => [
                 [
                     'key' => 'intersoccer_players',
-                    'compare' => 'EXISTS'
-                ]
+                    'compare' => 'EXISTS',
+                ],
             ],
-            'number' => 1000 // Limit for performance
         ]);
-        
+    }
+
+    /**
+     * Count matching players for search functionality (all users, chunked).
+     */
+    public function count_matching_players($search_term) {
         $matching_count = 0;
-        foreach ($all_users as $user) {
-            $players = get_user_meta($user->ID, 'intersoccer_players', true) ?: [];
-            if (!is_array($players)) continue;
-            
-            foreach ($players as $player) {
-                if (!is_array($player)) continue;
-                
-                $full_name = ($player['first_name'] ?? '') . ' ' . ($player['last_name'] ?? '');
-                $user_email = get_user_by('ID', $user->ID)->user_email ?? '';
-                $avs_number = $player['avs_number'] ?? '';
-                
-                $search_matches = (
-                    stripos($full_name, $search_term) !== false ||
-                    stripos($user_email, $search_term) !== false ||
-                    stripos($avs_number, $search_term) !== false
-                );
-                
-                if ($search_matches) {
-                    $matching_count++;
+        $chunk_size = 200;
+        $offset = 0;
+
+        while (true) {
+            $users = $this->get_users_with_players_chunk($chunk_size, $offset);
+            if (empty($users)) {
+                break;
+            }
+
+            foreach ($users as $user) {
+                $players = get_user_meta($user->ID, 'intersoccer_players', true) ?: [];
+                if (!is_array($players)) {
+                    continue;
+                }
+
+                foreach ($players as $player) {
+                    if (!is_array($player)) {
+                        continue;
+                    }
+                    if ($this->player_matches_search($player, $user->user_email ?? '', $search_term)) {
+                        $matching_count++;
+                    }
                 }
             }
+
+            $offset += $chunk_size;
+            if (count($users) < $chunk_size) {
+                break;
+            }
         }
-        
+
         return $matching_count;
+    }
+
+    /**
+     * Return one page of players matching a search term (paginate matches, not users).
+     */
+    public function get_matching_players_page($search_term, $page, $per_page = 50) {
+        $target_offset = max(0, ($page - 1) * $per_page);
+        $collected = [];
+        $match_index = 0;
+        $chunk_size = 200;
+        $offset = 0;
+        $today = current_time('mysql');
+
+        while (count($collected) < $per_page) {
+            $users = $this->get_users_with_players_chunk($chunk_size, $offset);
+            if (empty($users)) {
+                break;
+            }
+
+            foreach ($users as $user) {
+                try {
+                    $players = $this->get_user_players($user->ID);
+                    if (empty($players)) {
+                        continue;
+                    }
+
+                    $billing_info = $this->get_user_billing_info($user->ID);
+
+                    foreach ($players as $index => $player) {
+                        if (!$this->player_matches_search($player, $user->user_email ?? '', $search_term)) {
+                            continue;
+                        }
+
+                        if ($match_index < $target_offset) {
+                            $match_index++;
+                            continue;
+                        }
+
+                        $collected[] = $this->enhance_player_data($player, $user, $billing_info, $index, $today);
+                        $match_index++;
+
+                        if (count($collected) >= $per_page) {
+                            break 2;
+                        }
+                    }
+                } catch (Exception $e) {
+                    if (defined('WP_DEBUG') && WP_DEBUG) {
+                        error_log("InterSoccer: Error processing user {$user->ID}: " . $e->getMessage());
+                    }
+                }
+            }
+
+            $offset += $chunk_size;
+            if (count($users) < $chunk_size) {
+                break;
+            }
+        }
+
+        return $collected;
     }
     
     /**
@@ -180,7 +255,9 @@ class Player_Management_Utils {
             
             try {
                 $players = $this->get_user_players($user->ID);
-                if (empty($players)) continue;
+                if (empty($players)) {
+                    continue;
+                }
                 
                 $billing_info = $this->get_user_billing_info($user->ID);
                 

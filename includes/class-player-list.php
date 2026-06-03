@@ -62,43 +62,32 @@ class Player_Management_List {
 
         $this->utils->log_memory('after_user_counts');
 
-        // Load users in paginated batches
-        $user_query_args = [
-            'role__in' => ['customer', 'subscriber'],
-            'number' => $per_page,
-            'offset' => $offset,
-            'fields' => ['ID', 'user_email'],
-            'meta_query' => [
-                [
-                    'key' => 'intersoccer_players',
-                    'compare' => 'EXISTS'
-                ]
-            ]
-        ];
-
-        // Handle search
         if (!empty($search_term)) {
-            // Load more users when searching since we'll filter players
-            $user_query_args['number'] = $per_page * 3;
-            $user_query_args['offset'] = max(0, ($current_page - 1) * $per_page * 3);
-        }
-
-        $users = get_users($user_query_args);
-        
-        $this->utils->log_memory('after_paginated_users_loaded');
-
-        // Calculate pagination
-        if (empty($search_term)) {
-            $total_users_with_players = $users_with_players;
-            $total_pages = ceil($total_users_with_players / $per_page);
-        } else {
             $search_total = $this->utils->count_matching_players($search_term);
-            $total_pages = ceil($search_total / $per_page);
             $total_users_with_players = $search_total;
+            $total_pages = $search_total > 0 ? (int) ceil($search_total / $per_page) : 1;
+            $all_players = $this->utils->get_matching_players_page($search_term, $current_page, $per_page);
+        } else {
+            $user_query_args = [
+                'role__in' => ['customer', 'subscriber'],
+                'number' => $per_page,
+                'offset' => $offset,
+                'fields' => ['ID', 'user_email'],
+                'meta_query' => [
+                    [
+                        'key' => 'intersoccer_players',
+                        'compare' => 'EXISTS',
+                    ],
+                ],
+            ];
+
+            $users = get_users($user_query_args);
+            $total_users_with_players = $users_with_players;
+            $total_pages = (int) ceil($total_users_with_players / $per_page);
+            $all_players = $this->utils->process_player_batch($users, '', $per_page);
         }
 
-        // Process players for this page
-        $all_players = $this->utils->process_player_batch($users, $search_term, $per_page);
+        $this->utils->log_memory('after_paginated_users_loaded');
         
         // Calculate page stats
         $page_stats = $this->calculate_page_stats($all_players);
