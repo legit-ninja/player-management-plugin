@@ -1,0 +1,36 @@
+#!/bin/bash
+
+###############################################################################
+# Local Deployment Configuration
+###############################################################################
+#
+# Copy this file to deploy.local.sh and configure with your credentials:
+#   cp deploy.local.sh.example deploy.local.sh
+#
+# Then edit deploy.local.sh with your actual server details.
+# The deploy.local.sh file is in .gitignore and won't be committed.
+#
+###############################################################################
+
+# SSH credentials
+SERVER_USER="your-ssh-username"
+SERVER_HOST="intersoccer.legit.ninja"
+SSH_PORT="22"
+SSH_KEY="~/.ssh/id_rsa"
+
+# Plugin path on server (absolute path)
+SERVER_PATH="/var/www/html/wp-content/plugins/player-management"
+
+# Cypress test directory (relative to this plugin directory)
+# Default points to ../intersoccer-player-management-tests
+CYPRESS_TEST_DIR="../intersoccer-player-management-tests"
+
+# Cypress spec to run (leave empty to run all tests)
+# Examples:
+#   - "cypress/e2e/player_management.spec.js" (single test)
+#   - "" (all tests)
+CYPRESS_SPEC="cypress/e2e/player_management.spec.js"
+
+# Optional: Custom rsync options
+# RSYNC_EXTRA_OPTS="--verbose"
+

@@ -1,0 +1,34 @@
+---
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: '3'
+
+includes:
+  common: .taskfiles/common/Taskfile.yaml
+  # TASK_LINT_ISSUE_FILE: .task/lint-had-issue
+tasks:
+  init:
+    desc: Initialize and install dependencies
+    run: once
+    deps:
+      - common:init
+
+  lint:
+    desc: Run linters to check code for style
+    deps:
+      - init
+    cmds:
+      - task: common:lint
+      # This must always be the final step for the 'lint' target.
+      - task: common:last_lint_check
+
+  test:
+    desc: Run tests to verify code
+    cmds:
+      - task: common:test
+
+  clean:
+    desc: Clean up local dependency installs and build artifacts
+    cmds:
+      # Cleanup should occur in reverse of dependencies, e.g. Ansible needs the venv to
+      # still exist to clean up the Molecule instances
+      - task: common:clean
