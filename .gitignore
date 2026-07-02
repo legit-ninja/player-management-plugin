@@ -1,74 +1,44 @@
-# WordPress specific ignores
-wp-config.php
-wp-content/uploads/
-wp-content/upgrade/
-wp-content/themes/
-wp-content/plugins/*
-!wp-content/plugins/your-plugin-slug/  # Replace with actual plugin slug if needed
-
-# Ignore everything in the root except the plugin directory
-/*
-!wp-content/
-!SECURITY-AUDIT.md
-wp-content/*
-!wp-content/plugins/
-wp-content/plugins/*
-!wp-content/plugins/your-plugin-slug/  # Adjust to your plugin
-
-# General development ignores
-node_modules/
+# Dependencies
 vendor/
-composer.lock
-package-lock.json
-yarn.lock
+node_modules/
 
-# Build and dist files
-dist/
-build/
-*.min.js
-*.min.css
+# PHPUnit / coverage
+.phpunit.result.cache
+coverage/
 
-# Logs and debug files
+# Logs
 *.log
 debug.log
 error_log
 
-# Editor and IDE files
+# Secrets / local config
+.env
+.env.*
+deploy.local.sh
+
+# OS / IDE
+.DS_Store
+Thumbs.db
 .vscode/
 .idea/
 *.sublime-project
 *.sublime-workspace
 
-# OS specific files
-.DS_Store
-Thumbs.db
+# Local WP test stubs (not part of the plugin)
+wp-admin/
 
-# Cache and temp files
-.cache/
-tmp/
+# Task runner
+.taskfiles/
+
+# Misc temp / archives
 *.tmp
 *.bak
 *.swp
-*~.nib
-
-# Environment files
-.env
-.env.local
-.env.development
-.env.production
-
-# Deployment configuration (contains credentials)
-deploy.local.sh
-
-# Documentation folder (tracked in git, excluded by deploy.sh)
-# docs/ folder will be excluded by deploy.sh but kept in git
-
-# Testing and coverage
-coverage/
-cypress/videos/
-cypress/screenshots/
-
-# Miscellaneous
+*~
 *.sql
 *.zip
 *.tar.gz
+
+# Cypress artifacts (if added later)
+cypress/videos/
+cypress/screenshots/
