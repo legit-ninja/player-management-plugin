@@ -42,6 +42,58 @@ if (!function_exists('intersoccer_translate_gender')) {
     }
 }
 
+if (!function_exists('intersoccer_parse_player_dob')) {
+    /**
+     * Parse a player date of birth into a midnight-normalized DateTime.
+     *
+     * @param string $dob Date of birth string.
+     * @return DateTime|null
+     */
+    function intersoccer_parse_player_dob(string $dob): ?DateTime {
+        $formats = array('Y-m-d', 'd/m/Y', 'm/d/Y', 'Y-m-d H:i:s');
+
+        foreach ($formats as $format) {
+            $parsed = DateTime::createFromFormat($format, $dob);
+            if ($parsed && $parsed->format($format) === $dob) {
+                $parsed->setTime(0, 0, 0);
+                return $parsed;
+            }
+        }
+
+        return null;
+    }
+}
+
+if (!function_exists('intersoccer_calculate_player_age')) {
+    /**
+     * Calculate player age in full years from date of birth.
+     *
+     * @param string $dob Date of birth string.
+     * @return int Age in years, or -1 if DOB is invalid.
+     */
+    function intersoccer_calculate_player_age(string $dob): int {
+        $birth = intersoccer_parse_player_dob($dob);
+        if (!$birth) {
+            return -1;
+        }
+
+        $today = new DateTime('today');
+        return $birth->diff($today)->y;
+    }
+}
+
+if (!function_exists('intersoccer_is_valid_player_age')) {
+    /**
+     * Whether age is within the allowed player range (3–13 years).
+     *
+     * @param int $age Player age in years.
+     * @return bool
+     */
+    function intersoccer_is_valid_player_age(int $age): bool {
+        return $age >= 3 && $age <= 13;
+    }
+}
+
 // Helper function to count events for a player
 if (!function_exists('intersoccer_get_player_event_count')) {
     function intersoccer_get_player_event_count($user_id, $player_index) {
@@ -50,7 +102,7 @@ if (!function_exists('intersoccer_get_player_event_count')) {
         
         if (!isset($players[$player_index])) {
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('InterSoccer: Player not found at index ' . $player_index . ' for user ' . $user_id);
+                error_log(sprintf('InterSoccer: Player not found user_id=%d player_index=%d', $user_id, $player_index));
             }
             return 0;
         }
@@ -60,55 +112,33 @@ if (!function_exists('intersoccer_get_player_event_count')) {
         
         if (empty($full_name)) {
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('InterSoccer: Empty full name for player index ' . $player_index . ' user ' . $user_id);
+                error_log(sprintf('InterSoccer: Empty player name user_id=%d player_index=%d', $user_id, $player_index));
             }
             return 0;
         }
         
         $orders = wc_get_orders([
             'customer_id' => $user_id,
-            'status' => ['wc-completed', 'wc-processing', 'wc-on-hold', 'wc-pending'], // Expanded statuses
+            'status' => ['wc-completed', 'wc-processing', 'wc-on-hold', 'wc-pending'],
             'limit' => -1
         ]);
         
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('InterSoccer: Counting events for user ' . $user_id . ', player_index: ' . $player_index . ', full_name: "' . $full_name . '"');
-            error_log('InterSoccer: Found ' . count($orders) . ' orders for user ' . $user_id);
-        }
-        
         foreach ($orders as $order) {
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('InterSoccer: Order ID ' . $order->get_id() . ', Status: ' . $order->get_status());
-            }
-            
             foreach ($order->get_items() as $item_id => $item) {
-                // Primary: Match by name
                 $attendee = trim($item->get_meta('Assigned Attendee') ?? '');
-                
-                // Fallback: Check index if name doesn't match
                 $player_index_meta = $item->get_meta('intersoccer_player_index');
                 
                 $name_match = ($attendee === $full_name);
-                $index_match = ($player_index_meta == $player_index); // Loose comparison
+                $index_match = ($player_index_meta == $player_index);
                 
                 if ($name_match || $index_match) {
-                    if (defined('WP_DEBUG') && WP_DEBUG) {
-                        error_log('InterSoccer: Match found for item ID ' . $item_id . 
-                                ' - Name: "' . $attendee . '" (match: ' . ($name_match ? 'yes' : 'no') . 
-                                '), Index: ' . print_r($player_index_meta, true) . ' (match: ' . ($index_match ? 'yes' : 'no') . ')');
-                    }
                     $count++;
-                } else {
-                    if (defined('WP_DEBUG') && WP_DEBUG) {
-                        error_log('InterSoccer: No match for item ID ' . $item_id . 
-                                ' - Attendee: "' . $attendee . '", Index: ' . print_r($player_index_meta, true));
-                    }
                 }
             }
         }
         
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('InterSoccer: Final event count for player_index ' . $player_index . ' ("' . $full_name . '"): ' . $count);
+            error_log(sprintf('InterSoccer: Event count user_id=%d player_index=%d count=%d', $user_id, $player_index, $count));
         }
         
         return $count;
