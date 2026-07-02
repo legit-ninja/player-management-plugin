@@ -1,0 +1,1618 @@
+# French translations for PACKAGE package.
+# Copyright (C) 2025 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Jeremy Lee <jlee@underdogunlimited.com>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-17 08:26-0400\n"
+"PO-Revision-Date: 2025-10-17 08:26-0400\n"
+"Last-Translator: Jeremy Lee <jlee@underdogunlimited.com>\n"
+"Language-Team: French <traduc@traduc.org>\n"
+"Language: fr_CH\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/player-management.php:135
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/player-management.php:140
+msgid "Manage Players"
+msgstr "Gérer les participants"
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/player-management.php:136
+msgid "Coach"
+msgstr "Entraîneur"
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/player-management.php:139
+msgid "Organizer"
+msgstr "Organisateur"
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/player-management.php:342
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:128
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:129
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:323
+msgid "Settings"
+msgstr "Paramètres"
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:98
+msgid "Players Overview Dashboard"
+msgstr "Tableau de bord des participants"
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:101
+msgid "Refresh Data"
+msgstr "Actualiser les données"
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:107
+msgid "Data Status:"
+msgstr "État des données :"
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:108
+msgid "Generated:"
+msgstr "Généré :"
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:109
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:185
+msgid "Users Processed:"
+msgstr "Utilisateurs traités :"
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:110
+msgid "Method:"
+msgstr "Méthode :"
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:112
+msgid "Error:"
+msgstr "Erreur :"
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:114
+msgid "Data cached for 30 minutes."
+msgstr "Données mises en cache pour 30 minutes."
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:119
+msgid "Warning:"
+msgstr "Avertissement :"
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:120
+msgid ""
+"The overview data could not be fully generated due to an error. Showing "
+"partial or fallback data."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:121
+msgid "Please check the debug logs or try refreshing the data."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:128
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:237
+msgid "Total Players"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:134
+msgid "Users Without Players"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:140
+msgid "Assigned vs Unassigned"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:149
+msgid "Gender Breakdown"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:158
+msgid "Players by Canton"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:167
+msgid "Top 5 Cantons"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:179
+msgid "Debug Information"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:183
+msgid "Memory Peak:"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:184
+msgid "Total Players:"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:186
+msgid "Processing Method:"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:187
+msgid "Cache Key:"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/data-deletion.php:24
+msgid "Please log in to request data deletion."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/data-deletion.php:30
+msgid "Request Data Deletion"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/data-deletion.php:34
+msgid "Reason for Deletion (optional):"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/data-deletion.php:38
+msgid "Submit Request"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/data-deletion.php:60
+msgid "New Data Deletion Request"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/data-deletion.php:61
+#, php-format
+msgid ""
+"A user (ID: %d) has requested data deletion. Reason: %s. Review in admin."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/data-deletion.php:63
+msgid "Your request has been submitted."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/data-deletion.php:74
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/data-deletion.php:109
+msgid "Data Deletion Requests"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/data-deletion.php:75
+msgid "Data Deletion"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/data-deletion.php:85
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:234
+msgid "You do not have permission to access this page."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/data-deletion.php:97
+msgid "User data deleted."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/data-deletion.php:113
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:92
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:221
+msgid "User ID"
+msgstr "ID utilisateur"
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/data-deletion.php:114
+msgid "Reason"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/data-deletion.php:115
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/player-management.php:139
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:434
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:693
+msgid "Actions"
+msgstr "Actions"
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/data-deletion.php:128
+msgid "Process"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-players.php:40
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-players.php:41
+msgid "Players"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-players.php:51
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-players.php:52
+msgid "Overview"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-players.php:60
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-players.php:61
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:81
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:98
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:99
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:394
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:159
+msgid "All Players"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-players.php:69
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-players.php:70
+msgid "Advanced"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-players.php:95
+msgid "Players per page"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:29
+msgid "Player List"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:47
+msgid "Content"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:55
+msgid "Title"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:57
+msgid "Our Players"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:58
+msgid "Enter widget title"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:65
+msgid "Show Title"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:67
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:125
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:137
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:181
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:181
+msgid "Show"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:68
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:126
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:138
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:182
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:182
+msgid "Hide"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:77
+msgid "Player Source"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:82
+msgid "Current User Players"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:83
+msgid "Specific User Players"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:84
+msgid "Recently Added"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:104
+msgid "Display Fields"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:109
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:428
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:144
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:144
+msgid "Name"
+msgstr "Nom"
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:110
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:429
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:229
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:145
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:145
+msgid "Age"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:111
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/player-management.php:136
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:430
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:513
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:227
+msgid "Gender"
+msgstr "Genre"
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:112
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:509
+msgid "Date of Birth"
+msgstr "Date de naissance"
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:113
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:147
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:147
+msgid "Event Count"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:114
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:525
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:230
+msgid "Medical Conditions"
+msgstr "Conditions médicales"
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:115
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:533
+msgid "Emergency Contact"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:123
+msgid "Show Avatar"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:135
+msgid "Show Action Buttons"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:153
+msgid "Age Filters"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:161
+msgid "Minimum Age"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:172
+msgid "Maximum Age"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:183
+msgid "Gender Filter"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:187
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:418
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:505
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:517
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:530
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:505
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:517
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:530
+msgid "All"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:188
+msgid "Male Only"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:189
+msgid "Female Only"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:213
+msgid "No players found matching your criteria."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:325
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:443
+msgid "Age:"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:332
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:416
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:450
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:503
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:503
+msgid "Gender:"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:339
+msgid "Date of Birth:"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:346
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:457
+msgid "Events:"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:353
+msgid "Medical:"
+msgstr "Médical :"
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:360
+msgid "Emergency Contact:"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:380
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:466
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:296
+msgid "View"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:387
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:466
+msgid "Edit"
+msgstr "Modifier"
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:394
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:467
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/player-management.php:138
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:118
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:119
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:432
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:470
+msgid "Events"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:419
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:451
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:405
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:515
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:754
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:506
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:600
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:506
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:600
+msgid "Male"
+msgstr "Garçon"
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:420
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:451
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:406
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:516
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:756
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:507
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:602
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:507
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:602
+msgid "Female"
+msgstr "Fille"
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/player-management.php:101
+msgid "Please log in to manage your Attendees."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/player-management.php:109
+msgid "Error: Unable to load user data."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/player-management.php:133
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:501
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:224
+msgid "First Name"
+msgstr "Prénom"
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/player-management.php:134
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:505
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:225
+msgid "Last Name"
+msgstr "Nom"
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/player-management.php:135
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:226
+msgid "DOB"
+msgstr "Date de naissance"
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/player-management.php:137
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:521
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:228
+msgid "AVS Number"
+msgstr "Numéro AVS"
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/player-management.php:140
+msgid "Manage All Players"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/player-management.php:140
+msgid "Manage Your Attendees"
+msgstr "Gérer vos participants"
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/player-management.php:223
+#, php-format
+msgid "Total Players: %d"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/player-management.php:561
+msgid "Assigned Attendee"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:77
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:78
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-elementor-manager.php:87
+msgid "InterSoccer Players"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:89
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:90
+msgid "Dashboard"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:108
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:109
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:559
+msgid "Rosters & Export"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:138
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:139
+msgid "Tools"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:212
+msgid "Are you sure you want to delete this player?"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:213
+msgid "Are you sure you want to delete the selected players?"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:214
+msgid "Processing export..."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:215
+msgid "Export completed successfully!"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:216
+msgid "Export failed. Please try again."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:232
+msgid "InterSoccer Players Dashboard"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:242
+msgid "Recent Registrations"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:244
+msgid "Last 30 days"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:248
+msgid "Average Age"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:253
+msgid "Total Events"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:261
+msgid "Analytics"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:265
+msgid "Gender Distribution"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:270
+msgid "Events by Type"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:278
+msgid "Recent Players"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:281
+msgid "No recent players found."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:307
+msgid "Quick Actions"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:311
+msgid "Export Rosters"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:315
+msgid "View All Players"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:319
+msgid "Manage Events"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:396
+msgid "Add New Player"
+msgstr "Ajouter un nouveau participant"
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:404
+msgid "All Genders"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:407
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:517
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:758
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:508
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:604
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:508
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:604
+msgid "Other"
+msgstr "Autre"
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:411
+msgid "All Ages"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:412
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:518
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:518
+msgid "3-5 years"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:413
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:519
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:519
+msgid "6-8 years"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:414
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:520
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:520
+msgid "9-12 years"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:415
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:521
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:521
+msgid "13-18 years"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:418
+msgid "Search players..."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:419
+msgid "Reset"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:431
+msgid "Parent"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:433
+msgid "Registration Date"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:474
+msgid "Delete"
+msgstr "Supprimer"
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:485
+msgid "Bulk Actions"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:486
+msgid "Delete Selected"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:487
+msgid "Export Selected"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:489
+msgid "Apply"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:497
+msgid "Player Details"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:529
+msgid "Dietary Requirements"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:537
+msgid "Emergency Phone"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:542
+msgid "Save Player"
+msgstr "Enregistrer le participant"
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:543
+msgid "Cancel"
+msgstr "Annuler"
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:564
+msgid "Quick Export"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:567
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:608
+msgid "Custom Export"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:570
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:676
+msgid "Scheduled Exports"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:576
+msgid "Quick Export Options"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:577
+msgid "Export commonly requested roster formats:"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:581
+msgid "All Camps"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:582
+msgid "Export all camp rosters with player details."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:584
+msgid "Export Camps"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:589
+msgid "All Courses"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:590
+msgid "Export all course rosters with schedule details."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:592
+msgid "Export Courses"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:597
+msgid "Complete Roster"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:598
+msgid "Export all players and events in one comprehensive file."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:600
+msgid "Export All"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:613
+msgid "Activity Type"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:615
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:531
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:531
+msgid "Camps"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:616
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:532
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:532
+msgid "Courses"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:617
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:533
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:533
+msgid "Birthday Parties"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:622
+msgid "Season"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:624
+msgid "All Seasons"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:625
+msgid "Spring 2025"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:626
+msgid "Summer 2025"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:627
+msgid "Autumn 2025"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:628
+msgid "Winter 2025"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:633
+msgid "Start Date"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:638
+msgid "End Date"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:643
+msgid "Venue"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:645
+msgid "All Venues"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:657
+msgid "Export Format"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:659
+msgid "Excel (.xlsx)"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:660
+msgid "CSV"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:661
+msgid "PDF"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:668
+msgid "Generate Custom Export"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:677
+msgid "Set up automatic exports that run on a schedule."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:678
+msgid "Coming soon..."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:684
+msgid "Export History"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:688
+msgid "Date"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:689
+msgid "Type"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:690
+msgid "Records"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:691
+msgid "Format"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:692
+msgid "User"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:702
+msgid "No export history found."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:715
+msgid "Download"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:718
+msgid "Expired"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:732
+msgid "Exporting Data"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:736
+msgid "Preparing export..."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:760
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:606
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:606
+msgid "Not Specified"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/user-profile-players.php:141
+msgid "View orders"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:34
+msgid "First name is required."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:36
+msgid "First name contains invalid characters."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:41
+msgid "Last name is required."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:43
+msgid "Last name contains invalid characters."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:48
+msgid "Date of birth is required."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:50
+msgid "Invalid date of birth format."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:52
+msgid "Player age is not within acceptable range."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:57
+msgid "Gender is required."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:59
+msgid "Invalid gender selection."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:64
+msgid "Invalid AVS number format."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:86
+msgid "Activity type is required."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:88
+msgid "Invalid activity type."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:93
+msgid "Invalid start date format."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:97
+msgid "Invalid end date format."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:103
+msgid "End date must be after start date."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:109
+msgid "Venue name is too long."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:126
+msgid "Email address is required."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:128
+msgid "Invalid email address format."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:130
+msgid "Email address is already registered."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:135
+msgid "Invalid phone number format."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:30
+msgid "You do not have sufficient permissions to access this page."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:166
+msgid "Search by name, email, or AVS number..."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:168
+msgid "Search"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:171
+msgid "Clear Search"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:179
+msgid "Showing:"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:181
+#, php-format
+msgid ""
+"Page %d of %d | %d players on this page | %d total items | %d users without "
+"players"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:189
+msgid "Search results for:"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:196
+msgid "Players on Page"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:200
+msgid "Male (Page)"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:204
+msgid "Female (Page)"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:208
+msgid "Total Pages"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:222
+msgid "Canton"
+msgstr "Canton"
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:223
+msgid "City"
+msgstr "Ville"
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:231
+msgid "Creation Date"
+msgstr "Date de création"
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:239
+msgid "No players found matching your search."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:241
+msgid "No players found on this page."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:339
+msgid "Previous"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:370
+msgid "Next"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:556
+msgid "Unauthorized"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:66
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:66
+msgid "Layout"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:74
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:74
+msgid "Columns"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:90
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:90
+msgid "Gap"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:121
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:121
+msgid "Query"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:129
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:129
+msgid "Limit"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:140
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:140
+msgid "Order By"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:146
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:146
+msgid "Created Date"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:155
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:155
+msgid "Order"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:159
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:159
+msgid "Ascending"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:160
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:160
+msgid "Descending"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:171
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:171
+msgid "Filters"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:179
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:179
+msgid "Show Filters"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:191
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:191
+msgid "Filter by Age"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:204
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:204
+msgid "Filter by Activity Type"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:225
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:225
+msgid "Card Style"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:233
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:372
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:404
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:233
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:372
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:404
+msgid "Background Color"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:246
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:430
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:246
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:430
+msgid "Border"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:254
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:438
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:254
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:438
+msgid "Border Radius"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:267
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:267
+msgid "Box Shadow"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:275
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:450
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:275
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:450
+msgid "Padding"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:290
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:420
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:290
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:420
+msgid "Typography"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:299
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:299
+msgid "Title Typography"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:307
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:307
+msgid "Title Color"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:320
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:320
+msgid "Content Typography"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:328
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:328
+msgid "Content Color"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:343
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:343
+msgid "Button Style"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:353
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:353
+msgid "Normal"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:360
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:393
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:360
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:393
+msgid "Text Color"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:386
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:386
+msgid "Hover"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:515
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:515
+msgid "Age Group:"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:528
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:528
+msgid "Activity:"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:540
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:540
+msgid "Reset Filters"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:554
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-elementor-manager.php:127
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:554
+msgid "Loading..."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:564
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-elementor-manager.php:129
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:564
+msgid "No data found."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:616
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:616
+msgid "Camp"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:618
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:618
+msgid "Course"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:620
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:620
+msgid "Birthday Party"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-elementor-manager.php:128
+msgid "An error occurred. Please try again."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:51
+msgid "Camp Terms"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:60
+msgid ""
+"Please install the wp-background-processing library for asynchronous "
+"attribute creation in Player Management."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:69
+msgid "You do not have permission to perform this action."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:267
+msgid "Attribute creation queued. Check status in Site Health > Info."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:291
+msgid "Attributes created synchronously."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:298
+msgid "Please confirm user cleanup by checking the confirmation box."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:302
+#, php-format
+msgid ""
+"User cleanup completed: %d users deleted, %d users preserved (had activity)."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:318
+#, php-format
+msgid "Preview: %d users would be affected by cleanup."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:335
+msgid "Camp terms imported successfully."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:337
+msgid "No CSV file uploaded."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:383
+msgid "Users and players imported successfully."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:385
+msgid "No CSV file uploaded for import."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:419
+msgid "Please confirm player flagging."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:438
+#, php-format
+msgid "Flagged %d players as ineligible."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:444
+msgid "Advanced Settings"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:454
+msgid "🗄️ Database Cleanup"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:455
+msgid ""
+"Remove user accounts that have no players and no activity (orders, posts, "
+"etc.)."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:459
+msgid "Age Threshold"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:462
+msgid "Only delete accounts older than this many days."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:466
+msgid "Safety Check"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:470
+msgid ""
+"I understand this will permanently delete user accounts with no players and "
+"no activity."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:478
+msgid "Preview Cleanup"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:480
+msgid "Run Cleanup"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:489
+msgid "Preview of Users to be Cleaned Up"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:510
+#, php-format
+msgid "... and %d more users."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:520
+msgid "Last Cleanup Results"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:522
+msgid "Date:"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:523
+msgid "Deleted:"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:524
+msgid "Preserved:"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:532
+msgid "⚙️ Auto-Create Attributes"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:533
+msgid "Create WooCommerce product attributes for InterSoccer events."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:534
+msgid "Create Attributes"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:539
+msgid "📁 Import/Export"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:541
+msgid "Import Camp Terms from CSV"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:543
+msgid "Import Terms"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:545
+msgid "Import Users and Players from CSV"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:547
+msgid "Import Users & Players"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:549
+msgid "Export Users and Players"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:550
+msgid "Export to CSV"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:555
+msgid "👥 Player Management"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:557
+msgid "Flag Older Players"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:558
+#, php-format
+msgid "Flag players born before %s as ineligible."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:559
+msgid "Confirm Flagging"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:560
+msgid "Flag Players"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:565
+msgid "🔧 Advanced Configuration"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:566
+msgid "Custom JSON Attributes"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:568
+msgid "Save JSON"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:573
+msgid "📊 System Information"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:595
+msgid "Total Users:"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:599
+msgid "Users with Players:"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:603
+msgid "Users without Players:"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:607
+msgid "Total Orders:"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:611
+msgid "PHP Memory Limit:"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:615
+msgid "Current Memory Usage:"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:619
+msgid "WordPress Version:"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:623
+msgid "WooCommerce Version:"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:631
+msgid "❓ Help & Documentation"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:633
+msgid "Database Cleanup Guidelines:"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:635
+msgid "Always run a preview before performing cleanup"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:636
+msgid "Users with orders, posts, or comments will be preserved"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:637
+msgid "Users with billing information will be preserved"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:638
+msgid "Recommended to backup database before major cleanups"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:641
+msgid "Performance Tips:"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:643
+msgid "Regular cleanup helps maintain database performance"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:644
+msgid "Use 30-90 day age thresholds for safety"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:645
+msgid "Monitor memory usage during large operations"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:666
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:674
+msgid "Please check the confirmation box first."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:684
+msgid "Warning: Very short age thresholds may delete recent accounts."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/vendor/deliciousbrains/wp-background-processing/classes/wp-background-process.php:777
+msgid "Every Minute"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/vendor/deliciousbrains/wp-background-processing/classes/wp-background-process.php:779
+#, php-format
+msgid "Every %d Minutes"
+msgstr ""
+
+#: includes/player-management.php:389
+#: includes/player-management.php:541
+msgid "Save"
+msgstr "Enregistrer"
+
+#: includes/player-management.php:377
+msgid "No AVS? Enter foreign insurance number or \"0000\" and email us the insurance details."
+msgstr "Pas d'AVS ? Entrez le numéro d'assurance étranger ou \"0000\" et envoyez-nous les détails de l'assurance par e-mail."
+
+#: includes/player-management.php
+msgid "Add Player"
+msgstr "Ajouter un participant"
+
+#: includes/player-management.php
+msgid "Add Attendee"
+msgstr "Ajouter un participant"
+
+#: includes/player-management.php
+msgid "No players registered."
+msgstr "Aucun participant enregistré."
+
+#: includes/player-management.php
+msgid "No players found."
+msgstr "Aucun participant trouvé."
+
+#: includes/player-management.php
+
+#: includes/player-management.php:382
+msgid "Medical Conditions:"
+msgstr "Conditions médicales :"
+
+#: includes/player-management.php
+msgid "Player Assignment:"
+msgstr "Attribution du participant :"
+
+#: includes/player-management.php
+msgid "Guest order - no registered players available."
+msgstr "Commande invité - aucun participant enregistré disponible."
+
+#: includes/player-management.php
+msgid "Customer has no registered players."
+msgstr "Le client n'a aucun participant enregistré."
+
+#: includes/player-management.php
+msgid "Assigned Player:"
+msgstr "Participant assigné :"
+
+#: includes/player-management.php
+msgid "-- Select Player --"
+msgstr "-- Sélectionner un participant --"
+
+#: includes/player-management.php
+msgid "Current:"
+msgstr "Actuel :"

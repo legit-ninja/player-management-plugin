@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wpml-config>
+  <!--
+    Player Management does not register CPTs/taxonomies.
+    Endpoint slugs + UI strings are handled via WPML String Translation and gettext in code.
+  -->
+</wpml-config>
+

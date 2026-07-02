@@ -94,4 +94,25 @@ class AdminTest extends InterSoccer_Test_Case
 
         $this->assertNotEmpty($GLOBALS['wp_stub_actions']['admin_post_intersoccer_players_export'] ?? []);
     }
+
+    // Regression: AUDIT-005 — ajax_load_more_players missing nonce verification
+    public function test_load_more_players_rejects_missing_nonce()
+    {
+        require_once PLAYER_MANAGEMENT_PATH . 'includes/class-player-utils.php';
+        require_once PLAYER_MANAGEMENT_PATH . 'includes/class-player-list.php';
+
+        $GLOBALS['wp_stub_ajax_nonce_valid'] = false;
+        $GLOBALS['wp_stub_user_can'] = true;
+        $_POST = ['page' => 1];
+
+        $utils = new Player_Utils();
+        $list = new Player_Management_List($utils);
+
+        try {
+            $list->ajax_load_more_players();
+            $this->fail('Request without valid nonce should return 403');
+        } catch (WPSendJsonExit $e) {
+            $this->assertSame('error', $e->getMessage(), 'Missing nonce should reject with JSON error');
+        }
+    }
 }
