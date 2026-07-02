@@ -84,6 +84,12 @@ foreach ($core_files as $file) {
     }
 }
 
+// Bootstrap Elementor widgets when Elementor loads
+add_action('elementor/loaded', function () {
+    require_once PLAYER_MANAGEMENT_PATH . 'includes/class-elementor-bootstrap.php';
+    InterSoccer_Player_Elementor_Bootstrap::init();
+});
+
 // Include admin files only in admin context
 if (is_admin()) {
     $admin_files = [
@@ -429,38 +435,6 @@ function intersoccer_create_plugin_tables() {
     
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     dbDelta($sql);
-}
-
-/**
- * Helper function to get player event count (fallback if file missing)
- */
-if (!function_exists('intersoccer_get_player_event_count')) {
-    function intersoccer_get_player_event_count($user_id, $player_index) {
-        // Simple fallback - count from orders
-        $orders = wc_get_orders([
-            'customer_id' => $user_id,
-            'status' => ['wc-completed', 'wc-processing'],
-            'limit' => -1
-        ]);
-        
-        $count = 0;
-        $players = get_user_meta($user_id, 'intersoccer_players', true) ?: [];
-        
-        if (!isset($players[$player_index])) {
-            return 0;
-        }
-        
-        $player_name = ($players[$player_index]['first_name'] ?? '') . ' ' . ($players[$player_index]['last_name'] ?? '');
-        
-        foreach ($orders as $order) {
-            $order_players = $order->get_meta('intersoccer_players', true);
-            if ($order_players && in_array($player_name, (array)$order_players)) {
-                $count++;
-            }
-        }
-        
-        return $count;
-    }
 }
 
 // Enqueue scripts and styles
