@@ -50,10 +50,8 @@ function intersoccer_add_player() {
     }
 
     // Server-side age validation (3-13 years)
-    $dob_time = strtotime($dob);
-    $current_time = current_time('timestamp');
-    $age = date('Y', $current_time) - date('Y', $dob_time) - ((date('m', $current_time) < date('m', $dob_time)) || (date('m', $current_time) == date('m', $dob_time) && date('d', $current_time) < date('d', $dob_time)) ? 1 : 0);
-    if ($age < 3 || $age > 13) {
+    $age = intersoccer_calculate_player_age($dob);
+    if ($age < 0 || !intersoccer_is_valid_player_age($age)) {
         wp_send_json_error(['message' => __('Player must be between 3 and 13 years old.', 'player-management')], 400);
     }
 
@@ -88,7 +86,7 @@ function intersoccer_add_player() {
 
     if ($updated) {
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('InterSoccer: Player added for user ' . $user_id . ' (dob: ' . $new_player['dob'] . ')');
+            error_log('InterSoccer: Player added for user ' . $user_id . ', total players: ' . count($players));
         }
         wp_send_json_success([
             'message' => __('Player added successfully', 'player-management'),
@@ -146,10 +144,8 @@ function intersoccer_edit_player() {
     }
 
     // Server-side age validation (3-13 years)
-    $dob_time = strtotime($dob);
-    $current_time = current_time('timestamp');
-    $age = date('Y', $current_time) - date('Y', $dob_time) - ((date('m', $current_time) < date('m', $dob_time)) || (date('m', $current_time) == date('m', $dob_time) && date('d', $current_time) < date('d', $dob_time)) ? 1 : 0);
-    if ($age < 3 || $age > 13) {
+    $age = intersoccer_calculate_player_age($dob);
+    if ($age < 0 || !intersoccer_is_valid_player_age($age)) {
         wp_send_json_error(['message' => __('Player must be between 3 and 13 years old.', 'player-management')], 400);
     }
 
