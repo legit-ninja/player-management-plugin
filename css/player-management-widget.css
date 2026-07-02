@@ -1,0 +1,171 @@
+/**
+ * InterSoccer Player Management Widget Styles
+ */
+
+.intersoccer-player-link {
+    display: inline-block;
+}
+
+.intersoccer-player-link__anchor {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.intersoccer-player-link__anchor:hover {
+    opacity: 0.8;
+    transform: translateY(-1px);
+}
+
+.intersoccer-player-link__anchor:focus {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+
+.intersoccer-player-link__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.intersoccer-player-link__icon svg,
+.intersoccer-player-link__icon i {
+    width: 1em;
+    height: 1em;
+    display: block;
+}
+
+/* Ensure SVG icons inherit color properly */
+.intersoccer-player-link__icon svg {
+    fill: currentColor;
+    width: 1em;
+    height: 1em;
+}
+
+.intersoccer-player-link__icon svg path {
+    fill: currentColor;
+}
+
+/* Allow Elementor controls to override with !important if needed */
+.elementor-widget-intersoccer_player_management_link .intersoccer-player-link__icon svg {
+    fill: currentColor !important;
+}
+
+.elementor-widget-intersoccer_player_management_link .intersoccer-player-link__icon svg path {
+    fill: currentColor !important;
+}
+
+.intersoccer-player-link__text {
+    display: inline-block;
+    white-space: nowrap;
+}
+
+/* Display type: icon only */
+.intersoccer-player-link[data-display-type="icon_only"] .intersoccer-player-link__text {
+    display: none;
+}
+
+/* Display type: text only */
+.intersoccer-player-link[data-display-type="text_only"] .intersoccer-player-link__icon {
+    display: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .intersoccer-player-link__text {
+        font-size: 0.9em;
+    }
+    
+    .intersoccer-player-link__icon {
+        font-size: 0.9em;
+    }
+}
+
+/* Shepherd.js tour customizations */
+.intersoccer-shepherd-tour .shepherd-content {
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.intersoccer-shepherd-tour .shepherd-header {
+    background: #1e3a8a;
+    color: #fff;
+    border-radius: 8px 8px 0 0;
+    padding: 16px 20px;
+}
+
+.intersoccer-shepherd-tour .shepherd-title {
+    color: #fff;
+    font-weight: 600;
+    margin: 0;
+}
+
+.intersoccer-shepherd-tour .shepherd-text {
+    padding: 20px;
+    color: #333;
+    line-height: 1.6;
+}
+
+.intersoccer-shepherd-tour .shepherd-footer {
+    padding: 12px 20px;
+    border-top: 1px solid #e5e7eb;
+    border-radius: 0 0 8px 8px;
+}
+
+.intersoccer-shepherd-tour .shepherd-button {
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.intersoccer-shepherd-tour .shepherd-button:not(.shepherd-button-secondary) {
+    background: #1e3a8a;
+    color: #fff;
+}
+
+.intersoccer-shepherd-tour .shepherd-button:not(.shepherd-button-secondary):hover {
+    background: #1e40af;
+}
+
+.intersoccer-shepherd-tour .shepherd-button-secondary {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.intersoccer-shepherd-tour .shepherd-button-secondary:hover {
+    background: #e5e7eb;
+}
+
+.intersoccer-shepherd-highlight {
+    box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.2) !important;
+    border-radius: 4px;
+    transition: box-shadow 0.3s ease;
+}
+
+/* Ensure tour doesn't break on mobile */
+@media (max-width: 640px) {
+    .intersoccer-shepherd-tour .shepherd-element {
+        max-width: 90vw;
+    }
+    
+    .intersoccer-shepherd-tour .shepherd-text {
+        font-size: 14px;
+        padding: 16px;
+    }
+    
+    .intersoccer-shepherd-tour .shepherd-footer {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .intersoccer-shepherd-tour .shepherd-button {
+        width: 100%;
+    }
+}
+
+
