@@ -27,8 +27,8 @@ function intersoccer_add_user_profile_players($user) {
     }
 
     $is_admin = current_user_can('edit_users');
-    wp_enqueue_script('flatpickr', 'https://cdn.jsdelivr.net/npm/flatpickr', [], '4.6.13', true);
-    wp_enqueue_style('flatpickr', 'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css', [], '4.6.13');
+    wp_enqueue_script('flatpickr', PLAYER_MANAGEMENT_URL . 'assets/vendor/flatpickr/flatpickr.min.js', [], PLAYER_MANAGEMENT_VERSION, true);
+    wp_enqueue_style('flatpickr', PLAYER_MANAGEMENT_URL . 'assets/vendor/flatpickr/flatpickr.min.css', [], PLAYER_MANAGEMENT_VERSION);
 
     // Load appropriate scripts based on context
     if ($is_admin) {
