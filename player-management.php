@@ -566,8 +566,8 @@ add_action('admin_enqueue_scripts', function($hook) {
     // User profile pages are handled by user-profile-players.php
     if (strpos($hook, 'intersoccer-players') !== false) {
         // Enqueue for dashboard
-        wp_enqueue_script('flatpickr', 'https://cdn.jsdelivr.net/npm/flatpickr', [], '4.6.13', true);
-        wp_enqueue_style('flatpickr', 'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css', [], '4.6.13');
+        wp_enqueue_script('flatpickr', PLAYER_MANAGEMENT_URL . 'assets/vendor/flatpickr/flatpickr.min.js', [], PLAYER_MANAGEMENT_VERSION, true);
+        wp_enqueue_style('flatpickr', PLAYER_MANAGEMENT_URL . 'assets/vendor/flatpickr/flatpickr.min.css', [], PLAYER_MANAGEMENT_VERSION);
         
         if (file_exists(PLAYER_MANAGEMENT_PATH . 'js/admin.js')) {
             wp_enqueue_script('intersoccer-admin-js', PLAYER_MANAGEMENT_URL . 'js/admin.js', ['jquery', 'flatpickr'], PLAYER_MANAGEMENT_VERSION, true);

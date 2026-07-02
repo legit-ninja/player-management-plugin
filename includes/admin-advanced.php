@@ -208,6 +208,10 @@ function intersoccer_cleanup_empty_users() {
  * Preview function to show what would be deleted without actually deleting
  */
 function intersoccer_preview_cleanup() {
+    if (!current_user_can('manage_options')) {
+        return [];
+    }
+
     $cutoff_days = isset($_POST['preview_days']) ? (int)$_POST['preview_days'] : 30;
     $cutoff_date = date('Y-m-d H:i:s', strtotime("-{$cutoff_days} days"));
     
@@ -247,9 +251,9 @@ function player_management_render_advanced_tab() {
         wp_die(__('You do not have permission to access this page.', 'player-management'));
     }
 
-    wp_enqueue_script('codemirror', 'https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.js', [], '5.65.7', true);
-    wp_enqueue_script('codemirror-json', 'https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/mode/javascript/javascript.min.js', [], '5.65.7', true);
-    wp_enqueue_style('codemirror', 'https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.7/codemirror.min.css', [], '5.65.7');
+    wp_enqueue_script('codemirror', PLAYER_MANAGEMENT_URL . 'assets/vendor/codemirror/codemirror.min.js', [], PLAYER_MANAGEMENT_VERSION, true);
+    wp_enqueue_script('codemirror-json', PLAYER_MANAGEMENT_URL . 'assets/vendor/codemirror/mode/javascript/javascript.min.js', ['codemirror'], PLAYER_MANAGEMENT_VERSION, true);
+    wp_enqueue_style('codemirror', PLAYER_MANAGEMENT_URL . 'assets/vendor/codemirror/codemirror.min.css', [], PLAYER_MANAGEMENT_VERSION);
 
     $message = '';
     $current_year = date('Y');
