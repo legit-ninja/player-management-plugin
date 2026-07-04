@@ -126,7 +126,13 @@ if (!function_exists('intersoccer_get_player_event_count')) {
         foreach ($orders as $order) {
             foreach ($order->get_items() as $item_id => $item) {
                 $attendee = trim($item->get_meta('Assigned Attendee') ?? '');
-                $player_index_meta = $item->get_meta('intersoccer_player_index');
+                $player_index_meta = $item->get_meta('assigned_player', true);
+                if ($player_index_meta === '' || $player_index_meta === null) {
+                    $player_index_meta = $item->get_meta('intersoccer_player_index');
+                }
+                if ($player_index_meta === '' || $player_index_meta === null) {
+                    $player_index_meta = $item->get_meta('Player Index');
+                }
                 
                 $name_match = ($attendee === $full_name);
                 $index_match = ($player_index_meta == $player_index);
