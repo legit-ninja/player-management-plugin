@@ -67,9 +67,10 @@ if (!is_plugin_active('woocommerce/woocommerce.php')) {
 
 // Include core files (check if they exist first)
 $core_files = [
+    'includes/player-data.php',
     'includes/player-management.php',
-    'includes/ajax-handlers.php', 
-    'includes/data-deletion.php'
+    'includes/ajax-handlers.php',
+    'includes/data-deletion.php',
 ];
 
 foreach ($core_files as $file) {
