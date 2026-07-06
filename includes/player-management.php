@@ -243,12 +243,7 @@ function intersoccer_render_players_form($is_admin = false, $settings = []) {
             }
         }
     } else {
-        $cache_key = 'intersoccer_players_' . $user_id;
-        $players = wp_cache_get($cache_key, 'intersoccer');
-        if (false === $players) {
-            $players = get_user_meta($user_id, 'intersoccer_players', true) ?: [];
-            wp_cache_set($cache_key, $players, 'intersoccer', 3600);
-        }
+        $players = intersoccer_get_user_players($user_id);
 
         // Deduplicate and compute event_count
         $unique_players = [];

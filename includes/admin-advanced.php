@@ -335,6 +335,32 @@ function player_management_render_advanced_tab() {
         $message .= sprintf(__('Preview: %d users would be affected by cleanup.', 'player-management'), count($preview_users)) . '<br>';
     }
 
+    if (isset($_POST['backfill_player_ids']) && wp_verify_nonce($_POST['advanced_nonce'], 'player_management_advanced_actions')) {
+        if (!function_exists('intersoccer_backfill_all_player_ids')) {
+            $message .= __('Player ID backfill is unavailable. Update Player Management plugin.', 'player-management') . '<br>';
+        } else {
+            $batch_size = isset($_POST['backfill_batch_size']) ? max(10, min(500, (int) $_POST['backfill_batch_size'])) : 100;
+            $offset = isset($_POST['backfill_offset']) ? max(0, (int) $_POST['backfill_offset']) : 0;
+            $summary = intersoccer_backfill_all_player_ids($batch_size, $offset);
+            update_option('intersoccer_last_player_id_backfill', [
+                'timestamp' => current_time('mysql'),
+                'summary' => $summary,
+            ]);
+            $message .= sprintf(
+                __('Player ID backfill batch complete: %1$d users processed, %2$d users updated, %3$d players assigned UUIDs.', 'player-management'),
+                $summary['users_processed'],
+                $summary['users_updated'],
+                $summary['players_updated']
+            ) . '<br>';
+            if (!empty($summary['has_more'])) {
+                $message .= sprintf(
+                    __('More users remain — run again with offset %d or submit another batch.', 'player-management'),
+                    (int) $summary['next_offset']
+                ) . '<br>';
+            }
+        }
+    }
+
     if (isset($_POST['import_camp_terms']) && wp_verify_nonce($_POST['advanced_nonce'], 'player_management_advanced_actions')) {
         if (!empty($_FILES['csv_file']['tmp_name'])) {
             $csv_ext  = strtolower(pathinfo($_FILES['csv_file']['name'], PATHINFO_EXTENSION));
@@ -562,6 +588,34 @@ function player_management_render_advanced_tab() {
                 echo '</div>';
             }
             ?>
+
+            <hr style="margin: 30px 0;">
+
+            <!-- Player UUID backfill -->
+            <h2><?php _e('🆔 Backfill Player IDs', 'player-management'); ?></h2>
+            <p><?php _e('Assign stable UUID player_id values to existing player rows missing them. Run before order meta backfill in Product Variations.', 'player-management'); ?></p>
+            <?php
+            $last_backfill = get_option('intersoccer_last_player_id_backfill');
+            if (is_array($last_backfill) && !empty($last_backfill['summary'])) {
+                $s = $last_backfill['summary'];
+                echo '<div style="background:#f9f9f9;padding:10px;border-radius:4px;margin:10px 0;">';
+                echo '<p><strong>' . esc_html__('Last run:', 'player-management') . '</strong> ' . esc_html($last_backfill['timestamp'] ?? '') . '</p>';
+                echo '<p>' . esc_html(sprintf(
+                    __('Processed %1$d users, updated %2$d users, %3$d players.', 'player-management'),
+                    (int) ($s['users_processed'] ?? 0),
+                    (int) ($s['users_updated'] ?? 0),
+                    (int) ($s['players_updated'] ?? 0)
+                )) . '</p>';
+                echo '</div>';
+            }
+            ?>
+            <p>
+                <label for="backfill_batch_size"><?php _e('Batch size', 'player-management'); ?></label>
+                <input type="number" name="backfill_batch_size" id="backfill_batch_size" value="100" min="10" max="500" style="width:80px;">
+                <label for="backfill_offset" style="margin-left:12px;"><?php _e('Offset', 'player-management'); ?></label>
+                <input type="number" name="backfill_offset" id="backfill_offset" value="0" min="0" style="width:80px;">
+            </p>
+            <p><input type="submit" name="backfill_player_ids" class="button button-primary" value="<?php esc_attr_e('Backfill Player IDs', 'player-management'); ?>"></p>
 
             <hr style="margin: 30px 0;">
 

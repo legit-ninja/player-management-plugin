@@ -61,9 +61,6 @@ class InterSoccer_Player_Admin {
         add_filter('manage_users_columns', array($this, 'add_user_columns'));
         add_filter('manage_users_custom_column', array($this, 'show_user_column_content'), 10, 3);
 
-        // Add WooCommerce order integration
-        add_action('woocommerce_order_status_completed', array($this, 'process_completed_order'));
-        add_action('woocommerce_order_status_processing', array($this, 'process_completed_order'));
     }
 
     /**

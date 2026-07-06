@@ -16,12 +16,10 @@ if (!defined('ABSPATH')) exit;
 function intersoccer_add_user_profile_players($user) {
     if (!current_user_can('edit_user', $user->ID)) return;
 
-    $players = get_user_meta($user->ID, 'intersoccer_players', true);
+    $players = intersoccer_get_user_players($user->ID);
     if (!is_array($players)) {
         $players = $players ? (array) maybe_unserialize($players) : [];
     }
-    // Ensure sequential indices for rendering
-    $players = array_values($players);
     if (defined('WP_DEBUG') && WP_DEBUG) {
         error_log('InterSoccer: Rendering user profile players for user ' . $user->ID . ', player count: ' . count($players));
     }

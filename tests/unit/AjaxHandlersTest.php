@@ -4,6 +4,7 @@
  */
 
 require_once __DIR__ . '/../helpers/TestCase.php';
+require_once __DIR__ . '/../../includes/player-data.php';
 require_once __DIR__ . '/../../includes/player-management.php';
 require_once __DIR__ . '/../../includes/ajax-handlers.php';
 
