@@ -382,9 +382,9 @@ jQuery(document).ready(function($) {
       const $medicalRow = $(`
         <tr class="medical-row active" data-player-index="${index}">
           <td colspan="11">
-            <label for="player_medical_${index}">Medical Conditions:</label>
+            <label for="player_medical_${index}">Medical Conditions, Dietary Restrictions, and Allergies:</label>
             <textarea id="player_medical_${index}" name="player_medical" maxlength="500" aria-describedby="medical-instructions-${index}">${decodeURIComponent(medical)}</textarea>
-            <span id="medical-instructions-${index}" class="screen-reader-text">Optional field for medical conditions.</span>
+            <span id="medical-instructions-${index}" class="screen-reader-text">Optional field for medical conditions, dietary restrictions, and allergies.</span>
             <span class="error-message" style="display: none;"></span>
           </td>
         </tr>

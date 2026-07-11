@@ -163,7 +163,7 @@ class Player_Management_Admin {
             'Gender',
             'AVS Number',
             'Age',
-            'Medical Conditions',
+            __('Medical Conditions, Dietary Restrictions, and Allergies', 'player-management'),
             'Creation Date',
         ]);
 

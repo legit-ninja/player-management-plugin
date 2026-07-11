@@ -4,7 +4,7 @@
 The InterSoccer Player Management plugin provides comprehensive player registration and management capabilities for InterSoccer Switzerland's sports programs. It enables parents to manage their children's profiles through the WooCommerce My Account interface and provides administrators with powerful tools for player oversight, analytics, and event tracking. The plugin integrates seamlessly with WooCommerce orders and supports advanced features like medical information tracking, event history, and Elementor widget integration.
 
 ## Version
-- **Current Version:** 2.7.2.1
+- **Current Version:** 2.7.9
 - **Release Date:** July 2, 2026
 
 ## Core Features

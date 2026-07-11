@@ -98,7 +98,7 @@ function intersoccer_add_user_profile_players($user) {
                     <th><?php esc_html_e('DOB', 'player-management'); ?></th>
                     <th><?php esc_html_e('Gender', 'player-management'); ?></th>
                     <th><?php esc_html_e('AVS Number', 'player-management'); ?></th>
-                    <th><?php esc_html_e('Medical Conditions', 'player-management'); ?></th>
+                    <th><?php esc_html_e('Medical Conditions, Dietary Restrictions, and Allergies', 'player-management'); ?></th>
                     <th><?php esc_html_e('Events', 'player-management'); ?></th>
                     <th><?php esc_html_e('Actions', 'player-management'); ?></th>
                 </tr>
@@ -127,7 +127,7 @@ function intersoccer_add_user_profile_players($user) {
                             <td class="display-dob" data-label="DOB"><?php echo esc_html($player['dob'] ?? 'N/A'); ?></td>
                             <td class="display-gender" data-label="Gender"><?php echo esc_html(intersoccer_translate_gender($player['gender'] ?? 'N/A')); ?></td>
                             <td class="display-avs-number" data-label="AVS Number"><?php echo esc_html($player['avs_number'] ?? 'N/A'); ?></td>
-                            <td class="display-medical-conditions" data-label="Medical Conditions"><?php echo esc_html(substr($player['medical_conditions'] ?? '', 0, 20) . (strlen($player['medical_conditions'] ?? '') > 20 ? '...' : '')); ?></td>
+                            <td class="display-medical-conditions" data-label="<?php esc_attr_e('Medical Conditions, Dietary Restrictions, and Allergies', 'player-management'); ?>"><?php echo esc_html(substr($player['medical_conditions'] ?? '', 0, 20) . (strlen($player['medical_conditions'] ?? '') > 20 ? '...' : '')); ?></td>
                             <td class="display-event-count" data-label="Events">
                                 <?php
                                 $event_count = intersoccer_get_player_event_count($user->ID, $index);
@@ -183,7 +183,7 @@ function intersoccer_add_user_profile_players($user) {
             </div>
             <?php if ($is_admin): ?>
             <div class="form-row add-player-medical">
-                <label for="player_medical"><?php esc_html_e('Medical Conditions', 'player-management'); ?></label>
+                <label for="player_medical"><?php esc_html_e('Medical Conditions, Dietary Restrictions, and Allergies', 'player-management'); ?></label>
                 <textarea id="player_medical" name="player_medical" maxlength="500"></textarea>
                 <span class="error-message" style="display: none;"></span>
             </div>
