@@ -632,7 +632,7 @@
         // Validate medical conditions
         if (medical && medical.length > 500) {
             $section.find('[name="player_medical"]').next(".error-message")
-                .text("Medical conditions must be under 500 chars.")
+                .text("Medical, dietary, and allergy information must be under 500 chars.")
                 .show();
             isValid = false;
         }

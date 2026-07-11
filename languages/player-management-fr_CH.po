@@ -324,8 +324,14 @@ msgstr ""
 #: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:114
 #: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:525
 #: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:230
-msgid "Medical Conditions"
-msgstr "Conditions médicales"
+msgid "Medical Conditions, Dietary Restrictions, and Allergies"
+msgstr "Conditions médicales, restrictions alimentaires et allergies"
+
+msgid "Medical Conditions, Dietary Restrictions, and Allergies:"
+msgstr "Conditions médicales, restrictions alimentaires et allergies :"
+
+msgid "Optional field for medical conditions, dietary restrictions, and allergies."
+msgstr "Champ facultatif pour les conditions médicales, restrictions alimentaires et allergies."
 
 #: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:115
 #: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:533

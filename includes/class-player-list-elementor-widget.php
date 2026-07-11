@@ -111,7 +111,7 @@ class InterSoccer_Player_Elementor_Player_List extends InterSoccer_Player_Elemen
                     'gender' => __('Gender', INTERSOCCER_PLAYER_TEXT_DOMAIN),
                     'dob' => __('Date of Birth', INTERSOCCER_PLAYER_TEXT_DOMAIN),
                     'events' => __('Event Count', INTERSOCCER_PLAYER_TEXT_DOMAIN),
-                    'medical' => __('Medical Conditions', INTERSOCCER_PLAYER_TEXT_DOMAIN),
+                    'medical' => __('Medical Conditions, Dietary Restrictions, and Allergies', INTERSOCCER_PLAYER_TEXT_DOMAIN),
                     'emergency' => __('Emergency Contact', INTERSOCCER_PLAYER_TEXT_DOMAIN),
                 ),
             )

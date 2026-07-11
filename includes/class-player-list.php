@@ -232,7 +232,7 @@ class Player_Management_List {
                             <th><?php _e('Gender', 'player-management'); ?></th>
                             <th><?php _e('AVS Number', 'player-management'); ?></th>
                             <th><?php _e('Age', 'player-management'); ?></th>
-                            <th><?php _e('Medical Conditions', 'player-management'); ?></th>
+                            <th><?php _e('Medical Conditions, Dietary Restrictions, and Allergies', 'player-management'); ?></th>
                             <th><?php _e('Creation Date', 'player-management'); ?></th>
                         </tr>
                     </thead>
@@ -265,7 +265,7 @@ class Player_Management_List {
                                     <td class="display-gender" data-label="Gender"><?php echo esc_html(intersoccer_translate_gender($player['gender'] ?? '')); ?></td>
                                     <td class="display-avs-number" data-label="AVS Number"><?php echo esc_html($player['avs_number'] ?? ''); ?></td>
                                     <td class="display-age" data-label="Age"><?php echo esc_html($player['age'] ?? 'N/A'); ?></td>
-                                    <td class="display-medical-conditions" data-label="Medical Conditions">
+                                    <td class="display-medical-conditions" data-label="<?php esc_attr_e('Medical Conditions, Dietary Restrictions, and Allergies', 'player-management'); ?>">
                                         <?php 
                                         $medical = $player['medical_conditions'] ?? '';
                                         echo esc_html(strlen($medical) > 20 ? substr($medical, 0, 20) . '...' : $medical); 

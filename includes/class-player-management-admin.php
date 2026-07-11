@@ -519,12 +519,8 @@ class InterSoccer_Player_Admin {
                             <input type="text" id="player-avs" name="avs_number" placeholder="756.XXXX.XXXX.XX">
                         </div>
                         <div class="intersoccer-form-field intersoccer-form-field-full">
-                            <label for="player-medical"><?php _e('Medical Conditions', INTERSOCCER_PLAYER_TEXT_DOMAIN); ?></label>
+                            <label for="player-medical"><?php _e('Medical Conditions, Dietary Restrictions, and Allergies', INTERSOCCER_PLAYER_TEXT_DOMAIN); ?></label>
                             <textarea id="player-medical" name="medical_conditions" rows="3"></textarea>
-                        </div>
-                        <div class="intersoccer-form-field intersoccer-form-field-full">
-                            <label for="player-dietary"><?php _e('Dietary Requirements', INTERSOCCER_PLAYER_TEXT_DOMAIN); ?></label>
-                            <textarea id="player-dietary" name="dietary_requirements" rows="2"></textarea>
                         </div>
                         <div class="intersoccer-form-field">
                             <label for="player-emergency-contact"><?php _e('Emergency Contact', INTERSOCCER_PLAYER_TEXT_DOMAIN); ?></label>

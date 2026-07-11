@@ -316,7 +316,7 @@ function intersoccer_render_players_form($is_admin = false, $settings = []) {
                                 <th scope="col"><?php echo esc_html($events_heading); ?></th>
                             <?php endif; ?>
                             <?php if ($is_admin) : ?>
-                                <th scope="col"><?php esc_html_e('Medical Conditions', 'player-management'); ?></th>
+                                <th scope="col"><?php esc_html_e('Medical Conditions, Dietary Restrictions, and Allergies', 'player-management'); ?></th>
                                 <th scope="col"><?php esc_html_e('Creation Date', 'player-management'); ?></th>
                                 <th scope="col"><?php esc_html_e('Past Events', 'player-management'); ?></th>
                             <?php endif; ?>
@@ -369,7 +369,7 @@ function intersoccer_render_players_form($is_admin = false, $settings = []) {
                                         <td class="display-event-count" data-label="<?php echo esc_attr($events_heading); ?>"><?php echo esc_html($player['event_count'] ?? 0); ?></td>
                                     <?php endif; ?>
                                     <?php if ($is_admin) : ?>
-                                        <td class="display-medical-conditions" data-label="<?php esc_attr_e('Medical Conditions', 'player-management'); ?>"><?php echo esc_html($player['medical_conditions_display'] ?? ''); ?></td>
+                                        <td class="display-medical-conditions" data-label="<?php esc_attr_e('Medical Conditions, Dietary Restrictions, and Allergies', 'player-management'); ?>"><?php echo esc_html($player['medical_conditions_display'] ?? ''); ?></td>
                                         <td class="display-creation-date" data-label="<?php esc_attr_e('Creation Date', 'player-management'); ?>"><?php echo esc_html($player['creation_date'] ?? 'N/A'); ?></td>
                                         <td class="display-past-events" data-label="<?php esc_attr_e('Past Events', 'player-management'); ?>">
                                             <?php if (!empty($player['past_events'])) : ?>
@@ -440,9 +440,9 @@ function intersoccer_render_players_form($is_admin = false, $settings = []) {
                         </div>
                     <?php endif; ?>
                     <div class="form-row">
-                        <label for="player_medical"><?php esc_html_e('Medical Conditions:', 'player-management'); ?></label>
+                        <label for="player_medical"><?php esc_html_e('Medical Conditions, Dietary Restrictions, and Allergies:', 'player-management'); ?></label>
                         <textarea id="player_medical" name="player_medical" maxlength="500" aria-describedby="medical-instructions"></textarea>
-                        <span id="medical-instructions" class="screen-reader-text"><?php esc_html_e('Optional field for medical conditions.', 'player-management'); ?></span>
+                        <span id="medical-instructions" class="screen-reader-text"><?php esc_html_e('Optional field for medical conditions, dietary restrictions, and allergies.', 'player-management'); ?></span>
                         <span class="error-message" style="display: none;"></span>
                     </div>
                     <div class="form-actions">
@@ -503,7 +503,7 @@ function intersoccer_render_user_profile_players($user) {
         $localize_data
     );
 
-    $colspan = 7; // For user profile table: First Name, Last Name, DOB, Gender, AVS Number, Medical Conditions, Actions
+    $colspan = 7; // For user profile table: First Name, Last Name, DOB, Gender, AVS Number, Medical Conditions, Dietary Restrictions, and Allergies, Actions
 ?>
     <div class="profile-players intersoccer-player-management">
         <h2><?php esc_html_e('InterSoccer Players', 'player-management'); ?></h2>
@@ -517,7 +517,7 @@ function intersoccer_render_user_profile_players($user) {
                     <th><?php esc_html_e('DOB', 'player-management'); ?></th>
                     <th><?php esc_html_e('Gender', 'player-management'); ?></th>
                     <th><?php esc_html_e('AVS Number', 'player-management'); ?></th>
-                    <th><?php esc_html_e('Medical Conditions', 'player-management'); ?></th>
+                    <th><?php esc_html_e('Medical Conditions, Dietary Restrictions, and Allergies', 'player-management'); ?></th>
                     <th><?php esc_html_e('Actions', 'player-management'); ?></th>
                 </tr>
             </thead>
@@ -594,7 +594,7 @@ function intersoccer_render_user_profile_players($user) {
                 <span class="error-message" style="display: none;"></span>
             </div>
             <div class="form-row">
-                <label for="player_medical"><?php esc_html_e('Medical Conditions', 'player-management'); ?></label>
+                <label for="player_medical"><?php esc_html_e('Medical Conditions, Dietary Restrictions, and Allergies', 'player-management'); ?></label>
                 <textarea name="player_medical" maxlength="500"></textarea>
                 <span class="error-message" style="display: none;"></span>
             </div>
