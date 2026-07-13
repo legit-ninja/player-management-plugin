@@ -130,127 +130,164 @@
         }
     }
 
-    // Handle form submission to add a player
+    function restorePlayerRowDisplay($row, player, index, userId) {
+        $row.find(".display-first-name").html(`<span>${player.first_name || 'N/A'}</span>`);
+        $row.find(".display-last-name").html(`<span>${player.last_name || 'N/A'}</span>`);
+        $row.find(".display-dob").html(`<span>${player.dob || 'N/A'}</span>`);
+        $row.find(".display-gender").html(`<span>${translateGender(player.gender || 'N/A')}</span>`);
+        $row.find(".display-avs-number").html(`<span>${player.avs_number || 'N/A'}</span>`);
+        $row.find(".display-event-count").html(`<span>${player.event_count || 0}</span>`);
+        $row.find(".display-medical-conditions").html(`<span>${(player.medical_conditions || '').substring(0, 20) + ((player.medical_conditions || '').length > 20 ? '...' : '')}</span>`);
+        $row.find(".actions").html(`
+            <a href="#" class="edit-player" data-index="${index}" data-user-id="${userId}" aria-label="Edit player ${player.first_name || ''}" aria-expanded="false">Edit</a>
+            <a href="#" class="delete-player" data-index="${index}" aria-label="Delete player ${player.first_name || ''}">Delete</a>
+        `);
+        $row.attr("data-first-name", player.first_name || "N/A");
+        $row.attr("data-last-name", player.last_name || "N/A");
+        $row.attr("data-dob", player.dob || "N/A");
+        $row.attr("data-gender", player.gender || "N/A");
+        $row.attr("data-avs-number", player.avs_number || "N/A");
+        $row.attr("data-medical-conditions", player.medical_conditions || "");
+        $row.removeClass("editing");
+        $tableBody.find(`.medical-row[data-player-index="${index}"]`).remove();
+        intersoccerState.editingIndex = null;
+        $tableBody.find(".edit-player").removeClass("disabled").attr("aria-disabled", "false");
+    }
+
+    // Handle Save for add form and inline edit rows (user profile / manage-players).
     $managePlayers.on("click", ".player-submit", function (e) {
         e.preventDefault();
         const $section = $(this).closest(".add-player-section");
-        const isAdd = true;
-        if (intersoccerState.isProcessing || intersoccerState.isAdding) {
+        const $row = $(this).closest("tr");
+        const isEdit = $row.length > 0 && ($row.hasClass("editing") || intersoccerState.editingIndex !== null);
+        const isAdd = !isEdit;
+        const $source = isEdit ? $row : $section;
+        if (intersoccerState.isProcessing || (isAdd && intersoccerState.isAdding)) {
             if (debugEnabled) console.log("InterSoccer: Save aborted, isProcessing:", intersoccerState.isProcessing, "isAdding:", intersoccerState.isAdding);
             return;
         }
 
-        if (debugEnabled) console.log('InterSoccer: Form section HTML:', $section.html());
+        const existingPlayer = isEdit && intersoccerPlayer.preload_players
+            ? (intersoccerPlayer.preload_players[intersoccerState.editingIndex] || intersoccerPlayer.preload_players[$row.data("player-index")])
+            : null;
+        const existingMedical = existingPlayer?.medical_conditions
+            || $row.attr("data-medical-conditions")
+            || "";
 
         const playerData = {
-            player_first_name: $section.find('input[name="player_first_name"]').val()?.trim(),
-            player_last_name: $section.find('input[name="player_last_name"]').val()?.trim(),
-            player_dob: $section.find('input[name="player_dob"]').val()?.trim(),
-            player_gender: $section.find('select[name="player_gender"]').val()?.trim(),
-            player_avs_number: $section.find('input[name="player_avs_number"]').val()?.trim() || "0000",
-            player_medical: $section.find('textarea[name="player_medical"]').val()?.trim() || "",
+            player_first_name: $source.find('input[name="player_first_name"]').val()?.trim(),
+            player_last_name: $source.find('input[name="player_last_name"]').val()?.trim(),
+            player_dob: $source.find('input[name="player_dob"]').val()?.trim(),
+            player_gender: $source.find('select[name="player_gender"]').val()?.trim(),
+            player_avs_number: $source.find('input[name="player_avs_number"]').val()?.trim() || "0000",
+            player_medical: $source.find('textarea[name="player_medical"]').val()?.trim() || (isEdit ? existingMedical : ""),
         };
 
-        if (debugEnabled) console.log("InterSoccer: Player data before validation:", playerData);
+        if (debugEnabled) console.log("InterSoccer: Player data before validation:", playerData, "mode:", isEdit ? "edit" : "add");
 
-        if (!window.intersoccerValidateRow($section, isAdd)) {
+        if (!window.intersoccerValidateRow($source, isAdd)) {
             if (debugEnabled) console.log("InterSoccer: Validation failed, row inputs:", playerData);
             return;
         }
 
-        intersoccerState.isProcessing = true;
-        intersoccerState.isAdding = true;
-        const $spinner = $section.find(".spinner").show();
-
         if (!playerData.player_first_name || !playerData.player_last_name || !playerData.player_dob || !playerData.player_gender) {
             $message.text("First name, last name, date of birth, and gender are required.").show();
             setTimeout(() => $message.hide(), 5000);
-            intersoccerState.isProcessing = false;
-            intersoccerState.isAdding = false;
-            $spinner.hide();
             return;
         }
 
         if (!/^\d{4}-\d{2}-\d{2}$/.test(playerData.player_dob) || !new Date(playerData.player_dob).getTime()) {
             $message.text("Invalid date of birth format. Use YYYY-MM-DD.").show();
             setTimeout(() => $message.hide(), 5000);
-            intersoccerState.isProcessing = false;
-            intersoccerState.isAdding = false;
-            $spinner.hide();
             return;
         }
 
+        intersoccerState.isProcessing = true;
+        if (isAdd) intersoccerState.isAdding = true;
+        const $submitLink = $(this);
+        $submitLink.addClass("disabled").attr("aria-disabled", "true");
+
+        const playerIndex = isEdit
+            ? (intersoccerState.editingIndex ?? $row.data("player-index")).toString()
+            : null;
+        const userId = (isEdit ? ($row.data("user-id") || intersoccerPlayer.user_id) : intersoccerPlayer.user_id);
+
         const sendAjaxRequest = (nonce) => {
-            if (debugEnabled) console.log("InterSoccer: Sending add player request with data:", JSON.stringify(playerData), "nonce:", nonce);
+            const ajaxData = {
+                action: isEdit ? "intersoccer_edit_player" : "intersoccer_add_player",
+                nonce: nonce,
+                player_first_name: encodeURIComponent(playerData.player_first_name),
+                player_last_name: encodeURIComponent(playerData.player_last_name),
+                player_dob: playerData.player_dob,
+                player_gender: playerData.player_gender,
+                player_avs_number: playerData.player_avs_number,
+                player_medical: encodeURIComponent(playerData.player_medical),
+                user_id: userId,
+            };
+            if (isEdit) ajaxData.player_index = playerIndex;
+
+            if (debugEnabled) console.log("InterSoccer: Sending player save request:", ajaxData);
             $.ajax({
                 url: intersoccerPlayer.ajax_url,
                 type: "POST",
-                data: {
-                    action: "intersoccer_add_player",
-                    nonce: nonce,
-                    player_first_name: encodeURIComponent(playerData.player_first_name),
-                    player_last_name: encodeURIComponent(playerData.player_last_name),
-                    player_dob: playerData.player_dob,
-                    player_gender: playerData.player_gender,
-                    player_avs_number: playerData.player_avs_number,
-                    player_medical: encodeURIComponent(playerData.player_medical),
-                    user_id: intersoccerPlayer.user_id,
-                },
+                data: ajaxData,
                 contentType: "application/x-www-form-urlencoded; charset=UTF-8",
                 success: function (response) {
-                    if (debugEnabled) console.log("InterSoccer: Add player response:", JSON.stringify(response));
-                    $spinner.hide();
+                    if (debugEnabled) console.log("InterSoccer: Save player response:", JSON.stringify(response));
                     if (response.success) {
-                        $section.find("input, select, textarea").val("");
-                        $section.removeClass("active").hide();
-                        $(".toggle-add-player").attr("aria-expanded", "false");
-                        if (response.data.player) {
+                        if (isEdit && response.data.player) {
                             intersoccerPlayer.preload_players = intersoccerPlayer.preload_players || [];
-                            const newIndex = intersoccerPlayer.preload_players.length.toString();
-                            intersoccerPlayer.preload_players[newIndex] = response.data.player;
-                            if (debugEnabled) console.log("InterSoccer: Updated preload_players after add:", JSON.stringify(intersoccerPlayer.preload_players));
+                            intersoccerPlayer.preload_players[playerIndex] = response.data.player;
+                            restorePlayerRowDisplay($row, response.data.player, playerIndex, userId);
+                            $message.text(response.data.message || "Player updated successfully.").show();
+                        } else {
+                            $section.find("input, select, textarea").val("");
+                            $section.removeClass("active").hide();
+                            $(".toggle-add-player").attr("aria-expanded", "false");
+                            if (response.data.player) {
+                                intersoccerPlayer.preload_players = intersoccerPlayer.preload_players || [];
+                                const newIndex = intersoccerPlayer.preload_players.length.toString();
+                                intersoccerPlayer.preload_players[newIndex] = response.data.player;
+                            }
+                            populatePlayers();
+                            $message.text(response.data.message || "Player added successfully.").show();
                         }
-                        populatePlayers();
-                        $message.text(response.data.message || "Player added successfully.").show();
                         setTimeout(() => $message.hide(), 5000);
                     } else {
-                        $message.text(response.data.message || "Error adding player.").show();
+                        $message.text(response.data.message || "Error saving player.").show();
                         setTimeout(() => $message.hide(), 5000);
                         if (response.data.new_nonce) {
                             intersoccerPlayer.nonce = response.data.new_nonce;
-                            if (debugEnabled) console.log("InterSoccer: Updated nonce from server response:", intersoccerPlayer.nonce);
                         }
                     }
                 },
                 error: function (xhr, status, error) {
-                    console.error("InterSoccer: Add player error:", status, error, xhr.responseText, "Response JSON:", JSON.stringify(xhr.responseJSON));
-                    $message.text("Error adding player: " + (xhr.responseText || "Unknown error")).show();
+                    console.error("InterSoccer: Save player error:", status, error, xhr.responseText);
+                    $message.text("Error saving player: " + (xhr.responseText || "Unknown error")).show();
                     setTimeout(() => $message.hide(), 5000);
                     if (xhr.status === 403 && !intersoccerState.nonceRetryAttempted) {
                         intersoccerState.nonceRetryAttempted = true;
                         intersoccerRefreshNonce().then((newNonce) => {
                             sendAjaxRequest(newNonce);
-                        }).catch((error) => {
-                            console.error("InterSoccer: Nonce refresh failed:", error);
+                        }).catch(() => {
                             intersoccerState.nonceRetryAttempted = false;
                             intersoccerState.isProcessing = false;
-                            intersoccerState.isAdding = false;
-                            $spinner.hide();
+                            if (isAdd) intersoccerState.isAdding = false;
+                            $submitLink.removeClass("disabled").attr("aria-disabled", "false");
                         });
                     } else {
                         intersoccerState.nonceRetryAttempted = false;
                         intersoccerState.isProcessing = false;
-                        intersoccerState.isAdding = false;
-                        $spinner.hide();
+                        if (isAdd) intersoccerState.isAdding = false;
+                        $submitLink.removeClass("disabled").attr("aria-disabled", "false");
                     }
                 },
                 complete: function () {
                     if (!intersoccerState.nonceRetryAttempted) {
                         intersoccerState.isProcessing = false;
-                        intersoccerState.isAdding = false;
-                        $spinner.hide();
+                        if (isAdd) intersoccerState.isAdding = false;
+                        $submitLink.removeClass("disabled").attr("aria-disabled", "false");
                     }
-                    if (debugEnabled) console.log("InterSoccer: Add operation completed");
                 }
             });
         };
@@ -387,22 +424,7 @@
             medical_conditions: $row.attr("data-medical-conditions") || "",
         };
 
-        $row.find(".display-first-name").html(`<span>${player.first_name || 'N/A'}</span>`);
-        $row.find(".display-last-name").html(`<span>${player.last_name || 'N/A'}</span>`);
-        $row.find(".display-dob").html(`<span>${player.dob || 'N/A'}</span>`);
-        $row.find(".display-gender").html(`<span>${translateGender(player.gender || 'N/A')}</span>`);
-        $row.find(".display-avs-number").html(`<span>${player.avs_number || 'N/A'}</span>`);
-        $row.find(".display-event-count").html(`<span>${player.event_count || 0}</span>`);
-        $row.find(".display-medical-conditions").html(`<span>${(player.medical_conditions || '').substring(0, 20) + ((player.medical_conditions || '').length > 20 ? '...' : '')}</span>`);
-        $row.find(".actions").html(`
-            <a href="#" class="edit-player" data-index="${index}" data-user-id="${userId}" aria-label="Edit player ${player.first_name || ''}" aria-expanded="false">Edit</a>
-            <a href="#" class="delete-player" data-index="${index}" aria-label="Delete player ${player.first_name || ''}">Delete</a>
-        `);
-
-        $row.removeClass("editing");
-        $tableBody.find(`.medical-row[data-player-index="${index}"]`).remove();
-        intersoccerState.editingIndex = null;
-        $tableBody.find(".edit-player").removeClass("disabled").attr("aria-disabled", "false");
+        restorePlayerRowDisplay($row, player, index, userId);
 
         $message.text("Edit canceled.").show();
         setTimeout(() => $message.hide(), 5000);

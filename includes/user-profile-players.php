@@ -35,19 +35,19 @@ function intersoccer_add_user_profile_players($user) {
         $plugin_url = plugin_dir_url(dirname(__FILE__));
 
         if (file_exists($plugin_path . 'js/player-management-core.js')) {
-            wp_enqueue_script('intersoccer-player-core-js', $plugin_url . 'js/player-management-core.js', ['jquery', 'flatpickr'], '1.0.12', true);
+            wp_enqueue_script('intersoccer-player-core-js', $plugin_url . 'js/player-management-core.js', ['jquery', 'flatpickr'], '1.0.13', true);
         }
 
         if (file_exists($plugin_path . 'js/player-management.js')) {
-            wp_enqueue_script('intersoccer-player-management-js', $plugin_url . 'js/player-management.js', ['jquery', 'intersoccer-player-core-js'], '1.0.12', true);
+            wp_enqueue_script('intersoccer-player-management-js', $plugin_url . 'js/player-management.js', ['jquery', 'intersoccer-player-core-js'], '1.0.13', true);
         }
 
         if (file_exists($plugin_path . 'js/admin-core.js')) {
-            wp_enqueue_script('intersoccer-admin-core-js', $plugin_url . 'js/admin-core.js', ['jquery', 'intersoccer-player-management-js'], '1.0.12', true);
+            wp_enqueue_script('intersoccer-admin-core-js', $plugin_url . 'js/admin-core.js', ['jquery', 'intersoccer-player-management-js'], '1.0.13', true);
         }
 
         if (file_exists($plugin_path . 'js/admin-actions.js')) {
-            wp_enqueue_script('intersoccer-admin-actions-js', $plugin_url . 'js/admin-actions.js', ['jquery', 'intersoccer-admin-core-js'], '1.0.12', true);
+            wp_enqueue_script('intersoccer-admin-actions-js', $plugin_url . 'js/admin-actions.js', ['jquery', 'intersoccer-admin-core-js'], '1.0.13', true);
         }
     } else {
         // Load regular scripts for non-admin users
@@ -55,17 +55,17 @@ function intersoccer_add_user_profile_players($user) {
         $plugin_url = plugin_dir_url(dirname(__FILE__));
 
         if (file_exists($plugin_path . 'js/player-management-core.js')) {
-            wp_enqueue_script('intersoccer-player-core-js', $plugin_url . 'js/player-management-core.js', ['jquery', 'flatpickr'], '1.0.12', true);
+            wp_enqueue_script('intersoccer-player-core-js', $plugin_url . 'js/player-management-core.js', ['jquery', 'flatpickr'], '1.0.13', true);
         }
 
         if (file_exists($plugin_path . 'js/player-management.js')) {
-            wp_enqueue_script('intersoccer-player-management-js', $plugin_url . 'js/player-management.js', ['jquery', 'intersoccer-player-core-js'], '1.0.12', true);
+            wp_enqueue_script('intersoccer-player-management-js', $plugin_url . 'js/player-management.js', ['jquery', 'intersoccer-player-core-js'], '1.0.13', true);
         }
     }
 
     // Load CSS
     if (file_exists(plugin_dir_path(dirname(__FILE__)) . 'css/player-management.css')) {
-        wp_enqueue_style('intersoccer-player-management-css', plugin_dir_url(dirname(__FILE__)) . 'css/player-management.css', [], '1.0.12');
+        wp_enqueue_style('intersoccer-player-management-css', plugin_dir_url(dirname(__FILE__)) . 'css/player-management.css', [], '1.0.13');
     }
 
     $localize_data = [
