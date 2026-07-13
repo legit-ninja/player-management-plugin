@@ -11,6 +11,7 @@
  * Text Domain: player-management
  * Domain Path: /languages
  */
+
 add_action('wp_ajax_intersoccer_add_player', 'intersoccer_add_player');
 function intersoccer_add_player() {
     $nonce = isset($_POST['nonce']) ? sanitize_text_field($_POST['nonce']) : '';
