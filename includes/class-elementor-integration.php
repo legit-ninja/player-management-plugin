@@ -147,6 +147,7 @@ class InterSoccer_Player_Management_Elementor_Integration {
  * @param int $user_id User ID to check
  * @return bool True if user has at least one valid player, false otherwise
  */
+if (!function_exists('intersoccer_user_has_players')) {
 function intersoccer_user_has_players($user_id = null) {
     if (!$user_id) {
         $user_id = get_current_user_id();
@@ -172,6 +173,7 @@ function intersoccer_user_has_players($user_id = null) {
     }
     
     return false;
+}
 }
 
 

@@ -3,7 +3,7 @@
  * Plugin Name: Player Management
  * Plugin URI: https://github.com/legit-ninja/player-management-plugin
  * Description: Manages players for InterSoccer events, integrating with WooCommerce My Account page and providing an admin dashboard.
- * Version: 2.7.13
+ * Version: 2.7.14
  * Author: Jeremy Lee
  * Author URI: https://underdogunlimited.com
  * License: GPL-2.0-or-later
@@ -22,11 +22,17 @@ if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
 
+/*
+ * Load-once wrapper: versioned zip folders otherwise fatal with Cannot redeclare
+ * because PHP registers top-level functions on include before `return` can help.
+ */
+if (!defined('INTERSOCCER_PLAYER_MANAGEMENT_LOADED')) {
+define('INTERSOCCER_PLAYER_MANAGEMENT_LOADED', true);
+
 // Define plugin constants
-define('PLAYER_MANAGEMENT_VERSION', '2.7.13');
+define('PLAYER_MANAGEMENT_VERSION', '2.7.14');
 define('PLAYER_MANAGEMENT_PATH', plugin_dir_path(__FILE__));
 define('PLAYER_MANAGEMENT_URL', plugin_dir_url(__FILE__));
-
 // Load translation
 add_action('init', function () {
     $locale = determine_locale();
@@ -614,4 +620,13 @@ add_action('admin_notices', function() {
         }
     }
 });
-?>
+} else {
+    add_action('admin_notices', static function () {
+        echo '<div class="notice notice-error"><p>';
+        echo esc_html__(
+            'Player Management is already loaded from another plugin folder. Deactivate and delete the older versioned directory (e.g. player-management-plugin-2.6.3) before activating this copy.',
+            'player-management'
+        );
+        echo '</p></div>';
+    });
+}
