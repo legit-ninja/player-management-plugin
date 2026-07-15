@@ -14,9 +14,11 @@ if (!defined('ABSPATH')) {
  *
  * @return array<int, array>
  */
+if (!function_exists('_intersoccer_pm_players_request_cache')) {
 function &_intersoccer_pm_players_request_cache() {
     static $cache = [];
     return $cache;
+}
 }
 
 /**
@@ -24,6 +26,7 @@ function &_intersoccer_pm_players_request_cache() {
  *
  * @return string
  */
+if (!function_exists('intersoccer_generate_player_id')) {
 function intersoccer_generate_player_id() {
     if (function_exists('wp_generate_uuid4')) {
         return wp_generate_uuid4();
@@ -41,6 +44,7 @@ function intersoccer_generate_player_id() {
         mt_rand(0, 0xffff)
     );
 }
+}
 
 /**
  * Assign player_id UUIDs to rows missing them (idempotent).
@@ -49,6 +53,7 @@ function intersoccer_generate_player_id() {
  * @param bool $persist When true, save back to user meta if any IDs were added.
  * @return array{players: array, updated: int}
  */
+if (!function_exists('intersoccer_backfill_player_ids')) {
 function intersoccer_backfill_player_ids($user_id, $persist = true) {
     $user_id = (int) $user_id;
     if ($user_id <= 0) {
@@ -81,6 +86,7 @@ function intersoccer_backfill_player_ids($user_id, $persist = true) {
 
     return ['players' => $players, 'updated' => $updated];
 }
+}
 
 /**
  * Backfill missing player_id UUIDs for all users with intersoccer_players meta.
@@ -89,6 +95,7 @@ function intersoccer_backfill_player_ids($user_id, $persist = true) {
  * @param int $offset     User query offset for batching.
  * @return array{users_processed:int,users_updated:int,players_updated:int,has_more:bool,next_offset:int}
  */
+if (!function_exists('intersoccer_backfill_all_player_ids')) {
 function intersoccer_backfill_all_player_ids($batch_size = 100, $offset = 0) {
     $batch_size = max(0, (int) $batch_size);
     $offset = max(0, (int) $offset);
@@ -128,12 +135,14 @@ function intersoccer_backfill_all_player_ids($batch_size = 100, $offset = 0) {
 
     return $summary;
 }
+}
 
 /**
  * Invalidate object cache and request cache after player mutations.
  *
  * @param int $user_id WordPress user ID.
  */
+if (!function_exists('intersoccer_invalidate_user_players_cache')) {
 function intersoccer_invalidate_user_players_cache($user_id) {
     $user_id = (int) $user_id;
     if ($user_id <= 0) {
@@ -150,6 +159,7 @@ function intersoccer_invalidate_user_players_cache($user_id) {
      */
     do_action('intersoccer_players_cache_invalidated', $user_id);
 }
+}
 
 /**
  * Persist player rows and refresh caches.
@@ -158,6 +168,7 @@ function intersoccer_invalidate_user_players_cache($user_id) {
  * @param array $players Player rows.
  * @return bool Whether user meta was updated.
  */
+if (!function_exists('intersoccer_persist_user_players')) {
 function intersoccer_persist_user_players($user_id, array $players) {
     $user_id = (int) $user_id;
     $updated = update_user_meta($user_id, 'intersoccer_players', $players);
@@ -169,6 +180,7 @@ function intersoccer_persist_user_players($user_id, array $players) {
 
     return (bool) $updated;
 }
+}
 
 /**
  * Get players for a user with request-level caching and lazy UUID backfill.
@@ -177,6 +189,7 @@ function intersoccer_persist_user_players($user_id, array $players) {
  * @param bool $force_refresh Bypass request cache.
  * @return array<int|string, array>
  */
+if (!function_exists('intersoccer_get_user_players')) {
 function intersoccer_get_user_players($user_id, $force_refresh = false) {
     if (empty($user_id) || !is_numeric($user_id)) {
         return [];
@@ -214,12 +227,14 @@ function intersoccer_get_user_players($user_id, $force_refresh = false) {
 
     return $players;
 }
+}
 
 /**
  * Clear request-level player cache.
  *
  * @param int|null $user_id User ID or null for all.
  */
+if (!function_exists('intersoccer_clear_user_players_cache')) {
 function intersoccer_clear_user_players_cache($user_id = null) {
     $cache = &_intersoccer_pm_players_request_cache();
 
@@ -230,6 +245,7 @@ function intersoccer_clear_user_players_cache($user_id = null) {
 
     unset($cache[(int) $user_id]);
 }
+}
 
 /**
  * Map a posted slot to the real intersoccer_players array key.
@@ -238,6 +254,7 @@ function intersoccer_clear_user_players_cache($user_id = null) {
  * @param mixed                    $requested Posted index or key.
  * @return int|string|null
  */
+if (!function_exists('intersoccer_resolve_intersoccer_players_meta_key')) {
 function intersoccer_resolve_intersoccer_players_meta_key(array $players, $requested) {
     if ($players === []) {
         return null;
@@ -269,6 +286,7 @@ function intersoccer_resolve_intersoccer_players_meta_key(array $players, $reque
 
     return null;
 }
+}
 
 /**
  * Find a player row by stable UUID.
@@ -277,6 +295,7 @@ function intersoccer_resolve_intersoccer_players_meta_key(array $players, $reque
  * @param string $player_id Player UUID.
  * @return array{key: int|string, player: array}|null
  */
+if (!function_exists('intersoccer_get_player_by_id')) {
 function intersoccer_get_player_by_id($user_id, $player_id) {
     $player_id = sanitize_text_field((string) $player_id);
     if ($player_id === '') {
@@ -295,6 +314,7 @@ function intersoccer_get_player_by_id($user_id, $player_id) {
 
     return null;
 }
+}
 
 /**
  * Get a player row by array index/key.
@@ -303,6 +323,7 @@ function intersoccer_get_player_by_id($user_id, $player_id) {
  * @param int|string $player_index Array key or list position.
  * @return array|null
  */
+if (!function_exists('intersoccer_get_player_by_index')) {
 function intersoccer_get_player_by_index($user_id, $player_index) {
     $players = intersoccer_get_user_players($user_id);
     if (!is_array($players)) {
@@ -315,4 +336,5 @@ function intersoccer_get_player_by_index($user_id, $player_index) {
     }
 
     return null;
+}
 }
