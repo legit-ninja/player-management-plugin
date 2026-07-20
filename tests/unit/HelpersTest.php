@@ -5,6 +5,7 @@
  */
 
 require_once __DIR__ . '/../helpers/TestCase.php';
+require_once __DIR__ . '/../../includes/player-data.php';
 require_once __DIR__ . '/../../includes/player-management.php';
 
 class HelpersTest extends InterSoccer_Test_Case
@@ -155,7 +156,13 @@ class HelpersTest extends InterSoccer_Test_Case
             ->with('Assigned Attendee')
             ->andReturn('John Doe');
         $mockItem->shouldReceive('get_meta')
+            ->with('assigned_player', true)
+            ->andReturn('');
+        $mockItem->shouldReceive('get_meta')
             ->with('intersoccer_player_index')
+            ->andReturn(null);
+        $mockItem->shouldReceive('get_meta')
+            ->with('Player Index')
             ->andReturn(null);
         
         $mockOrder->shouldReceive('get_items')->andReturn([1 => $mockItem]);
@@ -184,7 +191,13 @@ class HelpersTest extends InterSoccer_Test_Case
             ->with('Assigned Attendee')
             ->andReturn('Different Name');
         $mockItem->shouldReceive('get_meta')
+            ->with('assigned_player', true)
+            ->andReturn(0);
+        $mockItem->shouldReceive('get_meta')
             ->with('intersoccer_player_index')
+            ->andReturn(0);
+        $mockItem->shouldReceive('get_meta')
+            ->with('Player Index')
             ->andReturn(0);
         
         $mockOrder->shouldReceive('get_items')->andReturn([1 => $mockItem]);
@@ -213,7 +226,13 @@ class HelpersTest extends InterSoccer_Test_Case
             ->with('Assigned Attendee')
             ->andReturn('John Doe');
         $mockItem1->shouldReceive('get_meta')
+            ->with('assigned_player', true)
+            ->andReturn('');
+        $mockItem1->shouldReceive('get_meta')
             ->with('intersoccer_player_index')
+            ->andReturn(null);
+        $mockItem1->shouldReceive('get_meta')
+            ->with('Player Index')
             ->andReturn(null);
         
         $mockOrder1->shouldReceive('get_items')->andReturn([1 => $mockItem1]);
@@ -227,7 +246,13 @@ class HelpersTest extends InterSoccer_Test_Case
             ->with('Assigned Attendee')
             ->andReturn('John Doe');
         $mockItem2->shouldReceive('get_meta')
+            ->with('assigned_player', true)
+            ->andReturn('');
+        $mockItem2->shouldReceive('get_meta')
             ->with('intersoccer_player_index')
+            ->andReturn(null);
+        $mockItem2->shouldReceive('get_meta')
+            ->with('Player Index')
             ->andReturn(null);
         
         $mockOrder2->shouldReceive('get_items')->andReturn([2 => $mockItem2]);
@@ -260,7 +285,13 @@ class HelpersTest extends InterSoccer_Test_Case
                 ->with('Assigned Attendee')
                 ->andReturn('John Doe');
             $mockItem->shouldReceive('get_meta')
+                ->with('assigned_player', true)
+                ->andReturn('');
+            $mockItem->shouldReceive('get_meta')
                 ->with('intersoccer_player_index')
+                ->andReturn(null);
+            $mockItem->shouldReceive('get_meta')
+                ->with('Player Index')
                 ->andReturn(null);
             
             $mockOrder->shouldReceive('get_items')->andReturn([$index => $mockItem]);
@@ -313,38 +344,52 @@ class HelpersTest extends InterSoccer_Test_Case
      */
     public function test_render_players_form_logged_in_regular_user()
     {
-        WP_Mock::userFunction('is_user_logged_in', [
-            'return' => true,
-        ]);
-        
-        WP_Mock::userFunction('get_current_user_id', [
-            'return' => 1,
-        ]);
-        
-        WP_Mock::userFunction('get_user_meta', [
-            'args' => [1, 'intersoccer_players', true],
-            'return' => [],
-        ]);
-        
+        $GLOBALS['wp_stub_logged_in'] = true;
+        $GLOBALS['wp_stub_current_user_id'] = 1;
+        $GLOBALS['wp_stub_users'][1] = [
+            'meta' => [
+                'intersoccer_players' => [],
+            ],
+        ];
+
+        if (function_exists('intersoccer_clear_user_players_cache')) {
+            intersoccer_clear_user_players_cache(null);
+        }
+        if (function_exists('intersoccer_invalidate_user_players_cache')) {
+            WP_Mock::userFunction('wp_cache_delete')->andReturn(true);
+            WP_Mock::userFunction('do_action')->andReturnNull();
+            intersoccer_invalidate_user_players_cache(1);
+        }
+
         WP_Mock::userFunction('esc_html__')->andReturnUsing(function($text) {
             return $text;
         });
-        
+
+        WP_Mock::userFunction('esc_html_e')->andReturnUsing(function($text) {
+            echo $text;
+        });
+
+        WP_Mock::userFunction('esc_attr_e')->andReturnUsing(function($text) {
+            echo $text;
+        });
+
         WP_Mock::userFunction('esc_attr')->andReturnUsing(function($text) {
             return $text;
         });
-        
+
         WP_Mock::userFunction('esc_html')->andReturnUsing(function($text) {
             return $text;
         });
-        
+
         WP_Mock::userFunction('wp_nonce_field')->andReturn('');
-        
+
         $result = intersoccer_render_players_form(false, []);
-        
-        // Should return form HTML
+
+        // Should return form HTML with actionable empty state
         $this->assertIsString($result);
         $this->assertNotEmpty($result);
+        $this->assertStringContainsString('No participants yet', $result);
+        $this->assertStringContainsString('intersoccer-player-management', $result);
     }
 
     /**
@@ -435,8 +480,14 @@ class HelpersTest extends InterSoccer_Test_Case
             ->with('Assigned Attendee')
             ->andReturn('Different Person');
         $mockItem->shouldReceive('get_meta')
+            ->with('assigned_player', true)
+            ->andReturn(99);
+        $mockItem->shouldReceive('get_meta')
             ->with('intersoccer_player_index')
             ->andReturn(99);  // Different index
+        $mockItem->shouldReceive('get_meta')
+            ->with('Player Index')
+            ->andReturn(99);
         
         $mockOrder->shouldReceive('get_items')->andReturn([1 => $mockItem]);
         
