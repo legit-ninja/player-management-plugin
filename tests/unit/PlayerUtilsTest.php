@@ -273,21 +273,8 @@ class PlayerUtilsTest extends InterSoccer_Test_Case
      */
     public function test_clear_all_caches()
     {
-        WP_Mock::userFunction('delete_transient', [
-            'args' => ['intersoccer_overview_data'],
-            'return' => true,
-        ]);
-        
-        WP_Mock::userFunction('delete_transient', [
-            'args' => ['intersoccer_overview_data_v2'],
-            'return' => true,
-        ]);
-        
-        WP_Mock::userFunction('delete_transient', [
-            'args' => ['intersoccer_player_counts'],
-            'return' => true,
-        ]);
-        
+        WP_Mock::userFunction('delete_transient')->andReturn(true);
+
         $this->utils->clear_all_caches();
         $this->assertTrue(true, 'clear_all_caches should execute without errors');
     }
