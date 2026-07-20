@@ -327,7 +327,11 @@ function intersoccer_render_players_form($is_admin = false, $settings = []) {
                         <?php if (empty($players)) : ?>
                             <tr class="no-players">
                                 <td colspan="<?php echo esc_attr($colspan); ?>">
-                                    <?php esc_html_e('No attendees added yet.', 'player-management'); ?>
+                                    <?php if ($is_admin) : ?>
+                                        <?php esc_html_e('No attendees added yet.', 'player-management'); ?>
+                                    <?php else : ?>
+                                        <?php esc_html_e('No participants yet. Use Add to register a participant before booking.', 'player-management'); ?>
+                                    <?php endif; ?>
                                 </td>
                             </tr>
                         <?php else : ?>
