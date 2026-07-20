@@ -76,6 +76,7 @@ $core_files = [
     'includes/player-data.php',
     'includes/player-management.php',
     'includes/account-dashboard.php',
+    'includes/overview-metrics.php',
     'includes/ajax-handlers.php',
     'includes/data-deletion.php',
 ];
