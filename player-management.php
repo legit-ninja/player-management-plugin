@@ -3,7 +3,7 @@
  * Plugin Name: Player Management
  * Plugin URI: https://github.com/legit-ninja/player-management-plugin
  * Description: Manages players for InterSoccer events, integrating with WooCommerce My Account page and providing an admin dashboard.
- * Version: 2.7.19
+ * Version: 2.7.20
  * Author: Jeremy Lee
  * Author URI: https://underdogunlimited.com
  * License: GPL-2.0-or-later
@@ -30,7 +30,7 @@ if (!defined('INTERSOCCER_PLAYER_MANAGEMENT_LOADED')) {
 define('INTERSOCCER_PLAYER_MANAGEMENT_LOADED', true);
 
 // Define plugin constants
-define('PLAYER_MANAGEMENT_VERSION', '2.7.19');
+define('PLAYER_MANAGEMENT_VERSION', '2.7.20');
 define('PLAYER_MANAGEMENT_PATH', plugin_dir_path(__FILE__));
 define('PLAYER_MANAGEMENT_URL', plugin_dir_url(__FILE__));
 // Load translation
