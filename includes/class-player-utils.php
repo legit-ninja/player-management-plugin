@@ -217,6 +217,8 @@ class Player_Management_Utils {
     public function clear_all_caches() {
         delete_transient('intersoccer_overview_data');
         delete_transient('intersoccer_overview_data_v2');
+        delete_transient('intersoccer_overview_data_v3');
+        delete_transient('intersoccer_overview_data_v4');
         delete_transient('intersoccer_player_counts');
         
         if (defined('WP_DEBUG') && WP_DEBUG) {
