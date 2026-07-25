@@ -16,6 +16,7 @@
  * WC requires at least: 4.0
  * WC tested up to: 8.0
  * Network: false
+ * Update URI: https://plugins.underdogunlimited.com/api/plugins/v1/player-management
  */
 
 if (!defined('ABSPATH')) {
@@ -33,6 +34,9 @@ define('INTERSOCCER_PLAYER_MANAGEMENT_LOADED', true);
 define('PLAYER_MANAGEMENT_VERSION', '2.7.20');
 define('PLAYER_MANAGEMENT_PATH', plugin_dir_path(__FILE__));
 define('PLAYER_MANAGEMENT_URL', plugin_dir_url(__FILE__));
+if (!defined('PLAYER_MANAGEMENT_UPDATE_BASE')) {
+	define('PLAYER_MANAGEMENT_UPDATE_BASE', 'https://plugins.underdogunlimited.com');
+}
 // Load translation
 add_action('init', function () {
     $locale = determine_locale();
@@ -79,6 +83,7 @@ $core_files = [
     'includes/overview-metrics.php',
     'includes/ajax-handlers.php',
     'includes/data-deletion.php',
+    'includes/class-underdog-updater.php',
 ];
 
 foreach ($core_files as $file) {
@@ -91,6 +96,10 @@ foreach ($core_files as $file) {
             error_log("InterSoccer Plugin: Missing core file: $file");
         }
     }
+}
+
+if (class_exists('InterSoccer_Player_Management_Underdog_Updater')) {
+	InterSoccer_Player_Management_Underdog_Updater::init();
 }
 
 // Bootstrap Elementor widgets when Elementor loads

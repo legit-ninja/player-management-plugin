@@ -80,18 +80,20 @@ The InterSoccer Player Management plugin provides comprehensive player registrat
 4. Plugin automatically creates required database tables
 5. Configure user roles and permissions as needed
 
-## Configuration
-- **User Roles**: Custom roles are automatically registered (coach, organizer)
-- **My Account Menu**: "Manage Players" endpoint added to WooCommerce account menu
-- **Admin Menus**: Player management menu added to WordPress admin
-- **Caching**: Overview data cached for 30 minutes with manual refresh option
-
 ## Development Workflow
 - **Local Development**: Code locally, test on development environment
 - **Version Control**: Commit to `github.com/legit-ninja/player-management-plugin`
 - **Testing**: PHPUnit unit tests and integration testing
 - **Code Quality**: Task runner for linting and automated checks
 - **Dependencies**: Composer for PHP dependencies, npm for build processes
+- **Underdog publish**: Release tags publish a plugin ZIP via GitHub Actions — see [docs/underdog-publish.md](docs/underdog-publish.md) (tags, secrets, staging vs prod, WP Admin update smoke test)
+
+## Configuration
+- **User Roles**: Custom roles are automatically registered (coach, organizer)
+- **My Account Menu**: "Manage Players" endpoint added to WooCommerce account menu
+- **Admin Menus**: Player management menu added to WordPress admin
+- **Caching**: Overview data cached for 30 minutes with manual refresh option
+- **Underdog Updates**: Players → Updates — store a site token (`udpl_…`) so Dashboard → Updates can install builds from `plugins.underdogunlimited.com`
 
 ## Key Metrics & Monitoring
 - Player registration completion rates
