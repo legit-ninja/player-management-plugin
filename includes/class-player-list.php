@@ -148,6 +148,27 @@ class Player_Management_List {
             <h1><?php _e('All Players', 'player-management'); ?></h1>
 
             <?php
+            $overview_filter = isset($_GET['overview_filter']) ? sanitize_key(wp_unslash($_GET['overview_filter'])) : '';
+            $allowed_overview = ['no_players', 'never_booked', 'incomplete'];
+            if (in_array($overview_filter, $allowed_overview, true)) :
+                ?>
+                <div class="notice notice-info">
+                    <p>
+                        <?php
+                        if ($overview_filter === 'never_booked') {
+                            esc_html_e('Nurture queue: Overview filter “Never booked (lifetime)”. Prioritize parents of players with 0 events — use Events column = 0 and export for outreach.', 'player-management');
+                        } elseif ($overview_filter === 'no_players') {
+                            esc_html_e('Nurture queue: Overview filter “Parents with 0 kids”. These are customer accounts without player profiles — invite them to Manage Players.', 'player-management');
+                        } else {
+                            esc_html_e('Nurture queue: Overview filter “Incomplete profiles”. Ask parents to complete DOB and medical/dietary/allergies.', 'player-management');
+                        }
+                        ?>
+                        <a href="<?php echo esc_url(admin_url('admin.php?page=intersoccer-players')); ?>"><?php esc_html_e('Back to Overview', 'player-management'); ?></a>
+                    </p>
+                </div>
+                <?php
+            endif;
+
             $export_url = add_query_arg(
                 array_filter([
                     'action' => 'intersoccer_players_export',
@@ -561,8 +582,12 @@ class Player_Management_List {
      * AJAX endpoint for loading more players (for future infinite scroll implementation)
      */
     public function ajax_load_more_players() {
+        if (!check_ajax_referer('intersoccer_player_list_nonce', 'nonce', false)) {
+            wp_send_json_error(['message' => __('Invalid security token', 'player-management')], 403);
+        }
+
         if (!current_user_can('manage_options')) {
-            wp_die(__('Unauthorized', 'player-management'));
+            wp_send_json_error(['message' => __('Unauthorized', 'player-management')], 403);
         }
         
         $page = isset($_POST['page']) ? (int)$_POST['page'] : 1;

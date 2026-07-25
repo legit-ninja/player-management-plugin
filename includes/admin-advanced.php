@@ -427,14 +427,18 @@ function player_management_render_advanced_tab() {
                     update_user_meta($user_id, 'billing_region', $region);
                 }
 
-                // Add player
+                // Add player (canonical first_name / last_name — AUDIT-006)
                 if ($player_name && $user_id) {
                     $age = $player_dob
                         ? (int) floor((time() - strtotime($player_dob)) / 31536000)
                         : 0;
+                    $name_parts = preg_split('/\s+/', trim($player_name), 2);
+                    $player_first = $name_parts[0] ?? '';
+                    $player_last = $name_parts[1] ?? '';
                     $players = get_user_meta($user_id, 'intersoccer_players', true) ?: [];
                     $players[] = [
-                        'name' => $player_name,
+                        'first_name' => $player_first,
+                        'last_name' => $player_last,
                         'dob' => $player_dob,
                         'gender' => $player_gender,
                         'age_group' => $player_dob ? ($age <= 5 ? 'Mini Soccer' : ($age <= 13 ? 'Fun Footy' : 'Soccer League')) : 'N/A'
@@ -462,12 +466,16 @@ function player_management_render_advanced_tab() {
             $region = get_user_meta($user->ID, 'billing_region', true) ?: '';
             $players = get_user_meta($user->ID, 'intersoccer_players', true) ?: [];
             foreach ($players as $player) {
+                $player_display = trim(($player['first_name'] ?? '') . ' ' . ($player['last_name'] ?? ''));
+                if ($player_display === '') {
+                    $player_display = (string) ($player['name'] ?? '');
+                }
                 fputcsv($output, [
                     intersoccer_sanitize_csv_cell($user->user_email),
                     intersoccer_sanitize_csv_cell($first_name),
                     intersoccer_sanitize_csv_cell($last_name),
                     intersoccer_sanitize_csv_cell($region),
-                    intersoccer_sanitize_csv_cell($player['name'] ?? ''),
+                    intersoccer_sanitize_csv_cell($player_display),
                     intersoccer_sanitize_csv_cell($player['dob'] ?? ''),
                     intersoccer_sanitize_csv_cell($player['gender'] ?? 'Other'),
                 ]);
@@ -492,7 +500,11 @@ function player_management_render_advanced_tab() {
                         if ($current_year - $birth_year >= 14) {
                             $players[$index]['ineligible'] = true;
                             $flagged_count++;
-                            error_log(sprintf('Flagged player %s (DOB: %s) for user %d on %s', $player['name'], $dob, $user->ID, current_time('mysql')));
+                            $flag_name = trim(($player['first_name'] ?? '') . ' ' . ($player['last_name'] ?? ''));
+                            if ($flag_name === '') {
+                                $flag_name = (string) ($player['name'] ?? '');
+                            }
+                            error_log(sprintf('Flagged player %s (DOB: %s) for user %d on %s', $flag_name, $dob, $user->ID, current_time('mysql')));
                         }
                     }
                 }

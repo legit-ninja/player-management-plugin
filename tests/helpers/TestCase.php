@@ -26,6 +26,7 @@ abstract class InterSoccer_Test_Case extends PHPUnit_TestCase
         $GLOBALS['wp_stub_user_caps'] = [];
         $GLOBALS['wp_stub_is_admin'] = false;
         $GLOBALS['wp_stub_actions'] = [];
+        $GLOBALS['wp_stub_wc_orders'] = [];
     }
 
     /**
@@ -242,9 +243,13 @@ abstract class InterSoccer_Test_Case extends PHPUnit_TestCase
      */
     protected function mockWcGetOrders(array $orders): void
     {
-        WP_Mock::userFunction('wc_get_orders', [
-            'return' => $orders,
-        ]);
+        $GLOBALS['wp_stub_wc_orders'] = $orders;
+        // Prefer stub global when wc_get_orders is already defined (wp-stubs.php).
+        if (!function_exists('wc_get_orders')) {
+            WP_Mock::userFunction('wc_get_orders', [
+                'return' => $orders,
+            ]);
+        }
     }
 }
 
