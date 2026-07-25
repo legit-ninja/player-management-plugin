@@ -105,7 +105,7 @@ class AdminTest extends InterSoccer_Test_Case
         $GLOBALS['wp_stub_user_can'] = true;
         $_POST = ['page' => 1];
 
-        $utils = new Player_Utils();
+        $utils = new Player_Management_Utils();
         $list = new Player_Management_List($utils);
 
         try {

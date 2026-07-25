@@ -384,7 +384,12 @@ class InterSoccer_Player_Admin {
      */
     public function render_all_players_page() {
         $players = $this->database->get_players_filtered(array('limit' => 1000)); // Limit for performance
-        
+        $overview_filter = isset($_GET['overview_filter']) ? sanitize_key(wp_unslash($_GET['overview_filter'])) : '';
+        $allowed_overview = array('no_players', 'never_booked', 'incomplete');
+        if (!in_array($overview_filter, $allowed_overview, true)) {
+            $overview_filter = '';
+        }
+
         ?>
         <div class="wrap intersoccer-admin-page">
             <h1>
@@ -393,6 +398,23 @@ class InterSoccer_Player_Admin {
                     <?php _e('Add New Player', INTERSOCCER_PLAYER_TEXT_DOMAIN); ?>
                 </button>
             </h1>
+
+            <?php if ($overview_filter !== '') : ?>
+                <div class="notice notice-info">
+                    <p>
+                        <?php
+                        if ($overview_filter === 'never_booked') {
+                            esc_html_e('Nurture queue: Overview filter “Never booked (lifetime)”. Prioritize parents of players with 0 events — use Events column = 0 and export for outreach.', 'player-management');
+                        } elseif ($overview_filter === 'no_players') {
+                            esc_html_e('Nurture queue: Overview filter “Parents with 0 kids”. These are customer accounts without player profiles — invite them to Manage Players.', 'player-management');
+                        } else {
+                            esc_html_e('Nurture queue: Overview filter “Incomplete profiles”. Ask parents to complete DOB and medical/dietary/allergies.', 'player-management');
+                        }
+                        ?>
+                        <a href="<?php echo esc_url(admin_url('admin.php?page=intersoccer-players')); ?>"><?php esc_html_e('Back to Overview', 'player-management'); ?></a>
+                    </p>
+                </div>
+            <?php endif; ?>
 
             <!-- Filters -->
             <div class="intersoccer-filters-section">

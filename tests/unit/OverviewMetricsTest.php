@@ -83,7 +83,7 @@ class OverviewMetricsTest extends InterSoccer_Test_Case
 
         $url = intersoccer_pm_overview_filter_url('never_booked');
         $this->assertStringContainsString('overview_filter=never_booked', $url);
-        $this->assertStringContainsString('page=intersoccer-all-players', $url);
+        $this->assertStringContainsString('page=intersoccer-players-all', $url);
     }
 
     public function test_empty_payload_has_v4_keys_not_collage_keys()
@@ -115,9 +115,7 @@ class OverviewMetricsTest extends InterSoccer_Test_Case
             ],
         ]);
 
-        WP_Mock::userFunction('wc_get_orders', [
-            'return' => [],
-        ]);
+        $this->mockWcGetOrders([]);
 
         $this->assertTrue(intersoccer_pm_player_never_booked_lifetime(5, 0));
     }
@@ -147,9 +145,7 @@ class OverviewMetricsTest extends InterSoccer_Test_Case
         $mockItem->shouldReceive('get_meta')->with('Player Index')->andReturn(null);
         $mockOrder->shouldReceive('get_items')->andReturn([1 => $mockItem]);
 
-        WP_Mock::userFunction('wc_get_orders', [
-            'return' => [$mockOrder],
-        ]);
+        $this->mockWcGetOrders([$mockOrder]);
 
         $this->assertFalse(intersoccer_pm_player_never_booked_lifetime(6, 0));
     }

@@ -364,6 +364,21 @@ if (!function_exists('check_ajax_referer')) {
     }
 }
 
+if (!function_exists('wc_get_orders')) {
+    /**
+     * WooCommerce order query stub — empty by default for unit tests.
+     *
+     * @param array $args Query args.
+     * @return array
+     */
+    function wc_get_orders($args = []) {
+        if (isset($GLOBALS['wp_stub_wc_orders']) && is_array($GLOBALS['wp_stub_wc_orders'])) {
+            return $GLOBALS['wp_stub_wc_orders'];
+        }
+        return [];
+    }
+}
+
 if (!function_exists('current_user_can')) {
     function current_user_can($capability, $object_id = null) {
         if (isset($GLOBALS['wp_stub_user_caps'][$capability])) {

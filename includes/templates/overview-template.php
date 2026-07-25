@@ -18,13 +18,13 @@ $has_error = isset($data['error']);
 
 $url_no_players = function_exists('intersoccer_pm_overview_filter_url')
     ? intersoccer_pm_overview_filter_url('no_players')
-    : admin_url('admin.php?page=intersoccer-all-players');
+    : admin_url('admin.php?page=intersoccer-players-all');
 $url_never_booked = function_exists('intersoccer_pm_overview_filter_url')
     ? intersoccer_pm_overview_filter_url('never_booked')
-    : admin_url('admin.php?page=intersoccer-all-players');
+    : admin_url('admin.php?page=intersoccer-players-all');
 $url_incomplete = function_exists('intersoccer_pm_overview_filter_url')
     ? intersoccer_pm_overview_filter_url('incomplete')
-    : admin_url('admin.php?page=intersoccer-all-players');
+    : admin_url('admin.php?page=intersoccer-players-all');
 
 $refresh_url = add_query_arg('refresh', '1');
 

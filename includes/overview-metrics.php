@@ -78,7 +78,8 @@ function intersoccer_pm_overview_filter_url($filter) {
 		$filter = '';
 	}
 
-	$args = ['page' => 'intersoccer-all-players'];
+	// Live menu slug from admin-players.php (not legacy intersoccer-all-players).
+	$args = ['page' => 'intersoccer-players-all'];
 	if ($filter !== '') {
 		$args['overview_filter'] = $filter;
 	}
