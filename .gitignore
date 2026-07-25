@@ -38,6 +38,7 @@ wp-admin/
 *.sql
 *.zip
 *.tar.gz
+/dist/
 
 # Cypress artifacts (if added later)
 cypress/videos/
