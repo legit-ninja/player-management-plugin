@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.7.26.0-rc1 — 2026-07-26
+
+### Changed
+- Version bump for Underdog host RC publish (`v2.7.26.0-rc1`).
+- WordPress updates now deferred to shared `intersoccer-updates` client (removed in-plugin updater class).
+- Publish workflow accepts four-segment calendar versions with prerelease suffixes.
+
 ## 2.7.25 — 2026-07-25
 
 ### Added

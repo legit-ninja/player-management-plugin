@@ -4,7 +4,7 @@
 The InterSoccer Player Management plugin provides comprehensive player registration and management capabilities for InterSoccer Switzerland's sports programs. It enables parents to manage their children's profiles through the WooCommerce My Account interface and provides administrators with powerful tools for player oversight, analytics, and event tracking. The plugin integrates seamlessly with WooCommerce orders and supports advanced features like medical information tracking, event history, and Elementor widget integration.
 
 ## Version
-- **Current Version:** 2.7.25
+- **Current Version:** 2.7.26.0-rc1
 - **Release Date:** July 25, 2026
 
 ## Core Features
@@ -93,7 +93,7 @@ The InterSoccer Player Management plugin provides comprehensive player registrat
 - **My Account Menu**: "Manage Players" endpoint added to WooCommerce account menu
 - **Admin Menus**: Player management menu added to WordPress admin
 - **Caching**: Overview data cached for 30 minutes with manual refresh option
-- **Underdog Updates**: Players → Updates — store a site token (`udpl_…`) so Dashboard → Updates can install builds from `plugins.underdogunlimited.com`
+- **Underdog Updates**: Requires active `intersoccer-updates` plugin + `INTERSOCCER_UU_SITE_TOKEN` (`udpl_…`) — see [docs/underdog-publish.md](docs/underdog-publish.md)
 
 ## Key Metrics & Monitoring
 - Player registration completion rates
