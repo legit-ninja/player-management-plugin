@@ -41,16 +41,20 @@ Hosting CI reference: Underdog Unlimited `docs/ci-plugin-publish.md`.
 
 - Activate **InterSoccer Updates** (`intersoccer-updates`) on the site.
 - **Update URI** (this plugin header): `https://plugins.underdogunlimited.com`
-- **Site token:** WP Admin → **Settings → License** (see `intersoccer-updates/docs/host-api.md`). Optional override: `define('INTERSOCCER_UU_SITE_TOKEN', 'udpl_…');` in `wp-config.php` (wins over the database).
+- **Settings:** Players → **Settings**
+  - **General** — Update Stream (`release` / Beta=`prerelease` / `dev`); option `intersoccer_uu_update_channel`
+  - **License** — site token (`udpl_…`); option `intersoccer_uu_site_token` (same as shared client)
+- Optional override: `define('INTERSOCCER_UU_SITE_TOKEN', 'udpl_…');` in `wp-config.php` (wins over the database).
 - Installs into versioned folders (`player-management-plugin-{version}/`) and switches activation.
 
 ## Smoke test (staging WP)
 
 1. Install Player Management at version **N** (older than the build you will publish) and activate **InterSoccer Updates**.
-2. Settings → License → paste site token (`udpl_…`) → Save token.
-3. Publish `vN+1-rc…` as a GitHub **prerelease** (or `workflow_dispatch`).
-4. Dashboard → Updates → confirm the new version → Update now → confirm versioned folder + plugin loads.
-5. Only then: merge to `main`, tag `vN+1` as a **non-prerelease** release for production.
+2. Players → Settings → **License** → paste site token (`udpl_…`) → Save token.
+3. Players → Settings → **General** → set Update Stream to **Beta** for RC smoke (or **Release** for stable).
+4. Publish `vN+1-rc…` as a GitHub **prerelease** (or `workflow_dispatch`).
+5. Dashboard → Updates → confirm the new version → Update now → confirm versioned folder + plugin loads.
+6. Only then: merge to `main`, tag `vN+1` as a **non-prerelease** release for production.
 
 ## Optional curl smoke
 
@@ -62,8 +66,8 @@ curl -X POST "https://plugins.underdogunlimited.com/api/plugins/v1/player-manage
   -F "changelog=RC smoke" \
   -F "file=@player-management-2.7.26.0-rc1.zip;type=application/zip"
 
-# Metadata (site token — read)
-curl -sS "https://plugins.underdogunlimited.com/api/plugins/v1/player-management" \
+# Metadata (site token — read; channel=prerelease for Beta stream)
+curl -sS "https://plugins.underdogunlimited.com/api/plugins/v1/player-management?channel=prerelease" \
   -H "Authorization: Bearer $SITE_TOKEN" | jq .
 ```
 
