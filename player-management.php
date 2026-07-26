@@ -103,6 +103,7 @@ add_action('elementor/loaded', function () {
 // Include admin files only in admin context
 if (is_admin()) {
     $admin_files = [
+        'includes/admin-settings.php',
         'includes/admin-players.php',
         'includes/admin-advanced.php',
         'includes/user-profile-players.php'
@@ -118,6 +119,10 @@ if (is_admin()) {
                 error_log("InterSoccer Plugin: Missing admin file: $file");
             }
         }
+    }
+
+    if (class_exists('InterSoccer_Player_Management_Settings')) {
+        InterSoccer_Player_Management_Settings::init();
     }
 }
 
@@ -513,7 +518,7 @@ add_action('admin_enqueue_scripts', function($hook) {
 
 // Add settings link to plugins page
 add_filter('plugin_action_links_' . plugin_basename(__FILE__), function($links) {
-    $settings_link = '<a href="' . admin_url('admin.php?page=intersoccer-players') . '">' . __('Settings', 'player-management') . '</a>';
+    $settings_link = '<a href="' . admin_url('admin.php?page=intersoccer-players-settings') . '">' . __('Settings', 'player-management') . '</a>';
     array_unshift($links, $settings_link);
     return $links;
 });

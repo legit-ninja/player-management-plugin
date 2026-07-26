@@ -93,7 +93,7 @@ The InterSoccer Player Management plugin provides comprehensive player registrat
 - **My Account Menu**: "Manage Players" endpoint added to WooCommerce account menu
 - **Admin Menus**: Player management menu added to WordPress admin
 - **Caching**: Overview data cached for 30 minutes with manual refresh option
-- **Underdog Updates**: Requires active `intersoccer-updates` plugin + `INTERSOCCER_UU_SITE_TOKEN` (`udpl_…`) — see [docs/underdog-publish.md](docs/underdog-publish.md)
+- **Underdog Updates**: Players → Settings (Update Stream + License) with active `intersoccer-updates` — see [docs/underdog-publish.md](docs/underdog-publish.md)
 
 ## Key Metrics & Monitoring
 - Player registration completion rates
