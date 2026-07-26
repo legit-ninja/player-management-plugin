@@ -76,6 +76,15 @@ class Player_Management_Admin {
             'player_management_render_advanced_tab'
         );
 
+        add_submenu_page(
+            'intersoccer-players',
+            __('Settings', 'player-management'),
+            __('Settings', 'player-management'),
+            'manage_options',
+            'intersoccer-players-settings',
+            ['InterSoccer_Player_Management_Settings', 'render_page']
+        );
+
         add_action("load-$hook", [$this, 'screen_option']);
     }
 
