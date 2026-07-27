@@ -2,6 +2,11 @@
 /**
  * Overview KPI metric helpers — decision-first counts for admin Players overview.
  *
+ * Ownership (data-model / kpi-catalog): these funnel KPIs are Player Management only —
+ * participants_total, parents_no_players, never_booked_lifetime, incomplete_profiles.
+ * Source: usermeta `intersoccer_players` (+ order helpers for never_booked). Season fill /
+ * Final Numbers stay in Reports/Rosters. Do not add RR roster-based heroes here.
+ *
  * @package PlayerManagement
  */
 

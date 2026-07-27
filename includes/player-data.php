@@ -1,6 +1,13 @@
 <?php
 /**
- * Player data helpers — canonical read API for intersoccer_players user meta.
+ * Player data helpers — canonical read/write API for intersoccer_players user meta.
+ *
+ * Player SoT (data-model): WordPress user meta key `intersoccer_players` + UUID `player_id`.
+ * Do not treat `{prefix}intersoccer_players` SQL tables in InterSoccer_Player_Database as SoT;
+ * those are a legacy/migration path (see class-player-management-database.php).
+ *
+ * Overview funnel KPIs (participants_total, parents_no_players, never_booked_lifetime,
+ * incomplete_profiles) must be derived from this usermeta path — season fill stays in Reports/Rosters.
  *
  * @package Player_Management
  */

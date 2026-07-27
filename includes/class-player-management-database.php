@@ -11,7 +11,14 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * Database class for managing plugin tables and data
+ * Database class for legacy/optional SQL tables (NOT Player SoT).
+ *
+ * Canonical player storage is usermeta `intersoccer_players` via player-data.php (data-model).
+ * Methods that INSERT/UPDATE `{prefix}intersoccer_players` are gated by
+ * `intersoccer_pm_allow_secondary_player_table_writes` (default false).
+ *
+ * @package InterSoccer_Player_Management
+ * @since 2.0.0
  */
 class InterSoccer_Player_Database {
 
@@ -237,6 +244,14 @@ class InterSoccer_Player_Database {
      * @return int|false Player ID on success, false on failure
      */
     public function create_player($user_id, $player_index, array $player_data) {
+        if (!apply_filters('intersoccer_pm_allow_secondary_player_table_writes', false)) {
+            $this->logger->warning('Blocked create_player on secondary SQL table; Player SoT is usermeta intersoccer_players', array(
+                'user_id' => $user_id,
+                'player_index' => $player_index,
+            ));
+            return false;
+        }
+
         $validator = new InterSoccer_Player_Validator();
         $sanitized_data = $validator->sanitize_player_data($player_data);
         
@@ -288,6 +303,13 @@ class InterSoccer_Player_Database {
      * @return bool
      */
     public function update_player($player_id, array $player_data) {
+        if (!apply_filters('intersoccer_pm_allow_secondary_player_table_writes', false)) {
+            $this->logger->warning('Blocked update_player on secondary SQL table; Player SoT is usermeta intersoccer_players', array(
+                'player_id' => $player_id,
+            ));
+            return false;
+        }
+
         $validator = new InterSoccer_Player_Validator();
         $sanitized_data = $validator->sanitize_player_data($player_data);
         $sanitized_data['updated_timestamp'] = time();
