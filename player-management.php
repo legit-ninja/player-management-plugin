@@ -34,6 +34,9 @@ define('INTERSOCCER_PLAYER_MANAGEMENT_LOADED', true);
 define('PLAYER_MANAGEMENT_VERSION', '2.7.30');
 define('PLAYER_MANAGEMENT_PATH', plugin_dir_path(__FILE__));
 define('PLAYER_MANAGEMENT_URL', plugin_dir_url(__FILE__));
+if (!defined('INTERSOCCER_PLAYER_TEXT_DOMAIN')) {
+    define('INTERSOCCER_PLAYER_TEXT_DOMAIN', 'player-management');
+}
 // Load translation
 add_action('init', function () {
     $locale = determine_locale();
