@@ -189,7 +189,7 @@ class Player_Management_List {
                         style="width: 300px;">
                     <input type="submit" class="button button-primary" value="<?php _e('Search', 'player-management'); ?>">
                     <a href="<?php echo esc_url($export_url); ?>" class="button button-secondary">
-                        <?php _e('Export to Excel', 'player-management'); ?>
+                        <?php _e('Export to CSV', 'player-management'); ?>
                     </a>
                     <?php if (!empty($pagination_info['search_term'])): ?>
                         <a href="<?php echo admin_url('admin.php?page=intersoccer-players-all'); ?>" class="button">
