@@ -151,6 +151,76 @@ if (!function_exists('intersoccer_get_player_event_count')) {
     }
 }
 
+/**
+ * Get past events for a player.
+ *
+ * Returns an array of past event details from completed WooCommerce orders
+ * where this player was an assigned attendee.
+ *
+ * @param int $user_id      WordPress user ID (parent).
+ * @param int $player_index Index of the player in intersoccer_players meta.
+ * @return array<array{name: string, date: string, venue: string}>
+ */
+if (!function_exists('intersoccer_get_player_past_events')) {
+    function intersoccer_get_player_past_events($user_id, $player_index) {
+        $events = [];
+        $players = get_user_meta($user_id, 'intersoccer_players', true) ?: [];
+
+        if (!isset($players[$player_index])) {
+            return $events;
+        }
+
+        $player = $players[$player_index];
+        $full_name = trim(($player['first_name'] ?? '') . ' ' . ($player['last_name'] ?? ''));
+
+        if (empty($full_name)) {
+            return $events;
+        }
+
+        $orders = wc_get_orders([
+            'customer_id' => $user_id,
+            'status' => ['wc-completed'],
+            'limit' => -1,
+        ]);
+
+        foreach ($orders as $order) {
+            foreach ($order->get_items() as $item_id => $item) {
+                $attendee = trim($item->get_meta('Assigned Attendee') ?? '');
+                $player_index_meta = $item->get_meta('assigned_player', true);
+                if ($player_index_meta === '' || $player_index_meta === null) {
+                    $player_index_meta = $item->get_meta('intersoccer_player_index');
+                }
+                if ($player_index_meta === '' || $player_index_meta === null) {
+                    $player_index_meta = $item->get_meta('Player Index');
+                }
+
+                $name_match = ($attendee === $full_name);
+                $index_match = ($player_index_meta == $player_index);
+
+                if ($name_match || $index_match) {
+                    $product = $item->get_product();
+                    $event_name = $product ? $product->get_name() : $item->get_name();
+                    $event_date = $order->get_date_completed()
+                        ? $order->get_date_completed()->date('Y-m-d')
+                        : $order->get_date_created()->date('Y-m-d');
+                    $venue = $item->get_meta('pa_intersoccer-venues') ?: '';
+                    if (empty($venue)) {
+                        $venue = $item->get_meta('Venue') ?: '';
+                    }
+
+                    $events[] = [
+                        'name' => $event_name,
+                        'date' => $event_date,
+                        'venue' => $venue,
+                    ];
+                }
+            }
+        }
+
+        return $events;
+    }
+}
+
 // Render player management form
 function intersoccer_render_players_form($is_admin = false, $settings = []) {
     if (defined('WP_DEBUG') && WP_DEBUG) {
@@ -577,7 +647,7 @@ function intersoccer_render_user_profile_players($user) {
                 </select>
                 <select name="player_dob_year" required>
                     <option value=""><?php esc_html_e('Year', 'player-management'); ?></option>
-                    <?php for ($y = date('Y') - 13; $y >= date('Y') - 3; $y--) echo '<option value="' . $y . '">' . $y . '</option>'; ?>
+                    <?php for ($y = date('Y') - 3; $y >= date('Y') - 13; $y--) echo '<option value="' . $y . '">' . $y . '</option>'; ?>
                 </select>
                 <span class="error-message" style="display: none;"></span>
             </div>

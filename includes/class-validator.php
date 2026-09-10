@@ -235,4 +235,59 @@ class InterSoccer_Player_Validator {
     private function sanitize_text($text) {
         return sanitize_text_field($text);
     }
+
+    /**
+     * Sanitize player data for database storage.
+     *
+     * @param array $data Raw player data.
+     * @return array Sanitized player data.
+     */
+    public function sanitize_player_data(array $data) {
+        return [
+            'first_name' => isset($data['first_name']) ? sanitize_text_field($data['first_name']) : '',
+            'last_name' => isset($data['last_name']) ? sanitize_text_field($data['last_name']) : '',
+            'dob' => isset($data['dob']) ? sanitize_text_field($data['dob']) : '',
+            'gender' => isset($data['gender']) && in_array($data['gender'], ['male', 'female', 'other'], true)
+                ? $data['gender']
+                : 'other',
+            'avs_number' => isset($data['avs_number']) ? sanitize_text_field($data['avs_number']) : '',
+            'medical_conditions' => isset($data['medical_conditions']) ? sanitize_textarea_field($data['medical_conditions']) : '',
+            'dietary_requirements' => isset($data['dietary_requirements']) ? sanitize_textarea_field($data['dietary_requirements']) : '',
+            'emergency_contact' => isset($data['emergency_contact']) ? sanitize_text_field($data['emergency_contact']) : '',
+            'emergency_phone' => isset($data['emergency_phone']) ? sanitize_text_field($data['emergency_phone']) : '',
+            'creation_timestamp' => isset($data['creation_timestamp']) ? absint($data['creation_timestamp']) : time(),
+            'event_count' => isset($data['event_count']) ? absint($data['event_count']) : 0,
+        ];
+    }
+
+    /**
+     * Sanitize order/event data for database storage.
+     *
+     * @param array $data Raw order/event data.
+     * @return array Sanitized order/event data.
+     */
+    public function sanitize_order_data(array $data) {
+        $valid_activity_types = ['camp', 'course', 'birthday'];
+
+        return [
+            'player_id' => isset($data['player_id']) ? absint($data['player_id']) : 0,
+            'order_id' => isset($data['order_id']) ? absint($data['order_id']) : 0,
+            'product_id' => isset($data['product_id']) ? absint($data['product_id']) : 0,
+            'variation_id' => isset($data['variation_id']) ? absint($data['variation_id']) : null,
+            'activity_type' => isset($data['activity_type']) && in_array($data['activity_type'], $valid_activity_types, true)
+                ? $data['activity_type']
+                : 'camp',
+            'event_name' => isset($data['event_name']) ? sanitize_text_field($data['event_name']) : '',
+            'venue' => isset($data['venue']) ? sanitize_text_field($data['venue']) : '',
+            'age_group' => isset($data['age_group']) ? sanitize_text_field($data['age_group']) : '',
+            'season' => isset($data['season']) ? sanitize_text_field($data['season']) : '',
+            'start_date' => isset($data['start_date']) ? sanitize_text_field($data['start_date']) : null,
+            'end_date' => isset($data['end_date']) ? sanitize_text_field($data['end_date']) : null,
+            'booking_type' => isset($data['booking_type']) ? sanitize_text_field($data['booking_type']) : '',
+            'selected_days' => isset($data['selected_days']) ? $data['selected_days'] : '',
+            'event_times' => isset($data['event_times']) ? sanitize_text_field($data['event_times']) : '',
+            'canton' => isset($data['canton']) ? sanitize_text_field($data['canton']) : '',
+            'city' => isset($data['city']) ? sanitize_text_field($data['city']) : '',
+        ];
+    }
 }
