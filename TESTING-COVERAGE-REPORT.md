@@ -143,7 +143,7 @@ composer test:coverage-text
 1. **UI Rendering**: Template files not directly tested (requires browser/E2E tests)
 2. **JavaScript**: Frontend JS not covered (requires JS testing framework)
 3. **Background Processing**: Async job processing requires special setup
-4. **PDF/Excel Export**: File generation mocked, not fully tested
+4. **PDF/CSV Export**: File generation mocked, not fully tested
 
 ### Future Enhancements
 1. Add E2E tests with Playwright/Cypress for UI flows

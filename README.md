@@ -33,7 +33,7 @@ The InterSoccer Player Management plugin provides comprehensive player registrat
 - **Elementor Widgets**: Custom widgets for player lists and management interfaces
 - **Background Processing**: Asynchronous operations using WP Background Processing
 - **PDF Generation**: Player data export capabilities using DomPDF
-- **Excel Export**: Spreadsheet export functionality using PhpSpreadsheet
+- **CSV Export**: Formula-safe CSV export functionality
 - **Data Validation**: Comprehensive input validation and sanitization
 
 ### Database Architecture
@@ -66,7 +66,6 @@ The InterSoccer Player Management plugin provides comprehensive player registrat
 - **Required Plugins**:
   - WooCommerce (core e-commerce functionality)
 - **PHP Libraries**:
-  - PhpSpreadsheet (^1.29) - Excel export functionality
   - DomPDF (^2.0) - PDF generation
   - WP Background Processing (^1.0) - Asynchronous processing
 - **JavaScript Libraries**:

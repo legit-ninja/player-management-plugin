@@ -128,7 +128,7 @@ class Player_Management_Admin {
     }
 
     /**
-     * Stream an Excel-friendly CSV of all players (optionally filtered by search).
+     * Stream a formula-safe CSV of all players (optionally filtered by search).
      */
     public function handle_players_export() {
         if (!current_user_can('manage_options')) {
