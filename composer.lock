@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "",
+    "content-hash": "c181f56d0a5059118dfa2244cc0a847b",
     "packages": [
         {
             "name": "deliciousbrains/wp-background-processing",
@@ -217,7 +217,7 @@
             ],
             "authors": [
                 {
-                    "name": "Fabien M\u00e9nager",
+                    "name": "Fabien Ménager",
                     "email": "fabien.menager@gmail.com"
                 }
             ],
@@ -263,7 +263,7 @@
             ],
             "authors": [
                 {
-                    "name": "Fabien M\u00e9nager",
+                    "name": "Fabien Ménager",
                     "email": "fabien.menager@gmail.com"
                 }
             ],
@@ -599,7 +599,7 @@
             ],
             "authors": [
                 {
-                    "name": "P\u00e1draic Brady",
+                    "name": "Pádraic Brady",
                     "email": "padraic.brady@gmail.com",
                     "homepage": "https://github.com/padraic",
                     "role": "Author"
@@ -2370,10 +2370,10 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
-    "platform-dev": [],
-    "plugin-api-version": "2.6.0"
+    "platform": {},
+    "platform-dev": {},
+    "plugin-api-version": "2.9.0"
 }
