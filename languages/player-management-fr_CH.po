@@ -833,10 +833,6 @@ msgid "Export Format"
 msgstr ""
 
 #: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:659
-msgid "Excel (.xlsx)"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:660
 msgid "CSV"
 msgstr ""
 

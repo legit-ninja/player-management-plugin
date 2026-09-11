@@ -2,7 +2,6 @@
     "name": "intersoccer/player-management",
     "description": "InterSoccer Player Management Plugin",
     "require": {
-        "phpoffice/phpspreadsheet": "^1.29",
         "dompdf/dompdf": "^2.0",
         "deliciousbrains/wp-background-processing": "^1.0"
     },
