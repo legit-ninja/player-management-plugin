@@ -30,8 +30,108 @@ jQuery(document).ready(function($) {
         // Bind events
         $('.toggle-add-player').on('click', handleAddClick);
         $table.on('click', '.edit-player', handleEditClick);
+        $table.on('click', '.delete-player', handleDeleteClick);
         $('#save-player').on('click', handleSaveClick);
         $('#cancel-player').on('click', handleCancelClick);
+    }
+
+    // AC B5: Delete with confirmation dialog
+    function handleDeleteClick(e) {
+        e.preventDefault();
+        const $row = $(this).closest('tr');
+        const index = $row.data('player-index');
+        const userId = $row.data('user-id') || intersoccerPlayer.user_id;
+        const firstName = $row.data('first-name') || '';
+        const lastName = $row.data('last-name') || '';
+        const playerName = (firstName + ' ' + lastName).trim() || 'this player';
+
+        showConfirmDialog(
+            'Remove ' + escHtml(playerName) + '?',
+            'This action cannot be undone. The player will be removed from your account.',
+            function() {
+                deletePlayer(index, userId, $row);
+            }
+        );
+    }
+
+    // Show confirm dialog (AC B5)
+    function showConfirmDialog(title, message, onConfirm) {
+        const $dialog = $('<div class="intersoccer-confirm-dialog" data-field="confirm-dialog">' +
+            '<div class="intersoccer-confirm-dialog-content">' +
+            '<h3>' + title + '</h3>' +
+            '<p>' + message + '</p>' +
+            '<div class="dialog-actions">' +
+            '<button type="button" class="btn-cancel" data-field="cancel-btn">Cancel</button>' +
+            '<button type="button" class="btn-delete" data-field="confirm-delete-btn">Remove</button>' +
+            '</div>' +
+            '</div>' +
+            '</div>');
+
+        $('body').append($dialog);
+
+        $dialog.find('.btn-cancel').on('click', function() {
+            $dialog.remove();
+        });
+
+        $dialog.find('.btn-delete').on('click', function() {
+            $dialog.remove();
+            if (typeof onConfirm === 'function') {
+                onConfirm();
+            }
+        });
+
+        // Close on overlay click
+        $dialog.on('click', function(e) {
+            if ($(e.target).hasClass('intersoccer-confirm-dialog')) {
+                $dialog.remove();
+            }
+        });
+    }
+
+    // Delete player via AJAX
+    function deletePlayer(index, userId, $row) {
+        if (debugEnabled) console.log('InterSoccer: Deleting player index:', index);
+
+        $.ajax({
+            url: intersoccerPlayer.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'intersoccer_delete_player',
+                nonce: intersoccerPlayer.nonce,
+                user_id: userId,
+                player_index: index
+            },
+            success: function(response) {
+                if (response.success) {
+                    showMessage(response.data.message || 'Player removed successfully.', 'success');
+                    $row.fadeOut(300, function() {
+                        $(this).remove();
+                        // Show empty state if no players left
+                        if ($table.find('tbody tr[data-player-index]').length === 0) {
+                            $table.find('tbody').html(
+                                '<tr class="no-players"><td colspan="6" data-field="empty-state">' +
+                                'No participants yet. Use Add to register a participant before booking.' +
+                                '</td></tr>'
+                            );
+                        }
+                    });
+                } else {
+                    showMessage(response.data?.message || 'Failed to remove player.', 'error');
+                }
+            },
+            error: function(xhr) {
+                showMessage('Network error. Please try again.', 'error');
+                if (debugEnabled) console.error('InterSoccer: Delete error:', xhr);
+            }
+        });
+    }
+
+    // Show message helper (AC B7: clear errors)
+    function showMessage(text, type) {
+        $message.removeClass('success error').addClass(type).text(text).show();
+        setTimeout(function() {
+            $message.fadeOut();
+        }, 5000);
     }
 
     // Handle add button
@@ -126,16 +226,6 @@ jQuery(document).ready(function($) {
         });
     }
 
-    // Encode a value for safe insertion into HTML text/attribute context
-    function escHtml(s) {
-        return String(s === null || s === undefined ? '' : s)
-            .replace(/&/g, '&amp;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#39;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;');
-    }
-
     // Update/add table row after save
     function updateTable(player, index) {
         const firstName  = player.first_name  || 'N/A';
@@ -198,19 +288,82 @@ jQuery(document).ready(function($) {
         if (debugEnabled) console.log('InterSoccer: Canceled form');
     }
 
-    // Your validation function (adapt as needed)
+    // AC B7: Validation with clear inline errors
     function intersoccerValidateForm() {
         let valid = true;
-        // Add checks for required fields, show errors
+        
+        // Clear all previous errors first
+        $form.find('.error-message').hide().text('');
+        $form.find('.form-row').removeClass('field-error');
+        
+        // Check required fields
         $form.find('[required]').each(function() {
-            if ($(this).val().trim() === '') {
-                $(this).next('.error-message').text('This field is required.').show();
+            const $field = $(this);
+            const $row = $field.closest('.form-row');
+            const $error = $row.find('.error-message');
+            const fieldName = $row.find('label').text().replace('*', '').trim();
+            
+            if ($field.val().trim() === '') {
+                $error.text(fieldName + ' is required.').show();
+                $row.addClass('field-error');
                 valid = false;
-            } else {
-                $(this).next('.error-message').hide();
             }
         });
+
+        // Validate DOB format and age range
+        const $dob = $form.find('#player_dob');
+        if ($dob.length && $dob.val()) {
+            const dobVal = $dob.val();
+            const $dobRow = $dob.closest('.form-row');
+            const $dobError = $dobRow.find('.error-message');
+            
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(dobVal)) {
+                $dobError.text('Please enter a valid date (YYYY-MM-DD).').show();
+                $dobRow.addClass('field-error');
+                valid = false;
+            } else {
+                // Check age range (3-13 years)
+                const birthDate = new Date(dobVal);
+                const today = new Date();
+                let age = today.getFullYear() - birthDate.getFullYear();
+                const monthDiff = today.getMonth() - birthDate.getMonth();
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+                
+                if (age < 3 || age > 13) {
+                    $dobError.text('Player must be between 3 and 13 years old.').show();
+                    $dobRow.addClass('field-error');
+                    valid = false;
+                }
+            }
+        }
+
+        // Validate gender selection
+        const $gender = $form.find('#player_gender');
+        if ($gender.length && $gender.val() === '') {
+            const $genderRow = $gender.closest('.form-row');
+            $genderRow.find('.error-message').text('Please select a gender.').show();
+            $genderRow.addClass('field-error');
+            valid = false;
+        }
+
+        // Focus first error field
+        if (!valid) {
+            $form.find('.field-error').first().find('input, select, textarea').focus();
+        }
+
         return valid;
+    }
+
+    // Escape HTML for safe display
+    function escHtml(s) {
+        return String(s === null || s === undefined ? '' : s)
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
     }
 
     initializeFormState();
