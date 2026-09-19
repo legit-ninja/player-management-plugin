@@ -105,7 +105,7 @@ class InterSoccer_Player_Admin {
             __('Rosters & Export', INTERSOCCER_PLAYER_TEXT_DOMAIN),
             __('Rosters & Export', INTERSOCCER_PLAYER_TEXT_DOMAIN),
             'export_rosters',
-            'intersoccer-rosters',
+            'intersoccer-player-rosters',
             array($this, 'render_rosters_page')
         );
 
@@ -178,7 +178,7 @@ class InterSoccer_Player_Admin {
         }
 
         // DataTables for player lists
-        if (strpos($hook, 'intersoccer-all-players') !== false || strpos($hook, 'intersoccer-rosters') !== false) {
+        if (strpos($hook, 'intersoccer-all-players') !== false || strpos($hook, 'intersoccer-player-rosters') !== false) {
             wp_enqueue_script('jquery-ui-datepicker');
             wp_enqueue_style('jquery-ui-css', 'https://code.jquery.com/ui/1.12.1/themes/ui-lightness/jquery-ui.css');
             
@@ -304,7 +304,7 @@ class InterSoccer_Player_Admin {
                     <h2><?php _e('Quick Actions', INTERSOCCER_PLAYER_TEXT_DOMAIN); ?></h2>
                     
                     <div class="intersoccer-quick-actions">
-                        <a href="<?php echo admin_url('admin.php?page=intersoccer-rosters'); ?>" class="button button-primary">
+                        <a href="<?php echo admin_url('admin.php?page=intersoccer-player-rosters'); ?>" class="button button-primary">
                             <?php _e('Export Rosters', INTERSOCCER_PLAYER_TEXT_DOMAIN); ?>
                         </a>
                         
