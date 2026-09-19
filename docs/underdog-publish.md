@@ -26,7 +26,7 @@ Create Environments **`production`** and **`staging`**.
 | `UU_PLUGIN_SLUG` | variable | repository | Must be `player-management` |
 | `UU_PUBLISH_URL` | variable | each environment | `https://plugins.underdogunlimited.com` |
 
-Workflow: [`.github/workflows/publish-plugin.yml`](../.github/workflows/publish-plugin.yml).
+Workflow: [`.github/workflows/publish-plugin.yml`](../.github/workflows/publish-plugin.yml) — thin caller of the shared reusable workflow at [`legit-ninja/intersoccer-ci/.github/workflows/publish-plugin.yml`](https://github.com/legit-ninja/intersoccer-ci/blob/main/.github/workflows/publish-plugin.yml). The reusable handles ZIP build and curl upload; the caller only selects the environment (for env-scoped secrets) and passes inputs.
 
 Hosting CI reference: Underdog Unlimited `docs/ci-plugin-publish.md`.
 
