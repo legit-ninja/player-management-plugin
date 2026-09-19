@@ -1,12 +1,11 @@
-# Publish Player Management ZIP to Underdog Unlimited on release tags.
+# Thin caller: publish Player Management ZIP to Underdog Unlimited via shared reusable workflow.
 #
 # GitHub Environments: production (stable releases) | staging (prereleases + workflow_dispatch)
 #
 # Secrets (per environment):
-#   UU_PUBLISH_TOKEN  — same value as PLUGIN_PUBLISH_TOKEN on the Underdog server
-# Variables:
-#   UU_PLUGIN_SLUG    — repo variable; must be player-management
-#   UU_PUBLISH_URL    — per environment; default https://plugins.underdogunlimited.com
+#   UU_PUBLISH_TOKEN — same value as PLUGIN_PUBLISH_TOKEN on the Underdog server
+# Variables (repository or environment):
+#   UU_PUBLISH_URL — override base URL (reusable defaults to https://plugins.underdogunlimited.com)
 
 name: Publish plugin to Underdog
 
@@ -24,116 +23,30 @@ permissions:
   contents: read
 
 jobs:
-  publish:
+  guard:
+    name: Guard production release
     runs-on: ubuntu-latest
-    environment: ${{ github.event_name == 'workflow_dispatch' && 'staging' || (github.event.release.prerelease && 'staging' || 'production') }}
+    if: github.event_name == 'release' && github.event.release.prerelease == false
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Guard production publishes
-        if: github.event_name == 'release' && github.event.release.prerelease == false
+      - name: Ensure target is main or master
         run: |
           TARGET="${{ github.event.release.target_commitish }}"
           if [[ "$TARGET" != "main" && "$TARGET" != "master" ]]; then
-            echo "Production publishes must target main (got: $TARGET)" >&2
+            echo "::error::Production publishes must target main (got: $TARGET)"
             exit 1
           fi
 
-      - name: Resolve version
-        id: meta
-        env:
-          DISPATCH_VERSION: ${{ github.event.inputs.version }}
-        run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            RAW="$DISPATCH_VERSION"
-          else
-            RAW="${GITHUB_REF_NAME}"
-          fi
-          VERSION="${RAW#v}"
-          # Allow calendar triple, optional same-day fourth segment, optional prerelease
-          # e.g. 2.7.26, 2.7.26.1, 2.7.26.0-rc1
-          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?([-+][A-Za-z0-9.-]+)?$ ]]; then
-            echo "Version must look like 1.2.3, 1.2.3.1, or 1.2.3.0-rc1 (got: $RAW)" >&2
-            exit 1
-          fi
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "Resolved version=${VERSION}"
-
-      - name: Build plugin ZIP
-        env:
-          SLUG: ${{ vars.UU_PLUGIN_SLUG }}
-          VERSION: ${{ steps.meta.outputs.version }}
-        run: |
-          if [[ -z "$SLUG" ]]; then
-            echo "Set repository variable UU_PLUGIN_SLUG to player-management" >&2
-            exit 1
-          fi
-          if [[ ! -f "player-management.php" ]]; then
-            echo "Expected player-management.php at repo root" >&2
-            exit 1
-          fi
-          mkdir -p "dist/${SLUG}"
-          # Align with deploy.sh excludes so the ZIP matches manual/rsync uploads.
-          rsync -a \
-            --exclude='.git' \
-            --exclude='.github' \
-            --exclude='.gitignore' \
-            --exclude='dist' \
-            --exclude='node_modules' \
-            --exclude='vendor' \
-            --exclude='tests' \
-            --exclude='cypress' \
-            --exclude='docs' \
-            --exclude='coverage' \
-            --exclude='.phpunit.result.cache' \
-            --exclude='.taskfiles' \
-            --exclude='wp-admin' \
-            --exclude='composer.json' \
-            --exclude='composer.lock' \
-            --exclude='package.json' \
-            --exclude='package-lock.json' \
-            --exclude='phpunit.xml' \
-            --exclude='Taskfile.yaml' \
-            --exclude='*.log' \
-            --exclude='debug.log' \
-            --exclude='*.sh' \
-            --exclude='*.md' \
-            --exclude='*.list' \
-            --exclude='run-*.php' \
-            --exclude='.DS_Store' \
-            --exclude='*.swp' \
-            --exclude='*~' \
-            ./ "dist/${SLUG}/"
-          # Restore README after *.md exclude (matches deploy.sh include pattern).
-          if [[ -f README.md ]]; then
-            cp README.md "dist/${SLUG}/README.md"
-          fi
-          (
-            cd dist
-            zip -r "../${SLUG}-${VERSION}.zip" "$SLUG"
-          )
-          echo "ZIP=$(pwd)/${SLUG}-${VERSION}.zip" >> "$GITHUB_ENV"
-          echo "SLUG=$SLUG" >> "$GITHUB_ENV"
-          unzip -l "${SLUG}-${VERSION}.zip" | head -40
-
-      - name: Publish to Underdog Unlimited
-        env:
-          UU_PUBLISH_TOKEN: ${{ secrets.UU_PUBLISH_TOKEN }}
-          VERSION: ${{ steps.meta.outputs.version }}
-          BASE_URL: ${{ vars.UU_PUBLISH_URL }}
-          CHANGELOG: ${{ github.event.release.body || '' }}
-        run: |
-          if [[ -z "$UU_PUBLISH_TOKEN" ]]; then
-            echo "Missing secret UU_PUBLISH_TOKEN on this environment" >&2
-            exit 1
-          fi
-          PUBLISH_BASE="${BASE_URL:-https://plugins.underdogunlimited.com}"
-          PUBLISH_BASE="${PUBLISH_BASE%/}"
-          printf '%s' "$CHANGELOG" > /tmp/changelog.txt
-          curl -fsS -X POST "${PUBLISH_BASE}/api/plugins/v1/${SLUG}/publish" \
-            -H "Authorization: Bearer ${UU_PUBLISH_TOKEN}" \
-            -F "version=${VERSION}" \
-            -F "changelog=</tmp/changelog.txt" \
-            -F "file=@${ZIP};type=application/zip"
-          echo "Published ${SLUG}@${VERSION} to ${PUBLISH_BASE}"
+  publish:
+    name: Publish via shared workflow
+    needs: [guard]
+    if: always() && (needs.guard.result == 'success' || needs.guard.result == 'skipped')
+    environment: ${{ github.event_name == 'workflow_dispatch' && 'staging' || (github.event.release.prerelease && 'staging' || 'production') }}
+    uses: legit-ninja/intersoccer-ci/.github/workflows/publish-plugin.yml@main
+    with:
+      plugin_slug: player-management
+      bootstrap_php: player-management.php
+      version: ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref_name }}
+      changelog: ${{ github.event.release.body || '' }}
+      publish_url: ${{ vars.UU_PUBLISH_URL }}
+    secrets:
+      UU_PUBLISH_TOKEN: ${{ secrets.UU_PUBLISH_TOKEN }}
