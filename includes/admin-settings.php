@@ -15,11 +15,12 @@ class InterSoccer_Player_Management_Settings {
 	const OPTION_CHANNEL  = 'intersoccer_uu_update_channel';
 	const NONCE_GENERAL   = 'intersoccer_pm_settings_general';
 	const NONCE_FIELD     = 'intersoccer_pm_settings_nonce';
+	const PLUGIN_SLUG     = 'player-management';
+	const OPTION_BETA_MIGRATED = 'intersoccer_pm_beta_migrated';
 
 	/** @var array<string, string> Host channel => short UI example */
 	const CHANNELS = array(
 		'release'     => 'release',
-		'prerelease'  => 'prerelease',
 		'dev'         => 'dev',
 	);
 
@@ -31,8 +32,30 @@ class InterSoccer_Player_Management_Settings {
 	public static function init() {
 		add_action('admin_menu', array(__CLASS__, 'register_legacy_updates_alias'), 99);
 		add_action('admin_init', array(__CLASS__, 'redirect_legacy_updates_page'), 0);
+		add_action('admin_init', array(__CLASS__, 'maybe_migrate_beta_channel'));
 		add_action('admin_init', array(__CLASS__, 'handle_general_save'));
 		add_action('admin_init', array(__CLASS__, 'handle_builtin_license_save'));
+	}
+
+	/**
+	 * One-time migration: if site-wide channel was prerelease, enable per-plugin beta for this plugin.
+	 *
+	 * @return void
+	 */
+	public static function maybe_migrate_beta_channel() {
+		if (get_option(self::OPTION_BETA_MIGRATED)) {
+			return;
+		}
+
+		$stored = get_option(self::OPTION_CHANNEL, 'release');
+		if ($stored === 'prerelease') {
+			if (class_exists('InterSoccer_Updates_Http') && method_exists('InterSoccer_Updates_Http', 'set_beta_enabled_for_slug')) {
+				InterSoccer_Updates_Http::set_beta_enabled_for_slug(self::PLUGIN_SLUG, true);
+			}
+			update_option(self::OPTION_CHANNEL, 'release', false);
+		}
+
+		update_option(self::OPTION_BETA_MIGRATED, '1', false);
 	}
 
 	/**
@@ -99,18 +122,40 @@ class InterSoccer_Player_Management_Settings {
 	 * Sanitize Update Stream channel to a host channel value.
 	 *
 	 * @param string $channel Raw channel.
-	 * @return string release|prerelease|dev
+	 * @return string release|dev
 	 */
 	public static function sanitize_channel($channel) {
 		$channel = is_string($channel) ? strtolower(trim($channel)) : '';
-		// UI aliases.
-		if ($channel === 'beta') {
-			$channel = 'prerelease';
-		}
 		if (isset(self::CHANNELS[ $channel ])) {
 			return $channel;
 		}
 		return 'release';
+	}
+
+	/**
+	 * Whether beta updates are enabled for this plugin.
+	 *
+	 * @return bool
+	 */
+	public static function is_beta_enabled() {
+		if (class_exists('InterSoccer_Updates_Http') && method_exists('InterSoccer_Updates_Http', 'is_beta_enabled_for_slug')) {
+			return InterSoccer_Updates_Http::is_beta_enabled_for_slug(self::PLUGIN_SLUG);
+		}
+		return false;
+	}
+
+	/**
+	 * Set beta updates enabled/disabled for this plugin.
+	 *
+	 * @param bool $enabled Whether beta is enabled.
+	 * @return bool True if successfully set, false if InterSoccer Updates is not available.
+	 */
+	public static function set_beta_enabled($enabled) {
+		if (class_exists('InterSoccer_Updates_Http') && method_exists('InterSoccer_Updates_Http', 'set_beta_enabled_for_slug')) {
+			InterSoccer_Updates_Http::set_beta_enabled_for_slug(self::PLUGIN_SLUG, (bool) $enabled);
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -146,6 +191,9 @@ class InterSoccer_Player_Management_Settings {
 			? self::sanitize_channel(sanitize_text_field(wp_unslash($_POST['intersoccer_uu_update_channel'])))
 			: 'release';
 		update_option(self::OPTION_CHANNEL, $channel, false);
+
+		$beta_enabled = !empty($_POST['intersoccer_pm_beta_enabled']);
+		self::set_beta_enabled($beta_enabled);
 
 		wp_safe_redirect(add_query_arg('settings-updated', '1', self::page_url('general')));
 		exit;
@@ -188,7 +236,7 @@ class InterSoccer_Player_Management_Settings {
 	}
 
 	/**
-	 * General tab: Update Stream.
+	 * General tab: Update Stream + per-plugin beta toggle.
 	 *
 	 * @return void
 	 */
@@ -196,6 +244,7 @@ class InterSoccer_Player_Management_Settings {
 		$channel = self::get_channel();
 		$updated = isset($_GET['settings-updated']);
 		$uu_active = class_exists('InterSoccer_Updates_Http');
+		$beta_enabled = self::is_beta_enabled();
 
 		?>
 		<?php if ($updated) : ?>
@@ -212,6 +261,23 @@ class InterSoccer_Player_Management_Settings {
 			<?php wp_nonce_field(self::NONCE_GENERAL, self::NONCE_FIELD); ?>
 			<table class="form-table" role="presentation">
 				<tr>
+					<th scope="row"><?php echo esc_html__('Enable beta updates', 'player-management'); ?></th>
+					<td>
+						<label>
+							<input type="checkbox" name="intersoccer_pm_beta_enabled" value="1" <?php checked($beta_enabled); ?> <?php disabled(!$uu_active); ?> />
+							<?php echo esc_html__('Receive beta and release-candidate versions of this plugin', 'player-management'); ?>
+						</label>
+						<p class="description">
+							<?php echo esc_html__('When enabled, this plugin prefers the latest beta or release candidate from Underdog. When disabled, only stable releases are offered.', 'player-management'); ?>
+						</p>
+						<?php if (!$uu_active) : ?>
+							<p class="description" style="color:#d63638;">
+								<?php echo esc_html__('Beta updates require the InterSoccer Updates plugin to be active.', 'player-management'); ?>
+							</p>
+						<?php endif; ?>
+					</td>
+				</tr>
+				<tr>
 					<th scope="row"><?php echo esc_html__('Update Stream', 'player-management'); ?></th>
 					<td>
 						<fieldset>
@@ -224,19 +290,13 @@ class InterSoccer_Player_Management_Settings {
 							</label>
 
 							<label style="display:block;margin-bottom:12px;">
-								<input type="radio" name="intersoccer_uu_update_channel" value="prerelease" <?php checked($channel, 'prerelease'); ?> />
-								<strong><?php echo esc_html__('Beta', 'player-management'); ?></strong>
-								<span class="description"> — <?php echo esc_html__('Release candidates (e.g. v2.7.2-rc1).', 'player-management'); ?></span>
-							</label>
-
-							<label style="display:block;margin-bottom:12px;">
 								<input type="radio" name="intersoccer_uu_update_channel" value="dev" <?php checked($channel, 'dev'); ?> />
 								<strong><?php echo esc_html__('Dev', 'player-management'); ?></strong>
-								<span class="description"> — <?php echo esc_html__('Dev tip of master — this is bleeding edge code.', 'player-management'); ?></span>
+								<span class="description"> — <?php echo esc_html__('Bleeding-edge development builds for staging sites only.', 'player-management'); ?></span>
 							</label>
 						</fieldset>
 						<p class="description">
-							<?php echo esc_html__('Applies to InterSoccer plugins updated from plugins.underdogunlimited.com.', 'player-management'); ?>
+							<?php echo esc_html__('Applies site-wide to all InterSoccer plugins updated from plugins.underdogunlimited.com.', 'player-management'); ?>
 						</p>
 					</td>
 				</tr>
