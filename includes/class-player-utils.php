@@ -35,6 +35,7 @@ class Player_Management_Utils {
     
     /**
      * Users with stored players, fetched in chunks (stable ID order).
+     * AC 2: include display_name for parent search
      */
     private function get_users_with_players_chunk(int $number, int $offset): array {
         return get_users([
@@ -43,7 +44,7 @@ class Player_Management_Utils {
             'order' => 'ASC',
             'number' => $number,
             'offset' => $offset,
-            'fields' => ['ID', 'user_email'],
+            'fields' => ['ID', 'user_email', 'display_name'],
             'meta_query' => [
                 [
                     'key' => 'intersoccer_players',
@@ -73,11 +74,13 @@ class Player_Management_Utils {
                     continue;
                 }
 
+                $parent_name = $user->display_name ?? '';
+
                 foreach ($players as $player) {
                     if (!is_array($player)) {
                         continue;
                     }
-                    if ($this->player_matches_search($player, $user->user_email ?? '', $search_term)) {
+                    if ($this->player_matches_search($player, $user->user_email ?? '', $search_term, $parent_name)) {
                         $matching_count++;
                     }
                 }
@@ -118,8 +121,10 @@ class Player_Management_Utils {
 
                     $billing_info = $this->get_user_billing_info($user->ID);
 
+                    $parent_name = $user->display_name ?? '';
+
                     foreach ($players as $index => $player) {
-                        if (!$this->player_matches_search($player, $user->user_email ?? '', $search_term)) {
+                        if (!$this->player_matches_search($player, $user->user_email ?? '', $search_term, $parent_name)) {
                             continue;
                         }
 
@@ -263,14 +268,16 @@ class Player_Management_Utils {
                 
                 $billing_info = $this->get_user_billing_info($user->ID);
                 
+                $parent_name = $user->display_name ?? '';
+
                 foreach ($players as $index => $player) {
                     if ($player_count >= $per_page) {
                         break 2; // Break out of both loops
                     }
                     
-                    // Apply search filter if needed
+                    // Apply search filter if needed (AC 2: search by player name AND parent name/email)
                     if (!empty($search_term)) {
-                        if (!$this->player_matches_search($player, $user->user_email, $search_term)) {
+                        if (!$this->player_matches_search($player, $user->user_email, $search_term, $parent_name)) {
                             continue;
                         }
                     }
@@ -293,26 +300,30 @@ class Player_Management_Utils {
     }
     
     /**
-     * Check if player matches search term
+     * Check if player matches search term.
+     * AC 2: search by player name AND parent name/email
      */
-    private function player_matches_search($player, $user_email, $search_term) {
+    private function player_matches_search($player, $user_email, $search_term, $parent_display_name = '') {
         $full_name = ($player['first_name'] ?? '') . ' ' . ($player['last_name'] ?? '');
         $avs_number = $player['avs_number'] ?? '';
         
         return (
             stripos($full_name, $search_term) !== false ||
             stripos($user_email, $search_term) !== false ||
-            stripos($avs_number, $search_term) !== false
+            stripos($avs_number, $search_term) !== false ||
+            ($parent_display_name !== '' && stripos($parent_display_name, $search_term) !== false)
         );
     }
     
     /**
-     * Enhance player data with additional information
+     * Enhance player data with additional information.
+     * AC 2: include parent_name for display and search
      */
     private function enhance_player_data($player, $user, $billing_info, $index, $today) {
         $enhanced = $player;
         $enhanced['user_id'] = $user->ID;
-        $enhanced['user_email'] = $user->user_email;
+        $enhanced['user_email'] = $user->user_email ?? '';
+        $enhanced['parent_name'] = $user->display_name ?? '';
         $enhanced['index'] = $index;
         $enhanced['canton'] = $billing_info['state'];
         $enhanced['city'] = $billing_info['city'];
