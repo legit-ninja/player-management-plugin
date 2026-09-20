@@ -42,7 +42,9 @@ Hosting CI reference: Underdog Unlimited `docs/ci-plugin-publish.md`.
 - Activate **InterSoccer Updates** (`intersoccer-updates`) on the site.
 - **Update URI** (this plugin header): `https://plugins.underdogunlimited.com`
 - **Settings:** Players → **Settings**
-  - **General** — Update Stream (`release` / Beta=`prerelease` / `dev`); option `intersoccer_uu_update_channel`
+  - **General**
+    - **Enable beta updates** — checkbox to receive beta/RC versions of this plugin only; uses `intersoccer_uu_beta_slugs` option via InterSoccer Updates helpers
+    - **Update Stream** (`release` / `dev`) — site-wide channel; option `intersoccer_uu_update_channel`
   - **License** — site token (`udpl_…`); option `intersoccer_uu_site_token` (same as shared client)
 - Optional override: `define('INTERSOCCER_UU_SITE_TOKEN', 'udpl_…');` in `wp-config.php` (wins over the database).
 - Installs into versioned folders (`player-management-plugin-{version}/`) and switches activation.
@@ -51,7 +53,7 @@ Hosting CI reference: Underdog Unlimited `docs/ci-plugin-publish.md`.
 
 1. Install Player Management at version **N** (older than the build you will publish) and activate **InterSoccer Updates**.
 2. Players → Settings → **License** → paste site token (`udpl_…`) → Save token.
-3. Players → Settings → **General** → set Update Stream to **Beta** for RC smoke (or **Release** for stable).
+3. Players → Settings → **General** → enable **Enable beta updates** for RC smoke (or leave disabled for stable).
 4. Publish `vN+1-rc…` as a GitHub **prerelease** (or `workflow_dispatch`).
 5. Dashboard → Updates → confirm the new version → Update now → confirm versioned folder + plugin loads.
 6. Only then: merge to `main`, tag `vN+1` as a **non-prerelease** release for production.
