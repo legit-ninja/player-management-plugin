@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.7.31 — 2026-09-20
+
+### Added
+- **Admin Overview / Player List**: Search by player name and parent name/email; sortable columns for name and DOB; View/Edit player modal with inline form; parent name display in list table.
+- **My Account (Parent UI)**: Delete confirmation dialog; mobile-usable forms with 44px tap targets; clear inline validation errors; sticky CTA on mobile forms.
+- **Checkout Player Assignment**: Per-line player dropdown for products requiring attendee; persistent order meta (Assigned Attendee, `intersoccer_player_index`); block place order when required assignment missing; AJAX update for player selection changes.
+
+### Confirmed
+- CSV-only exports verified (no Excel in this plugin).
+
 ## 2.7.26.0-rc1 — 2026-07-26
 
 ### Changed
