@@ -362,3 +362,254 @@
     font-size: 16px;
   }
 }
+
+/* ==========================================================================
+   AC B5-B7: Mobile-usable forms with 44px tap targets
+   ========================================================================== */
+
+/* Single column layout for mobile */
+@media (max-width: 768px) {
+  .intersoccer-player-management #player-form {
+    padding: 16px;
+  }
+
+  .intersoccer-player-management .form-row {
+    margin-bottom: 20px;
+  }
+
+  /* 44px minimum touch target (Pixel Soft-STAMP requirement) */
+  .intersoccer-player-management .form-row input,
+  .intersoccer-player-management .form-row select,
+  .intersoccer-player-management .form-row textarea {
+    min-height: 44px;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 2px solid #ddd;
+  }
+
+  .intersoccer-player-management .form-row input:focus,
+  .intersoccer-player-management .form-row select:focus,
+  .intersoccer-player-management .form-row textarea:focus {
+    border-color: #7ab55c;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(122, 181, 92, 0.2);
+  }
+
+  .intersoccer-player-management .form-row label {
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+
+  /* Sticky primary CTA on mobile */
+  .intersoccer-player-management .form-actions {
+    position: sticky;
+    bottom: 0;
+    background: #fff;
+    padding: 16px 0;
+    margin: 0 -16px -16px;
+    padding-left: 16px;
+    padding-right: 16px;
+    border-top: 1px solid #eee;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .intersoccer-player-management .form-actions a,
+  .intersoccer-player-management .form-actions button {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    width: 100%;
+    margin: 0;
+    padding: 12px 20px;
+  }
+
+  /* Player cards on mobile */
+  .intersoccer-player-management .player-card {
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+  }
+
+  .intersoccer-player-management .player-card .actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #eee;
+  }
+
+  .intersoccer-player-management .player-card .actions a,
+  .intersoccer-player-management .player-card .actions button {
+    flex: 1;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+}
+
+/* ==========================================================================
+   AC B5: Delete confirmation dialog
+   ========================================================================== */
+.intersoccer-confirm-dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.intersoccer-confirm-dialog-content {
+  background: #fff;
+  padding: 24px;
+  border-radius: 12px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.intersoccer-confirm-dialog h3 {
+  margin: 0 0 12px;
+  font-size: 18px;
+  color: #1d2327;
+}
+
+.intersoccer-confirm-dialog p {
+  margin: 0 0 24px;
+  color: #50575e;
+  font-size: 14px;
+}
+
+.intersoccer-confirm-dialog .dialog-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.intersoccer-confirm-dialog .dialog-actions button {
+  min-height: 44px;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s;
+}
+
+.intersoccer-confirm-dialog .btn-cancel {
+  background: #f0f0f1;
+  color: #1d2327;
+}
+
+.intersoccer-confirm-dialog .btn-cancel:hover {
+  background: #dcdcde;
+}
+
+.intersoccer-confirm-dialog .btn-delete {
+  background: #d63638;
+  color: #fff;
+}
+
+.intersoccer-confirm-dialog .btn-delete:hover {
+  background: #b32d2e;
+}
+
+/* ==========================================================================
+   AC B7: Clear validation errors
+   ========================================================================== */
+.intersoccer-player-management .error-message {
+  color: #d63638;
+  font-size: 13px;
+  margin-top: 6px;
+  display: block;
+  padding: 4px 8px;
+  background: #fcf0f1;
+  border-radius: 4px;
+  border-left: 3px solid #d63638;
+}
+
+.intersoccer-player-management .error-message:empty,
+.intersoccer-player-management .error-message[style*="display: none"] {
+  display: none !important;
+}
+
+.intersoccer-player-management .field-error input,
+.intersoccer-player-management .field-error select,
+.intersoccer-player-management .field-error textarea {
+  border-color: #d63638 !important;
+}
+
+/* Success message */
+.intersoccer-message {
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.intersoccer-message.success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.intersoccer-message.error {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+/* Empty state */
+.intersoccer-player-management .no-players td {
+  text-align: center;
+  padding: 32px 16px;
+  color: #50575e;
+  font-size: 14px;
+}
+
+/* Add player CTA prominent on empty state */
+.intersoccer-player-management .toggle-add-player {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  background: #7ab55c;
+  color: #fff;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.intersoccer-player-management .toggle-add-player:hover {
+  background: #689c4b;
+  color: #fff;
+}
+
+/* Intro text styling */
+.intersoccer-account-dashboard-intro {
+  font-size: 16px;
+  color: #50575e;
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  background: #f0f6ed;
+  border-radius: 8px;
+  border-left: 4px solid #7ab55c;
+}
