@@ -98,7 +98,8 @@ composer.lock, package.json, package-lock.json, phpunit.xml, Taskfile.yaml,
 **Per-plugin wiring:**
 - `Update URI: https://plugins.underdogunlimited.com` in plugin header
 - Site token option: `intersoccer_uu_site_token` (prefix `udpl_…`)
-- Update channel option: `intersoccer_uu_update_channel` (`release`, `prerelease`, `dev`)
+- Update channel option: `intersoccer_uu_update_channel` (`release`, `dev`)
+- Per-plugin beta: `intersoccer_uu_beta_slugs` (via InterSoccer Updates helpers)
 - Override constant: `INTERSOCCER_UU_SITE_TOKEN` in `wp-config.php`
 
 **Current coverage:**
