@@ -21,5 +21,10 @@
         "test:integration": "phpunit --testsuite=integration",
         "test:coverage": "phpunit --coverage-html coverage/",
         "test:coverage-text": "phpunit --coverage-text"
+    },
+    "config": {
+        "platform": {
+            "php": "8.2.0"
+        }
     }
 }
