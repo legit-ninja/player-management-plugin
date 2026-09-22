@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.7.32 — 2026-09-22
+
+### Added
+- **Settings → General**: Per-plugin **Enable beta updates** checkbox for Player Management, wired to InterSoccer Updates (`intersoccer_uu_beta_slugs`). Checkbox is disabled with a notice when Updates is inactive (#26).
+
+### Changed
+- Version bump to 2.7.32 (customer release after 2.7.31; includes #26).
+- Update Stream: site-wide Beta radio removed; Release and Dev remain. One-time migration from channel `prerelease` enables beta for slug `player-management` and resets the channel to `release` (#26).
+
 ## 2.7.31 — 2026-09-20
 
 ### Added
