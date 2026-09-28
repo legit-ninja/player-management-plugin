@@ -11,82 +11,86 @@
 
 defined('ABSPATH') or die('No script kiddies please!');
 
-/**
- * Extract player index from cart item data using fallback chain.
- *
- * PV (intersoccer-product-variations) ATC may write player data via different keys.
- * This helper checks all known keys to ensure compatibility with both PM-only
- * flows and PV ATC flows.
- *
- * Fallback order (same as roster display in player-management.php):
- * 1. assigned_player (PV ATC primary key)
- * 2. intersoccer_player_index (PM cart/checkout key)
- * 3. Player Index (legacy)
- *
- * @param array $cart_item Cart item data array.
- * @return string|int Player index value, or empty string if not assigned.
- */
-function intersoccer_get_cart_item_player_index($cart_item) {
-    $keys_to_check = ['assigned_player', 'intersoccer_player_index', 'Player Index'];
-    
-    foreach ($keys_to_check as $key) {
-        if (isset($cart_item[$key]) && $cart_item[$key] !== '' && $cart_item[$key] !== null) {
-            return $cart_item[$key];
-        }
-    }
-    
-    return '';
-}
-
-/**
- * Check if a product requires an attendee assignment.
- *
- * Products are considered to require attendee if:
- * - They have the 'intersoccer-requires-attendee' attribute set to 'yes'
- * - OR they are in a product category containing 'camp', 'course', or 'birthday'
- *
- * @param WC_Product|int $product Product object or ID.
- * @return bool
- */
-function intersoccer_product_requires_attendee($product) {
-    if (is_numeric($product)) {
-        $product = wc_get_product($product);
-    }
-    
-    if (!$product) {
-        return false;
-    }
-
-    // Check explicit attribute
-    $requires_attendee = $product->get_attribute('intersoccer-requires-attendee');
-    if (strtolower($requires_attendee) === 'yes') {
-        return true;
-    }
-
-    // Check product categories for camp/course/birthday keywords
-    $categories = wp_get_post_terms($product->get_id(), 'product_cat', ['fields' => 'names']);
-    if (is_array($categories)) {
-        foreach ($categories as $cat_name) {
-            $cat_lower = strtolower($cat_name);
-            if (strpos($cat_lower, 'camp') !== false ||
-                strpos($cat_lower, 'course') !== false ||
-                strpos($cat_lower, 'birthday') !== false) {
-                return true;
+if (!function_exists('intersoccer_get_cart_item_player_index')) {
+    /**
+     * Extract player index from cart item data using fallback chain.
+     *
+     * PV (intersoccer-product-variations) ATC may write player data via different keys.
+     * This helper checks all known keys to ensure compatibility with both PM-only
+     * flows and PV ATC flows.
+     *
+     * Fallback order (same as roster display in player-management.php):
+     * 1. assigned_player (PV ATC primary key)
+     * 2. intersoccer_player_index (PM cart/checkout key)
+     * 3. Player Index (legacy)
+     *
+     * @param array $cart_item Cart item data array.
+     * @return string|int Player index value, or empty string if not assigned.
+     */
+    function intersoccer_get_cart_item_player_index($cart_item) {
+        $keys_to_check = ['assigned_player', 'intersoccer_player_index', 'Player Index'];
+        
+        foreach ($keys_to_check as $key) {
+            if (isset($cart_item[$key]) && $cart_item[$key] !== '' && $cart_item[$key] !== null) {
+                return $cart_item[$key];
             }
         }
+        
+        return '';
     }
+}
 
-    // Check product name/slug for keywords (fallback)
-    $name_lower = strtolower($product->get_name());
-    $slug_lower = strtolower($product->get_slug());
-    if (strpos($name_lower, 'camp') !== false ||
-        strpos($name_lower, 'course') !== false ||
-        strpos($slug_lower, 'camp') !== false ||
-        strpos($slug_lower, 'course') !== false) {
-        return true;
+if (!function_exists('intersoccer_product_requires_attendee')) {
+    /**
+     * Check if a product requires an attendee assignment.
+     *
+     * Products are considered to require attendee if:
+     * - They have the 'intersoccer-requires-attendee' attribute set to 'yes'
+     * - OR they are in a product category containing 'camp', 'course', or 'birthday'
+     *
+     * @param WC_Product|int $product Product object or ID.
+     * @return bool
+     */
+    function intersoccer_product_requires_attendee($product) {
+        if (is_numeric($product)) {
+            $product = wc_get_product($product);
+        }
+        
+        if (!$product) {
+            return false;
+        }
+
+        // Check explicit attribute
+        $requires_attendee = $product->get_attribute('intersoccer-requires-attendee');
+        if (strtolower($requires_attendee) === 'yes') {
+            return true;
+        }
+
+        // Check product categories for camp/course/birthday keywords
+        $categories = wp_get_post_terms($product->get_id(), 'product_cat', ['fields' => 'names']);
+        if (is_array($categories)) {
+            foreach ($categories as $cat_name) {
+                $cat_lower = strtolower($cat_name);
+                if (strpos($cat_lower, 'camp') !== false ||
+                    strpos($cat_lower, 'course') !== false ||
+                    strpos($cat_lower, 'birthday') !== false) {
+                    return true;
+                }
+            }
+        }
+
+        // Check product name/slug for keywords (fallback)
+        $name_lower = strtolower($product->get_name());
+        $slug_lower = strtolower($product->get_slug());
+        if (strpos($name_lower, 'camp') !== false ||
+            strpos($name_lower, 'course') !== false ||
+            strpos($slug_lower, 'camp') !== false ||
+            strpos($slug_lower, 'course') !== false) {
+            return true;
+        }
+
+        return false;
     }
-
-    return false;
 }
 
 /**
