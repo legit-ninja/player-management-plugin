@@ -12,6 +12,33 @@
 defined('ABSPATH') or die('No script kiddies please!');
 
 /**
+ * Extract player index from cart item data using fallback chain.
+ *
+ * PV (intersoccer-product-variations) ATC may write player data via different keys.
+ * This helper checks all known keys to ensure compatibility with both PM-only
+ * flows and PV ATC flows.
+ *
+ * Fallback order (same as roster display in player-management.php):
+ * 1. assigned_player (PV ATC primary key)
+ * 2. intersoccer_player_index (PM cart/checkout key)
+ * 3. Player Index (legacy)
+ *
+ * @param array $cart_item Cart item data array.
+ * @return string|int Player index value, or empty string if not assigned.
+ */
+function intersoccer_get_cart_item_player_index($cart_item) {
+    $keys_to_check = ['assigned_player', 'intersoccer_player_index', 'Player Index'];
+    
+    foreach ($keys_to_check as $key) {
+        if (isset($cart_item[$key]) && $cart_item[$key] !== '' && $cart_item[$key] !== null) {
+            return $cart_item[$key];
+        }
+    }
+    
+    return '';
+}
+
+/**
  * Check if a product requires an attendee assignment.
  *
  * Products are considered to require attendee if:
@@ -84,9 +111,7 @@ function intersoccer_render_player_dropdown($cart_item, $cart_item_key, $product
         ? intersoccer_get_user_players($user_id) 
         : (get_user_meta($user_id, 'intersoccer_players', true) ?: []);
 
-    $selected_index = isset($cart_item['intersoccer_player_index']) 
-        ? $cart_item['intersoccer_player_index'] 
-        : '';
+    $selected_index = intersoccer_get_cart_item_player_index($cart_item);
 
     ob_start();
     ?>
@@ -177,7 +202,7 @@ function intersoccer_checkout_item_player_field($product_name, $cart_item, $cart
             return $product_name;
         }
 
-        $player_index = isset($cart_item['intersoccer_player_index']) ? $cart_item['intersoccer_player_index'] : '';
+        $player_index = intersoccer_get_cart_item_player_index($cart_item);
         
         if ($player_index !== '' && is_user_logged_in()) {
             $user_id = get_current_user_id();
@@ -257,8 +282,11 @@ function intersoccer_save_cart_player_selection_from_post($posted_data) {
 }
 
 /**
- * AC C9: Validate player assignment before checkout.
- * Block place order when required assignment is missing.
+ * AC C10: Validate player assignment before checkout.
+ * Block Place order when required assignment is missing.
+ *
+ * Safety net for classic checkout — primary assignment happens at product ATC (PV repo).
+ * Recognizes assignment from any known cart item key (PV ATC or PM dropdown).
  */
 function intersoccer_validate_checkout_player_assignment() {
     $cart = WC()->cart;
@@ -275,7 +303,7 @@ function intersoccer_validate_checkout_player_assignment() {
             continue;
         }
 
-        $player_index = isset($cart_item['intersoccer_player_index']) ? $cart_item['intersoccer_player_index'] : '';
+        $player_index = intersoccer_get_cart_item_player_index($cart_item);
         
         if ($player_index === '' || $player_index === null) {
             $missing_assignments[] = $product->get_name();
@@ -300,13 +328,16 @@ add_action('woocommerce_checkout_process', 'intersoccer_validate_checkout_player
  * AC C9: Save player assignment to order item meta.
  * Persist for reports-rosters interop.
  *
+ * Reads player index from any known cart item key (PV ATC or PM dropdown)
+ * and writes all meta keys used by roster reports.
+ *
  * @param WC_Order_Item_Product $item          Order item.
  * @param string                $cart_item_key Cart item key.
  * @param array                 $values        Cart item values.
  * @param WC_Order              $order         Order object.
  */
 function intersoccer_save_order_item_player($item, $cart_item_key, $values, $order) {
-    $player_index = isset($values['intersoccer_player_index']) ? $values['intersoccer_player_index'] : '';
+    $player_index = intersoccer_get_cart_item_player_index($values);
     
     if ($player_index === '' || $player_index === null) {
         return;
