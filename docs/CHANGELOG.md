@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.9.28 — 2026-09-28
+
+### Changed
+- Calendar version cut covering #28 (earlier-assign checkout safety net), #29 (redeclare hotfix), and #30 (Soft-STAMP #19 dashboard intro CSS revert).
+
 ## 2.7.32 — 2026-09-22
 
 ### Added
