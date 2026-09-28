@@ -602,14 +602,3 @@
   background: #689c4b;
   color: #fff;
 }
-
-/* Intro text styling */
-.intersoccer-account-dashboard-intro {
-  font-size: 16px;
-  color: #50575e;
-  margin-bottom: 20px;
-  padding: 12px 16px;
-  background: #f0f6ed;
-  border-radius: 8px;
-  border-left: 4px solid #7ab55c;
-}
