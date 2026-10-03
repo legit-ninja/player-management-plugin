@@ -27,6 +27,18 @@ jQuery(document).ready(function($) {
     return translations[genderNormalized] || genderValue;
   }
 
+  /**
+   * Escape text for safe use in HTML text nodes and double-quoted attributes.
+   */
+  function escapeHtml(value) {
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   // Save player (edit or add) with debounce
   function savePlayer($row, isAdd = false) {
     if (intersoccerState.isProcessing) {
@@ -163,32 +175,45 @@ jQuery(document).ready(function($) {
           const player = response.data.player;
           if (isAdd) {
             $table.find(".no-players").remove();
+            const rowPlayerIndex = player.player_index || newIndex;
+            const rowUserId = player.user_id || userId;
+            const rowFirstName = player.first_name || "N/A";
+            const rowLastName = player.last_name || "N/A";
+            const rowDob = player.dob || "N/A";
+            const rowGender = player.gender || "N/A";
+            const rowAvs = player.avs_number || "N/A";
+            const rowEventCount = player.event_count || 0;
+            const rowCanton = player.canton || "";
+            const rowCity = player.city || "";
+            const rowCreated = player.creation_timestamp || "";
+            const rowMedical = player.medical_conditions || "";
+            const rowMedicalPreview = rowMedical.substring(0, 20) + (rowMedical.length > 20 ? "..." : "");
             const $newRow = $(`
-              <tr data-player-index="${player.player_index || newIndex}" 
-                  data-user-id="${player.user_id || userId}" 
-                  data-first-name="${player.first_name || "N/A"}" 
-                  data-last-name="${player.last_name || "N/A"}" 
-                  data-dob="${player.dob || "N/A"}" 
-                  data-gender="${player.gender || "N/A"}" 
-                  data-avs-number="${player.avs_number || "N/A"}"
-                  data-event-count="${player.event_count || 0}"
-                  data-canton="${player.canton || ""}"
-                  data-city="${player.city || ""}"
-                  data-creation-timestamp="${player.creation_timestamp || ""}"
-                  data-medical-conditions="${encodeURIComponent(player.medical_conditions || "")}">
-                  <td class="display-user-id">${player.user_id || userId}</td>
-                  <td class="display-canton">${player.canton || ""}</td>
-                  <td class="display-city">${player.city || ""}</td>
-                  <td class="display-first-name">${player.first_name || "N/A"}</td>
-                  <td class="display-last-name">${player.last_name || "N/A"}</td>
-                  <td class="display-dob">${player.dob || "N/A"}</td>
-                  <td class="display-gender">${translateGender(player.gender || "N/A")}</td>
-                  <td class="display-avs-number">${player.avs_number || "N/A"}</td>
-                  <td class="display-medical-conditions">${(player.medical_conditions || '').substring(0, 20) + ((player.medical_conditions || '').length > 20 ? '...' : '')}</td>
-                  <td class="display-event-count">${player.event_count || 0}</td>
+              <tr data-player-index="${escapeHtml(rowPlayerIndex)}" 
+                  data-user-id="${escapeHtml(rowUserId)}" 
+                  data-first-name="${escapeHtml(rowFirstName)}" 
+                  data-last-name="${escapeHtml(rowLastName)}" 
+                  data-dob="${escapeHtml(rowDob)}" 
+                  data-gender="${escapeHtml(rowGender)}" 
+                  data-avs-number="${escapeHtml(rowAvs)}"
+                  data-event-count="${escapeHtml(rowEventCount)}"
+                  data-canton="${escapeHtml(rowCanton)}"
+                  data-city="${escapeHtml(rowCity)}"
+                  data-creation-timestamp="${escapeHtml(rowCreated)}"
+                  data-medical-conditions="${escapeHtml(encodeURIComponent(rowMedical))}">
+                  <td class="display-user-id">${escapeHtml(rowUserId)}</td>
+                  <td class="display-canton">${escapeHtml(rowCanton)}</td>
+                  <td class="display-city">${escapeHtml(rowCity)}</td>
+                  <td class="display-first-name">${escapeHtml(rowFirstName)}</td>
+                  <td class="display-last-name">${escapeHtml(rowLastName)}</td>
+                  <td class="display-dob">${escapeHtml(rowDob)}</td>
+                  <td class="display-gender">${escapeHtml(translateGender(rowGender))}</td>
+                  <td class="display-avs-number">${escapeHtml(rowAvs)}</td>
+                  <td class="display-medical-conditions">${escapeHtml(rowMedicalPreview)}</td>
+                  <td class="display-event-count">${escapeHtml(rowEventCount)}</td>
                   <td class="actions">
-                      <a href="#" class="edit-player" data-index="${player.player_index || newIndex}" data-user-id="${player.user_id || userId}" aria-label="Edit player ${player.first_name || ""}" aria-expanded="false">Edit</a>
-                      <a href="#" class="delete-player" data-index="${player.player_index || newIndex}" data-user-id="${player.user_id || userId}" aria-label="Delete player ${player.first_name || ""}">Delete</a>
+                      <a href="#" class="edit-player" data-index="${escapeHtml(rowPlayerIndex)}" data-user-id="${escapeHtml(rowUserId)}" aria-label="Edit player ${escapeHtml(rowFirstName)}" aria-expanded="false">Edit</a>
+                      <a href="#" class="delete-player" data-index="${escapeHtml(rowPlayerIndex)}" data-user-id="${escapeHtml(rowUserId)}" aria-label="Delete player ${escapeHtml(rowFirstName)}">Delete</a>
                   </td>
               </tr>
             `);
@@ -332,19 +357,19 @@ jQuery(document).ready(function($) {
       });
     }
 
-    $row.find(".display-user-id").html(`<a href="/wp-admin/user-edit.php?user_id=${player.user_id || intersoccerPlayer.user_id}" aria-label="Edit user profile">${player.user_id || intersoccerPlayer.user_id}</a>`);
-    $row.find(".display-canton").html(`<span class="display-canton">${canton}</span>`);
-    $row.find(".display-city").html(`<span class="display-city">${city}</span>`);
+    $row.find(".display-user-id").html(`<a href="/wp-admin/user-edit.php?user_id=${escapeHtml(player.user_id || intersoccerPlayer.user_id)}" aria-label="Edit user profile">${escapeHtml(player.user_id || intersoccerPlayer.user_id)}</a>`);
+    $row.find(".display-canton").text(canton);
+    $row.find(".display-city").text(city);
     $row.find(".display-first-name").html(`
-      <input type="text" name="player_first_name" value="${firstName}" required aria-required="true" maxlength="50">
+      <input type="text" name="player_first_name" value="${escapeHtml(firstName)}" required aria-required="true" maxlength="50">
       <span class="error-message" style="display: none;"></span>
     `);
     $row.find(".display-last-name").html(`
-      <input type="text" name="player_last_name" value="${lastName}" required aria-required="true" maxlength="50">
+      <input type="text" name="player_last_name" value="${escapeHtml(lastName)}" required aria-required="true" maxlength="50">
       <span class="error-message" style="display: none;"></span>
     `);
     $row.find(".display-dob").html(`
-      <input type="text" name="player_dob" class="date-picker" value="${dob}" required aria-required="true" maxlength="10">
+      <input type="text" name="player_dob" class="date-picker" value="${escapeHtml(dob)}" required aria-required="true" maxlength="10">
       <span class="error-message" style="display: none;"></span>
     `);
     $row.find(".display-gender").html(`
@@ -357,34 +382,30 @@ jQuery(document).ready(function($) {
       <span class="error-message" style="display: none;"></span>
     `);
     $row.find(".display-avs-number").html(`
-      <input type="text" name="player_avs_number" value="${avsNumber}" aria-required="true" maxlength="50">
+      <input type="text" name="player_avs_number" value="${escapeHtml(avsNumber)}" aria-required="true" maxlength="50">
       <span class="avs-instruction">No AVS? Enter foreign insurance number or "0000" and email us the insurance details.</span>
       <span class="error-message" style="display: none;"></span>
     `);
-    $row.find(".display-medical-conditions").html(`
-      <span class="display-medical-conditions">${decodeURIComponent(medical).substring(0, 20) + (decodeURIComponent(medical).length > 20 ? "..." : "")}</span>
-    `);
-    $row.find(".display-event-count").html(`<span class="display-event-count">${eventCount}</span>`);
-    $row.find(".display-creation-date").html(`
-      <span class="display-creation-date">${creationTimestamp ? new Date(creationTimestamp * 1000).toISOString().split("T")[0] : "N/A"}</span>
-    `);
+    $row.find(".display-medical-conditions").text(decodeURIComponent(medical).substring(0, 20) + (decodeURIComponent(medical).length > 20 ? "..." : ""));
+    $row.find(".display-event-count").text(eventCount);
+    $row.find(".display-creation-date").text(creationTimestamp ? new Date(creationTimestamp * 1000).toISOString().split("T")[0] : "N/A");
     $row.find(".display-past-events").html(`
       <span class="display-past-events">${pastEvents.length ? pastEvents.map(event => event.name + (event.date && event.venue ? ` (${event.date}, ${event.venue})` : '')).join('<br>') : "No past events."}</span>
     `);
     $row.find(".actions").html(`
       <a href="#" class="player-submit" aria-label="Save Player">Save</a> /
       <a href="#" class="cancel-edit" aria-label="Cancel Edit">Cancel</a> /
-      <a href="#" class="delete-player" data-index="${index}" data-user-id="${player.user_id || intersoccerPlayer.user_id}" aria-label="Delete player ${firstName || ""}">Delete</a>
+      <a href="#" class="delete-player" data-index="${escapeHtml(index)}" data-user-id="${escapeHtml(player.user_id || intersoccerPlayer.user_id)}" aria-label="Delete player ${escapeHtml(firstName || "")}">Delete</a>
     `);
 
     // Insert medical row for the edited player
     if (intersoccerState.editingIndex === index) {
       const $medicalRow = $(`
-        <tr class="medical-row active" data-player-index="${index}">
+        <tr class="medical-row active" data-player-index="${escapeHtml(index)}">
           <td colspan="11">
-            <label for="player_medical_${index}">Medical Conditions, Dietary Restrictions, and Allergies:</label>
-            <textarea id="player_medical_${index}" name="player_medical" maxlength="500" aria-describedby="medical-instructions-${index}">${decodeURIComponent(medical)}</textarea>
-            <span id="medical-instructions-${index}" class="screen-reader-text">Optional field for medical conditions, dietary restrictions, and allergies.</span>
+            <label for="player_medical_${escapeHtml(index)}">Medical Conditions, Dietary Restrictions, and Allergies:</label>
+            <textarea id="player_medical_${escapeHtml(index)}" name="player_medical" maxlength="500" aria-describedby="medical-instructions-${escapeHtml(index)}">${escapeHtml(decodeURIComponent(medical))}</textarea>
+            <span id="medical-instructions-${escapeHtml(index)}" class="screen-reader-text">Optional field for medical conditions, dietary restrictions, and allergies.</span>
             <span class="error-message" style="display: none;"></span>
           </td>
         </tr>
@@ -440,21 +461,21 @@ jQuery(document).ready(function($) {
       const pastEvents = player.past_events && player.past_events.length ? player.past_events.map(event => event.name + (event.date && event.venue ? ` (${event.date}, ${event.venue})` : '')).join('<br>') : "No past events.";
 
       setTimeout(() => {
-        $row.find(".display-user-id").html(`<a href="/wp-admin/user-edit.php?user_id=${userId}" aria-label="Edit user profile">${userId}</a>`);
-        $row.find(".display-canton").html(`<span class="display-canton">${canton}</span>`);
-        $row.find(".display-city").html(`<span class="display-city">${city}</span>`);
-        $row.find(".display-first-name").html(`<span class="display-first-name">${firstName}</span>`);
-        $row.find(".display-last-name").html(`<span class="display-last-name">${lastName}</span>`);
-        $row.find(".display-dob").html(`<span class="display-dob">${dob}</span>`);
-        $row.find(".display-gender").html(`<span class="display-gender">${gender}</span>`);
-        $row.find(".display-avs-number").html(`<span class="display-avs-number">${avsNumber}</span>`);
-        $row.find(".display-medical-conditions").html(`<span class="display-medical-conditions">${decodeURIComponent(medical).substring(0, 20) + (decodeURIComponent(medical).length > 20 ? "..." : "") || ""}</span>`);
-        $row.find(".display-event-count").html(`<span class="display-event-count">${eventCount}</span>`);
-        $row.find(".display-creation-date").html(`<span class="display-creation-date">${creationTimestamp ? new Date(creationTimestamp * 1000).toISOString().split("T")[0] : "N/A"}</span>`);
-        $row.find(".display-past-events").html(`<span class="display-past-events">${pastEvents}</span>`);
+        $row.find(".display-user-id").html(`<a href="/wp-admin/user-edit.php?user_id=${escapeHtml(userId)}" aria-label="Edit user profile">${escapeHtml(userId)}</a>`);
+        $row.find(".display-canton").text(canton);
+        $row.find(".display-city").text(city);
+        $row.find(".display-first-name").text(firstName);
+        $row.find(".display-last-name").text(lastName);
+        $row.find(".display-dob").text(dob);
+        $row.find(".display-gender").text(translateGender(gender));
+        $row.find(".display-avs-number").text(avsNumber);
+        $row.find(".display-medical-conditions").text((decodeURIComponent(medical).substring(0, 20) + (decodeURIComponent(medical).length > 20 ? "..." : "")) || "");
+        $row.find(".display-event-count").text(eventCount);
+        $row.find(".display-creation-date").text(creationTimestamp ? new Date(creationTimestamp * 1000).toISOString().split("T")[0] : "N/A");
+        $row.find(".display-past-events").html(`<span class="display-past-events">${escapeHtml(pastEvents)}</span>`);
         $row.find(".actions").html(`
-          <a href="#" class="edit-player" data-index="${index}" data-user-id="${userId}" aria-label="Edit player ${firstName || ""}" aria-expanded="false">Edit</a>
-          <a href="#" class="delete-player" data-index="${index}" data-user-id="${userId}" aria-label="Delete player ${firstName || ""}">Delete</a>
+          <a href="#" class="edit-player" data-index="${escapeHtml(index)}" data-user-id="${escapeHtml(userId)}" aria-label="Edit player ${escapeHtml(firstName || "")}" aria-expanded="false">Edit</a>
+          <a href="#" class="delete-player" data-index="${escapeHtml(index)}" data-user-id="${escapeHtml(userId)}" aria-label="Delete player ${escapeHtml(firstName || "")}">Delete</a>
         `);
 
         $row.removeClass("editing");
@@ -487,21 +508,21 @@ jQuery(document).ready(function($) {
         const pastEvents = player.past_events && player.past_events.length ? player.past_events.map(event => event.name + (event.date && event.venue ? ` (${event.date}, ${event.venue})` : '')).join('<br>') : "No past events.";
 
         setTimeout(() => {
-          $row.find(".display-user-id").html(`<a href="/wp-admin/user-edit.php?user_id=${userId}" aria-label="Edit user profile">${userId}</a>`);
-          $row.find(".display-canton").html(`<span class="display-canton">${canton}</span>`);
-          $row.find(".display-city").html(`<span class="display-city">${city}</span>`);
-          $row.find(".display-first-name").html(`<span class="display-first-name">${firstName}</span>`);
-          $row.find(".display-last-name").html(`<span class="display-last-name">${lastName}</span>`);
-          $row.find(".display-dob").html(`<span class="display-dob">${dob}</span>`);
-          $row.find(".display-gender").html(`<span class="display-gender">${gender}</span>`);
-          $row.find(".display-avs-number").html(`<span class="display-avs-number">${avsNumber}</span>`);
-          $row.find(".display-medical-conditions").html(`<span class="display-medical-conditions">${decodeURIComponent(medical).substring(0, 20) + (decodeURIComponent(medical).length > 20 ? "..." : "") || ""}</span>`);
-          $row.find(".display-event-count").html(`<span class="display-event-count">${eventCount}</span>`);
-          $row.find(".display-creation-date").html(`<span class="display-creation-date">${creationTimestamp ? new Date(creationTimestamp * 1000).toISOString().split("T")[0] : "N/A"}</span>`);
-          $row.find(".display-past-events").html(`<span class="display-past-events">${pastEvents}</span>`);
+          $row.find(".display-user-id").html(`<a href="/wp-admin/user-edit.php?user_id=${escapeHtml(userId)}" aria-label="Edit user profile">${escapeHtml(userId)}</a>`);
+          $row.find(".display-canton").text(canton);
+          $row.find(".display-city").text(city);
+          $row.find(".display-first-name").text(firstName);
+          $row.find(".display-last-name").text(lastName);
+          $row.find(".display-dob").text(dob);
+          $row.find(".display-gender").text(translateGender(gender));
+          $row.find(".display-avs-number").text(avsNumber);
+          $row.find(".display-medical-conditions").text((decodeURIComponent(medical).substring(0, 20) + (decodeURIComponent(medical).length > 20 ? "..." : "")) || "");
+          $row.find(".display-event-count").text(eventCount);
+          $row.find(".display-creation-date").text(creationTimestamp ? new Date(creationTimestamp * 1000).toISOString().split("T")[0] : "N/A");
+          $row.find(".display-past-events").html(`<span class="display-past-events">${escapeHtml(pastEvents)}</span>`);
           $row.find(".actions").html(`
-            <a href="#" class="edit-player" data-index="${index}" data-user-id="${userId}" aria-label="Edit player ${firstName || ""}" aria-expanded="false">Edit</a>
-            <a href="#" class="delete-player" data-index="${index}" data-user-id="${userId}" aria-label="Delete player ${firstName || ""}">Delete</a>
+            <a href="#" class="edit-player" data-index="${escapeHtml(index)}" data-user-id="${escapeHtml(userId)}" aria-label="Edit player ${escapeHtml(firstName || "")}" aria-expanded="false">Edit</a>
+            <a href="#" class="delete-player" data-index="${escapeHtml(index)}" data-user-id="${escapeHtml(userId)}" aria-label="Delete player ${escapeHtml(firstName || "")}">Delete</a>
           `);
 
           $row.removeClass("editing");

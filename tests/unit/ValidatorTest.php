@@ -636,5 +636,67 @@ class ValidatorTest extends InterSoccer_Test_Case
             $this->assertTrue($result, "Date format '$format' should be supported");
         }
     }
-}
 
+    /**
+     * Reject names that break out of HTML attributes (quotes / angle brackets).
+     */
+    public function test_validate_player_data_rejects_html_breakout_in_name()
+    {
+        $data = $this->fixtures['valid_player'];
+        $data['first_name'] = 'Leo" tabindex="1" autofocus onfocus="alert(1)" x="';
+
+        $result = $this->validator->validate_player_data($data);
+        $this->assertFalse($result, 'Names with double quotes must be rejected');
+
+        $errors = $this->validator->get_errors();
+        $this->assertArrayHasKey('first_name', $errors);
+    }
+
+    /**
+     * Keep legitimate accents, apostrophes, and hyphens.
+     */
+    public function test_is_valid_player_name_allows_accents_apostrophes_hyphens()
+    {
+        $this->assertTrue($this->validator->is_valid_player_name("François"));
+        $this->assertTrue($this->validator->is_valid_player_name("O'Connor"));
+        $this->assertTrue($this->validator->is_valid_player_name("Anne-Marie"));
+        $this->assertFalse($this->validator->is_valid_player_name('Leo"x'));
+        $this->assertFalse($this->validator->is_valid_player_name('A<b>'));
+    }
+
+    /**
+     * Gender must stay within allowed values.
+     */
+    public function test_is_valid_gender_allows_only_known_values()
+    {
+        $this->assertTrue($this->validator->is_valid_gender('male'));
+        $this->assertTrue($this->validator->is_valid_gender('female'));
+        $this->assertTrue($this->validator->is_valid_gender('other'));
+        $this->assertFalse($this->validator->is_valid_gender('male" onfocus="alert(1)"'));
+        $this->assertFalse($this->validator->is_valid_gender('unknown'));
+    }
+
+    /**
+     * City and canton reject HTML breakout characters but allow place punctuation.
+     */
+    public function test_city_and_canton_reject_html_breakout_characters()
+    {
+        $data = $this->fixtures['valid_player'];
+        $data['city'] = 'Geneva" onfocus="alert(1)"';
+        $data['canton'] = 'GE';
+
+        $result = $this->validator->validate_player_data($data);
+        $this->assertFalse($result);
+        $this->assertArrayHasKey('city', $this->validator->get_errors());
+
+        $data = $this->fixtures['valid_player'];
+        $data['city'] = 'St. Gallen';
+        $data['canton'] = "L'Abbaye";
+        $this->assertTrue($this->validator->validate_player_data($data), 'Legitimate place names should pass');
+
+        $this->assertTrue($this->validator->is_valid_place_name('La Chaux-de-Fonds'));
+        $this->assertFalse($this->validator->is_valid_place_name('City<script>'));
+        $this->assertSame('Zurich', $this->validator->strip_html_breakout_chars('Zurich"<>`'));
+    }
+
+}

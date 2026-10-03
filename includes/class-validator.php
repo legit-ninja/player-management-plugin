@@ -55,8 +55,16 @@ class InterSoccer_Player_Validator {
         // Validate gender
         if (empty($data['gender'])) {
             $this->add_error('gender', __('Gender is required.', INTERSOCCER_PLAYER_TEXT_DOMAIN));
-        } elseif (!in_array($data['gender'], array('male', 'female', 'other'))) {
+        } elseif (!in_array($data['gender'], array('male', 'female', 'other'), true)) {
             $this->add_error('gender', __('Invalid gender selection.', INTERSOCCER_PLAYER_TEXT_DOMAIN));
+        }
+
+        // Optional city/canton (billing fields attached to player rows)
+        if (!empty($data['city']) && !$this->is_valid_place_name($data['city'])) {
+            $this->add_error('city', __('City contains invalid characters.', INTERSOCCER_PLAYER_TEXT_DOMAIN));
+        }
+        if (!empty($data['canton']) && !$this->is_valid_place_name($data['canton'])) {
+            $this->add_error('canton', __('Canton contains invalid characters.', INTERSOCCER_PLAYER_TEXT_DOMAIN));
         }
 
         // Validate AVS number (Swiss social security number)
@@ -147,6 +155,53 @@ class InterSoccer_Player_Validator {
     private function validate_name($name) {
         // Allow letters, spaces, hyphens, apostrophes, and some accented characters
         return preg_match('/^[a-zA-ZÀ-ÿ\s\'-]+$/u', $name) && strlen($name) <= 50;
+    }
+
+    /**
+     * Public name check for AJAX defence-in-depth (rejects quotes/angle brackets).
+     *
+     * @param string $name
+     * @return bool
+     */
+    public function is_valid_player_name($name) {
+        return is_string($name) && $name !== '' && $this->validate_name($name);
+    }
+
+    /**
+     * Allowed gender values stored for players.
+     *
+     * @param string $gender
+     * @return bool
+     */
+    public function is_valid_gender($gender) {
+        return is_string($gender) && in_array($gender, array('male', 'female', 'other'), true);
+    }
+
+    /**
+     * Validate city/canton place names. Same safety rules as player names, plus
+     * digits and periods for places like "St. Gallen" or "La Chaux-de-Fonds".
+     *
+     * @param string $place
+     * @return bool
+     */
+    public function is_valid_place_name($place) {
+        if (!is_string($place) || $place === '') {
+            return true; // optional
+        }
+        return (bool) preg_match('/^[a-zA-ZÀ-ÿ0-9\s\'.\-]+$/u', $place) && strlen($place) <= 100;
+    }
+
+    /**
+     * Strip characters that can break out of HTML attributes/text as defence in depth.
+     * Keeps accents, apostrophes, hyphens, and spaces. Removes angle brackets, double
+     * quotes, backticks, and backslashes.
+     *
+     * @param string $value
+     * @return string
+     */
+    public function strip_html_breakout_chars($value) {
+        $value = is_string($value) ? $value : '';
+        return preg_replace('/[<>"`\\\\]/', '', $value);
     }
 
     /**
@@ -244,8 +299,8 @@ class InterSoccer_Player_Validator {
      */
     public function sanitize_player_data(array $data) {
         return [
-            'first_name' => isset($data['first_name']) ? sanitize_text_field($data['first_name']) : '',
-            'last_name' => isset($data['last_name']) ? sanitize_text_field($data['last_name']) : '',
+            'first_name' => isset($data['first_name']) ? $this->strip_html_breakout_chars(sanitize_text_field($data['first_name'])) : '',
+            'last_name' => isset($data['last_name']) ? $this->strip_html_breakout_chars(sanitize_text_field($data['last_name'])) : '',
             'dob' => isset($data['dob']) ? sanitize_text_field($data['dob']) : '',
             'gender' => isset($data['gender']) && in_array($data['gender'], ['male', 'female', 'other'], true)
                 ? $data['gender']
