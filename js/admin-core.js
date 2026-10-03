@@ -23,6 +23,18 @@ jQuery(document).ready(function($) {
     return translations[genderNormalized] || genderValue;
   }
 
+  /**
+   * Escape text for safe use in HTML text nodes and double-quoted attributes.
+   */
+  function escapeHtml(value) {
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   const $container = $(".intersoccer-player-management");
   const $table = $("#player-table");
   const $message = $container.find(".intersoccer-message");
@@ -121,31 +133,43 @@ jQuery(document).ready(function($) {
           return;
         }
         if (debugEnabled) console.log('InterSoccer: Player data for index ' + index + ':', JSON.stringify(player));
+        const userId = player.user_id || intersoccerPlayer.user_id;
+        const firstName = player.first_name || 'N/A';
+        const lastName = player.last_name || 'N/A';
+        const dob = player.dob || 'N/A';
+        const gender = player.gender || 'N/A';
+        const avsNumber = player.avs_number || 'N/A';
+        const eventCount = player.event_count || 0;
+        const canton = player.canton || '';
+        const city = player.city || '';
+        const creationTimestamp = player.creation_timestamp || '';
+        const medical = player.medical_conditions || '';
+        const medicalPreview = medical.substring(0, 20) + (medical.length > 20 ? '...' : '');
         const rowHtml = `
-          <tr data-player-index="${index}"
-              data-user-id="${player.user_id || intersoccerPlayer.user_id}"
-              data-first-name="${player.first_name || 'N/A'}"
-              data-last-name="${player.last_name || 'N/A'}"
-              data-dob="${player.dob || 'N/A'}"
-              data-gender="${player.gender || 'N/A'}"
-              data-avs-number="${player.avs_number || 'N/A'}"
-              data-event-count="${player.event_count || 0}"
-              data-canton="${player.canton || ''}"
-              data-city="${player.city || ''}"
-              data-creation-timestamp="${player.creation_timestamp || ''}"
-              data-medical-conditions="${encodeURIComponent(player.medical_conditions || '')}">
-              <td class="display-user-id">${player.user_id || intersoccerPlayer.user_id}</td>
-              <td class="display-canton">${player.canton || ''}</td>
-              <td class="display-city">${player.city || ''}</td>
-              <td class="display-first-name">${player.first_name || 'N/A'}</td>
-              <td class="display-last-name">${player.last_name || 'N/A'}</td>
-              <td class="display-dob">${player.dob || 'N/A'}</td>
-              <td class="display-gender">${translateGender(player.gender || 'N/A')}</td>
-              <td class="display-avs-number">${player.avs_number || 'N/A'}</td>
-              <td class="display-medical-conditions">${(player.medical_conditions || '').substring(0, 20) + ((player.medical_conditions || '').length > 20 ? '...' : '')}</td>
+          <tr data-player-index="${escapeHtml(index)}"
+              data-user-id="${escapeHtml(userId)}"
+              data-first-name="${escapeHtml(firstName)}"
+              data-last-name="${escapeHtml(lastName)}"
+              data-dob="${escapeHtml(dob)}"
+              data-gender="${escapeHtml(gender)}"
+              data-avs-number="${escapeHtml(avsNumber)}"
+              data-event-count="${escapeHtml(eventCount)}"
+              data-canton="${escapeHtml(canton)}"
+              data-city="${escapeHtml(city)}"
+              data-creation-timestamp="${escapeHtml(creationTimestamp)}"
+              data-medical-conditions="${escapeHtml(encodeURIComponent(medical))}">
+              <td class="display-user-id">${escapeHtml(userId)}</td>
+              <td class="display-canton">${escapeHtml(canton)}</td>
+              <td class="display-city">${escapeHtml(city)}</td>
+              <td class="display-first-name">${escapeHtml(firstName)}</td>
+              <td class="display-last-name">${escapeHtml(lastName)}</td>
+              <td class="display-dob">${escapeHtml(dob)}</td>
+              <td class="display-gender">${escapeHtml(translateGender(gender))}</td>
+              <td class="display-avs-number">${escapeHtml(avsNumber)}</td>
+              <td class="display-medical-conditions">${escapeHtml(medicalPreview)}</td>
               <td class="actions">
-                  <a href="#" class="edit-player" data-index="${index}" data-user-id="${player.user_id || intersoccerPlayer.user_id}" aria-label="Edit player ${player.first_name || ''}" aria-expanded="false">Edit</a>
-                  <a href="#" class="delete-player" data-index="${index}" data-user-id="${player.user_id || intersoccerPlayer.user_id}" aria-label="Delete player ${player.first_name || ''}">Delete</a>
+                  <a href="#" class="edit-player" data-index="${escapeHtml(index)}" data-user-id="${escapeHtml(userId)}" aria-label="Edit player ${escapeHtml(firstName)}" aria-expanded="false">Edit</a>
+                  <a href="#" class="delete-player" data-index="${escapeHtml(index)}" data-user-id="${escapeHtml(userId)}" aria-label="Delete player ${escapeHtml(firstName)}">Delete</a>
               </td>
           </tr>
         `;

@@ -290,8 +290,12 @@ function intersoccer_render_players_form($is_admin = false, $settings = []) {
         $users = get_users(['role__in' => ['customer', 'subscriber']]);
         foreach ($users as $user) {
             $user_players = get_user_meta($user->ID, 'intersoccer_players', true) ?: [];
-            $billing_state = get_user_meta($user->ID, 'billing_state', true) ?: 'Unknown';
-            $billing_city = get_user_meta($user->ID, 'billing_city', true) ?: '';
+            $billing_state = function_exists('intersoccer_sanitize_place_field')
+                ? intersoccer_sanitize_place_field(get_user_meta($user->ID, 'billing_state', true) ?: 'Unknown')
+                : (get_user_meta($user->ID, 'billing_state', true) ?: 'Unknown');
+            $billing_city = function_exists('intersoccer_sanitize_place_field')
+                ? intersoccer_sanitize_place_field(get_user_meta($user->ID, 'billing_city', true) ?: '')
+                : (get_user_meta($user->ID, 'billing_city', true) ?: '');
             if (defined('WP_DEBUG') && WP_DEBUG) {
                 error_log('InterSoccer: User ' . $user->ID . ' canton: ' . $billing_state . ', city: ' . $billing_city);
             }
