@@ -292,6 +292,29 @@ function intersoccer_save_cart_player_selection_from_post($posted_data) {
  * Safety net for classic checkout — primary assignment happens at product ATC (PV repo).
  * Recognizes assignment from any known cart item key (PV ATC or PM dropdown).
  */
+
+if (!function_exists('intersoccer_checkout_player_index_is_unresolved')) {
+    /**
+     * True when a non-empty cart index does not match a stored player key.
+     *
+     * Logged-out checkouts are left unchanged (no player list to resolve).
+     * A deleted index must not pass just because another child remains.
+     *
+     * @param mixed $player_index Cart player index.
+     * @return bool
+     */
+    function intersoccer_checkout_player_index_is_unresolved($player_index) {
+        $user_id = get_current_user_id();
+        if (!$user_id || !function_exists('intersoccer_get_player_by_index')) {
+            return false;
+        }
+
+        $player = intersoccer_get_player_by_index($user_id, $player_index);
+
+        return !is_array($player);
+    }
+}
+
 function intersoccer_validate_checkout_player_assignment() {
     $cart = WC()->cart;
     if (!$cart) {
@@ -309,7 +332,7 @@ function intersoccer_validate_checkout_player_assignment() {
 
         $player_index = intersoccer_get_cart_item_player_index($cart_item);
         
-        if ($player_index === '' || $player_index === null) {
+        if ($player_index === '' || $player_index === null || intersoccer_checkout_player_index_is_unresolved($player_index)) {
             $missing_assignments[] = $product->get_name();
         }
     }
