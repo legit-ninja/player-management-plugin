@@ -282,15 +282,9 @@ function intersoccer_resolve_intersoccer_players_meta_key(array $players, $reque
     if ($as_int !== null && array_key_exists($as_int, $players)) {
         return $as_int;
     }
-    if ($as_int === null) {
-        return null;
-    }
-
-    $keys = array_keys($players);
-    if ($as_int >= 0 && $as_int < count($keys)) {
-        return $keys[$as_int];
-    }
-
+    // A missing key is a deleted player (unset leaves a hole). Do not fall
+    // back to list position: the cart still holds the old index, and that
+    // position may now be a different child.
     return null;
 }
 }
@@ -327,7 +321,7 @@ function intersoccer_get_player_by_id($user_id, $player_id) {
  * Get a player row by array index/key.
  *
  * @param int        $user_id      WordPress user ID.
- * @param int|string $player_index Array key or list position.
+ * @param int|string $player_index Stored array key. A missing key is rejected.
  * @return array|null
  */
 if (!function_exists('intersoccer_get_player_by_index')) {

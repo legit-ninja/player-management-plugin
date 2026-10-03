@@ -105,4 +105,60 @@ class PlayerDataTest extends InterSoccer_Test_Case
         $this->assertArrayHasKey(2, $stored);
         $this->assertSame('b', $stored[2]['player_id']);
     }
+
+    public function test_missing_player_index_is_rejected_instead_of_list_position()
+    {
+        $players = [
+            0 => [
+                'first_name' => 'Alice',
+                'last_name' => 'A',
+                'dob' => '2015-01-01',
+                'medical_conditions' => 'none',
+            ],
+            2 => [
+                'first_name' => 'Carol',
+                'last_name' => 'C',
+                'dob' => '2013-03-03',
+                'medical_conditions' => 'asthma',
+            ],
+        ];
+
+        $this->assertNull(intersoccer_resolve_intersoccer_players_meta_key($players, 1));
+        $this->assertNull(intersoccer_resolve_intersoccer_players_meta_key($players, '1'));
+
+        foreach ([0, '0'] as $requested) {
+            $key = intersoccer_resolve_intersoccer_players_meta_key($players, $requested);
+            $this->assertNotNull($key);
+            $this->assertSame('Alice', $players[$key]['first_name']);
+            $this->assertSame('2015-01-01', $players[$key]['dob']);
+        }
+        foreach ([2, '2'] as $requested) {
+            $key = intersoccer_resolve_intersoccer_players_meta_key($players, $requested);
+            $this->assertNotNull($key);
+            $this->assertSame('Carol', $players[$key]['first_name']);
+            $this->assertSame('asthma', $players[$key]['medical_conditions']);
+        }
+    }
+
+    public function test_deleted_index_does_not_return_the_only_remaining_player()
+    {
+        $user_id = 11;
+        $this->setUserMeta($user_id, [
+            'intersoccer_players' => [
+                0 => [
+                    'player_id' => 'alice',
+                    'first_name' => 'Alice',
+                    'last_name' => 'A',
+                    'dob' => '2015-01-01',
+                    'medical_conditions' => 'none',
+                ],
+            ],
+        ]);
+
+        $this->assertNull(intersoccer_get_player_by_index($user_id, 1));
+        $alice = intersoccer_get_player_by_index($user_id, 0);
+        $this->assertIsArray($alice);
+        $this->assertSame('Alice', $alice['first_name']);
+        $this->assertSame('2015-01-01', $alice['dob']);
+    }
 }
