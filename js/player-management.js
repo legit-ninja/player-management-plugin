@@ -26,6 +26,18 @@
         return translations[genderNormalized] || genderValue;
     }
 
+    /**
+     * Escape text for safe use in HTML text nodes and double-quoted attributes.
+     */
+    function escapeHtml(value) {
+        return String(value == null ? '' : value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
     // Initialize Flatpickr
     try {
         flatpickr(".date-picker", {
@@ -99,26 +111,35 @@
                     return;
                 }
                 if (debugEnabled) console.log('InterSoccer: Player data for index ' + index + ':', JSON.stringify(player));
+                const userId = player.user_id || intersoccerPlayer.user_id;
+                const firstName = player.first_name || 'N/A';
+                const lastName = player.last_name || 'N/A';
+                const dob = player.dob || 'N/A';
+                const gender = player.gender || 'N/A';
+                const avsNumber = player.avs_number || 'N/A';
+                const eventCount = player.event_count || 0;
+                const medical = player.medical_conditions || '';
+                const medicalPreview = medical.substring(0, 20) + (medical.length > 20 ? '...' : '');
                 const rowHtml = `
-                    <tr data-player-index="${index}"
-                        data-user-id="${player.user_id || intersoccerPlayer.user_id}"
-                        data-first-name="${player.first_name || 'N/A'}"
-                        data-last-name="${player.last_name || 'N/A'}"
-                        data-dob="${player.dob || 'N/A'}"
-                        data-gender="${player.gender || 'N/A'}"
-                        data-avs-number="${player.avs_number || 'N/A'}"
-                        data-event-count="${player.event_count || 0}"
-                        data-medical-conditions="${player.medical_conditions || ''}">
-                        <td class="display-first-name">${player.first_name || 'N/A'}</td>
-                        <td class="display-last-name">${player.last_name || 'N/A'}</td>
-                        <td class="display-dob">${player.dob || 'N/A'}</td>
-                        <td class="display-gender">${translateGender(player.gender || 'N/A')}</td>
-                        <td class="display-avs-number">${player.avs_number || 'N/A'}</td>
-                        <td class="display-medical-conditions">${(player.medical_conditions || '').substring(0, 20) + ((player.medical_conditions || '').length > 20 ? '...' : '')}</td>
-                        <td class="display-event-count">${player.event_count || 0}</td>
+                    <tr data-player-index="${escapeHtml(index)}"
+                        data-user-id="${escapeHtml(userId)}"
+                        data-first-name="${escapeHtml(firstName)}"
+                        data-last-name="${escapeHtml(lastName)}"
+                        data-dob="${escapeHtml(dob)}"
+                        data-gender="${escapeHtml(gender)}"
+                        data-avs-number="${escapeHtml(avsNumber)}"
+                        data-event-count="${escapeHtml(eventCount)}"
+                        data-medical-conditions="${escapeHtml(medical)}">
+                        <td class="display-first-name">${escapeHtml(firstName)}</td>
+                        <td class="display-last-name">${escapeHtml(lastName)}</td>
+                        <td class="display-dob">${escapeHtml(dob)}</td>
+                        <td class="display-gender">${escapeHtml(translateGender(gender))}</td>
+                        <td class="display-avs-number">${escapeHtml(avsNumber)}</td>
+                        <td class="display-medical-conditions">${escapeHtml(medicalPreview)}</td>
+                        <td class="display-event-count">${escapeHtml(eventCount)}</td>
                         <td class="actions">
-                            <a href="#" class="edit-player" data-index="${index}" data-user-id="${player.user_id || intersoccerPlayer.user_id}" aria-label="Edit player ${player.first_name || ''}" aria-expanded="false">Edit</a>
-                            <a href="#" class="delete-player" data-index="${index}" aria-label="Delete player ${player.first_name || ''}">Delete</a>
+                            <a href="#" class="edit-player" data-index="${escapeHtml(index)}" data-user-id="${escapeHtml(userId)}" aria-label="Edit player ${escapeHtml(firstName)}" aria-expanded="false">Edit</a>
+                            <a href="#" class="delete-player" data-index="${escapeHtml(index)}" aria-label="Delete player ${escapeHtml(firstName)}">Delete</a>
                         </td>
                     </tr>
                 `;
@@ -131,23 +152,31 @@
     }
 
     function restorePlayerRowDisplay($row, player, index, userId) {
-        $row.find(".display-first-name").html(`<span>${player.first_name || 'N/A'}</span>`);
-        $row.find(".display-last-name").html(`<span>${player.last_name || 'N/A'}</span>`);
-        $row.find(".display-dob").html(`<span>${player.dob || 'N/A'}</span>`);
-        $row.find(".display-gender").html(`<span>${translateGender(player.gender || 'N/A')}</span>`);
-        $row.find(".display-avs-number").html(`<span>${player.avs_number || 'N/A'}</span>`);
-        $row.find(".display-event-count").html(`<span>${player.event_count || 0}</span>`);
-        $row.find(".display-medical-conditions").html(`<span>${(player.medical_conditions || '').substring(0, 20) + ((player.medical_conditions || '').length > 20 ? '...' : '')}</span>`);
+        const firstName = player.first_name || 'N/A';
+        const lastName = player.last_name || 'N/A';
+        const dob = player.dob || 'N/A';
+        const gender = player.gender || 'N/A';
+        const avsNumber = player.avs_number || 'N/A';
+        const eventCount = player.event_count || 0;
+        const medical = player.medical_conditions || '';
+        const medicalPreview = medical.substring(0, 20) + (medical.length > 20 ? '...' : '');
+        $row.find(".display-first-name").text(firstName);
+        $row.find(".display-last-name").text(lastName);
+        $row.find(".display-dob").text(dob);
+        $row.find(".display-gender").text(translateGender(gender));
+        $row.find(".display-avs-number").text(avsNumber);
+        $row.find(".display-event-count").text(eventCount);
+        $row.find(".display-medical-conditions").text(medicalPreview);
         $row.find(".actions").html(`
-            <a href="#" class="edit-player" data-index="${index}" data-user-id="${userId}" aria-label="Edit player ${player.first_name || ''}" aria-expanded="false">Edit</a>
-            <a href="#" class="delete-player" data-index="${index}" aria-label="Delete player ${player.first_name || ''}">Delete</a>
+            <a href="#" class="edit-player" data-index="${escapeHtml(index)}" data-user-id="${escapeHtml(userId)}" aria-label="Edit player ${escapeHtml(firstName)}" aria-expanded="false">Edit</a>
+            <a href="#" class="delete-player" data-index="${escapeHtml(index)}" aria-label="Delete player ${escapeHtml(firstName)}">Delete</a>
         `);
-        $row.attr("data-first-name", player.first_name || "N/A");
-        $row.attr("data-last-name", player.last_name || "N/A");
-        $row.attr("data-dob", player.dob || "N/A");
-        $row.attr("data-gender", player.gender || "N/A");
-        $row.attr("data-avs-number", player.avs_number || "N/A");
-        $row.attr("data-medical-conditions", player.medical_conditions || "");
+        $row.attr("data-first-name", firstName);
+        $row.attr("data-last-name", lastName);
+        $row.attr("data-dob", dob);
+        $row.attr("data-gender", gender);
+        $row.attr("data-avs-number", avsNumber);
+        $row.attr("data-medical-conditions", medical);
         $row.removeClass("editing");
         $tableBody.find(`.medical-row[data-player-index="${index}"]`).remove();
         intersoccerState.editingIndex = null;
