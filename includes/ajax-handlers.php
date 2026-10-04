@@ -12,6 +12,37 @@
  * Domain Path: /languages
  */
 
+
+/**
+ * Shared defence-in-depth checks for player fields that can break HTML attributes.
+ *
+ * @return InterSoccer_Player_Validator
+ */
+function intersoccer_player_field_validator() {
+    if (!class_exists('InterSoccer_Player_Validator')) {
+        require_once dirname(__FILE__) . '/class-validator.php';
+    }
+    return new InterSoccer_Player_Validator();
+}
+
+/**
+ * Reject or blank place values that contain HTML breakout characters.
+ *
+ * @param string $value
+ * @return string
+ */
+function intersoccer_sanitize_place_field($value) {
+    $validator = intersoccer_player_field_validator();
+    $value = sanitize_text_field((string) $value);
+    if ($value === '') {
+        return '';
+    }
+    if (!$validator->is_valid_place_name($value)) {
+        return $validator->strip_html_breakout_chars($value);
+    }
+    return $value;
+}
+
 add_action('wp_ajax_intersoccer_add_player', 'intersoccer_add_player');
 function intersoccer_add_player() {
     $nonce = isset($_POST['nonce']) ? sanitize_text_field($_POST['nonce']) : '';
@@ -44,6 +75,14 @@ function intersoccer_add_player() {
 
     if (!$first_name || !$last_name || !$dob || !$gender) {
         wp_send_json_error(['message' => __('All required fields must be provided', 'player-management')], 400);
+    }
+
+    $field_validator = intersoccer_player_field_validator();
+    if (!$field_validator->is_valid_player_name($first_name) || !$field_validator->is_valid_player_name($last_name)) {
+        wp_send_json_error(['message' => __('Player name contains invalid characters.', 'player-management')], 400);
+    }
+    if (!$field_validator->is_valid_gender($gender)) {
+        wp_send_json_error(['message' => __('Invalid gender selection.', 'player-management')], 400);
     }
 
     if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $dob) || !strtotime($dob)) {
@@ -139,6 +178,14 @@ function intersoccer_edit_player() {
 
     if (!$first_name || !$last_name || !$dob || !$gender) {
         wp_send_json_error(['message' => __('All required fields must be provided', 'player-management')], 400);
+    }
+
+    $field_validator = intersoccer_player_field_validator();
+    if (!$field_validator->is_valid_player_name($first_name) || !$field_validator->is_valid_player_name($last_name)) {
+        wp_send_json_error(['message' => __('Player name contains invalid characters.', 'player-management')], 400);
+    }
+    if (!$field_validator->is_valid_gender($gender)) {
+        wp_send_json_error(['message' => __('Invalid gender selection.', 'player-management')], 400);
     }
 
     if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $dob) || !strtotime($dob)) {
@@ -315,8 +362,8 @@ function intersoccer_get_player() {
     $player['user_id'] = $user_id;
     $player['player_index'] = $player_index;
     $player['event_count'] = intersoccer_get_player_event_count($user_id, $player_index);
-    $player['canton'] = $player['canton'] ?? get_user_meta($user_id, 'billing_state', true) ?: '';
-    $player['city'] = $player['city'] ?? get_user_meta($user_id, 'billing_city', true) ?: '';
+    $player['canton'] = intersoccer_sanitize_place_field($player['canton'] ?? get_user_meta($user_id, 'billing_state', true) ?: '');
+    $player['city'] = intersoccer_sanitize_place_field($player['city'] ?? get_user_meta($user_id, 'billing_city', true) ?: '');
     $player['creation_timestamp'] = $player['creation_timestamp'] ?? '';
 
     if (defined('WP_DEBUG') && WP_DEBUG) {
