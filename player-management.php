@@ -83,7 +83,7 @@ $core_files = [
     'includes/overview-metrics.php',
     'includes/ajax-handlers.php',
     'includes/data-deletion.php',
-    'includes/checkout-player-assign.php', // AC C8-C10: Checkout player assignment
+    'includes/checkout-player-assign.php', // Order meta from ATC player keys (cart picker removed)
 ];
 
 foreach ($core_files as $file) {
