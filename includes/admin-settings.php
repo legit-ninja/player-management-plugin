@@ -1,6 +1,6 @@
 <?php
 /**
- * Players → Settings: General (Update Stream) + License tabs.
+ * Players → Settings: General (Update Stream) + InterSoccer Updates tab.
  */
 
 if (!defined('ABSPATH')) {
@@ -8,7 +8,7 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * Admin settings for Player Management (Update Stream + License).
+ * Admin settings for Player Management (Update Stream + InterSoccer Updates).
  */
 class InterSoccer_Player_Management_Settings {
 	const PAGE_SLUG       = 'intersoccer-players-settings';
@@ -220,7 +220,7 @@ class InterSoccer_Player_Management_Settings {
 					<?php echo esc_html__('General', 'player-management'); ?>
 				</a>
 				<a href="<?php echo esc_url(self::page_url('license')); ?>" class="nav-tab <?php echo $tab === 'license' ? 'nav-tab-active' : ''; ?>">
-					<?php echo esc_html__('License', 'player-management'); ?>
+					<?php echo esc_html__('InterSoccer Updates', 'player-management'); ?>
 				</a>
 			</nav>
 
@@ -311,17 +311,47 @@ class InterSoccer_Player_Management_Settings {
 	}
 
 	/**
-	 * License tab: site token (shared with intersoccer-updates).
+	 * InterSoccer Updates tab: site token (shared with intersoccer-updates).
 	 *
 	 * @return void
 	 */
 	public static function render_license_tab() {
+		self::render_updates_tab_intro();
+
 		if (class_exists('InterSoccer_Updates_License_Settings')) {
 			InterSoccer_Updates_License_Settings::render_embedded_form(self::page_url('license'));
 			return;
 		}
 
 		self::render_builtin_license_form();
+	}
+
+	/**
+	 * Section heading and link to the canonical InterSoccer Updates settings page.
+	 *
+	 * @return void
+	 */
+	public static function render_updates_tab_intro() {
+		$canonical_url = admin_url('options-general.php?page=intersoccer-updates');
+		?>
+		<h2><?php echo esc_html__('InterSoccer Updates', 'player-management'); ?></h2>
+		<p>
+			<?php
+			printf(
+				wp_kses(
+					/* translators: %s: link to Settings → InterSoccer Updates */
+					__('You can also manage the update token under %s.', 'player-management'),
+					array(
+						'a' => array(
+							'href' => array(),
+						),
+					)
+				),
+				'<a href="' . esc_url($canonical_url) . '">' . esc_html__('Settings → InterSoccer Updates', 'player-management') . '</a>'
+			);
+			?>
+		</p>
+		<?php
 	}
 
 	/**
