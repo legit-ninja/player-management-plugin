@@ -304,17 +304,11 @@ class InterSoccer_Player_Management_Link_Widget extends \Elementor\Widget_Base {
         // Get the Player Management URL
         $manage_players_url = $this->get_manage_players_url();
         
-        // Check if user has players (only on frontend, not in editor)
-        $has_players = false;
-        if (!$is_editor && function_exists('intersoccer_user_has_players')) {
-            $has_players = intersoccer_user_has_players($user_id);
-        }
-        
-        // Determine if tour should be shown (never in editor or on checkout/cart/order-pay)
-        $show_tour = !$is_editor
-            && !intersoccer_pm_shepherd_is_wc_blocked_context()
-            && intersoccer_pm_player_link_widget_show_tour_enabled($stored_settings)
-            && !$has_players;
+        $show_tour = intersoccer_pm_player_link_widget_should_show_tour(
+            $is_editor,
+            $stored_settings,
+            $user_id
+        );
         $tour_auto_start = $settings['tour_auto_start'] === 'yes';
         $tour_delay = floatval($settings['tour_delay'] ?? 2);
         
@@ -472,7 +466,7 @@ class InterSoccer_Player_Management_Link_Widget extends \Elementor\Widget_Base {
         wp_localize_script('intersoccer-player-tour', 'intersoccerPlayerTour', [
             'autoStart' => $auto_start,
             'delay' => $delay,
-            'hasPlayers' => function_exists('intersoccer_user_has_players') ? intersoccer_user_has_players() : false,
+            'hasPlayers' => intersoccer_user_has_players(get_current_user_id()),
             'managePlayersUrl' => $this->get_manage_players_url(),
             'i18n' => [
                 'tourTitle' => __('Register Your Players', 'player-management'),

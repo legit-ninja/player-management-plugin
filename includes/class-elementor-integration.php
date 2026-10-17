@@ -108,39 +108,3 @@ class InterSoccer_Player_Management_Elementor_Integration {
     }
 }
 
-/**
- * Helper function to check if a user has registered players
- * 
- * @param int $user_id User ID to check
- * @return bool True if user has at least one valid player, false otherwise
- */
-if (!function_exists('intersoccer_user_has_players')) {
-function intersoccer_user_has_players($user_id = null) {
-    if (!$user_id) {
-        $user_id = get_current_user_id();
-    }
-    
-    if (!$user_id) {
-        return false;
-    }
-    
-    $players = get_user_meta($user_id, 'intersoccer_players', true);
-    
-    if (!is_array($players) || empty($players)) {
-        return false;
-    }
-    
-    // Check if there's at least one valid player with required fields
-    foreach ($players as $player) {
-        if (is_array($player) && 
-            !empty($player['first_name']) && 
-            !empty($player['last_name'])) {
-            return true;
-        }
-    }
-    
-    return false;
-}
-}
-
-
