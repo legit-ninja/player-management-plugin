@@ -44,6 +44,7 @@ class ShepherdTourAssetsTest extends TestCase
         intersoccer_pm_enqueue_shepherd_vendor_assets();
 
         $this->assertNotEmpty($GLOBALS['intersoccer_test_enqueued_scripts']);
+        $this->assertSame('intersoccer-pm-shepherd', $GLOBALS['intersoccer_test_enqueued_scripts'][0]['handle']);
         foreach ($GLOBALS['intersoccer_test_enqueued_scripts'] as $item) {
             $this->assertStringNotContainsString('cdn.jsdelivr', $item['src']);
             $this->assertStringNotContainsString('@latest', $item['src']);
@@ -52,6 +53,7 @@ class ShepherdTourAssetsTest extends TestCase
         $this->assertSame('11.2.0', $GLOBALS['intersoccer_test_enqueued_scripts'][0]['ver']);
 
         $this->assertNotEmpty($GLOBALS['intersoccer_test_enqueued_styles']);
+        $this->assertSame('intersoccer-pm-shepherd', $GLOBALS['intersoccer_test_enqueued_styles'][0]['handle']);
         $this->assertStringContainsString('assets/vendor/shepherd/11.2.0/shepherd.css', $GLOBALS['intersoccer_test_enqueued_styles'][0]['src']);
     }
 
@@ -89,15 +91,31 @@ class ShepherdTourAssetsTest extends TestCase
         $this->assertEmpty($GLOBALS['intersoccer_test_enqueued_scripts']);
     }
 
-    public function test_show_tour_control_defaults_to_off(): void
+    public function test_show_tour_control_defaults_to_on_for_elementor_save_semantics(): void
     {
         $widget_file = PLAYER_MANAGEMENT_PATH . 'elementor/widgets/player-management-link-widget.php';
         $contents    = file_get_contents($widget_file);
         $this->assertIsString($contents);
         $this->assertMatchesRegularExpression(
-            "/'show_tour'[\\s\\S]*?'default'\\s*=>\\s*''/",
+            "/'show_tour'[\\s\\S]*?'default'\\s*=>\\s*'yes'/",
             $contents
         );
+    }
+
+    public function test_missing_stored_show_tour_still_enables_tour(): void
+    {
+        $this->assertTrue(intersoccer_pm_player_link_widget_show_tour_enabled([]));
+    }
+
+    public function test_stored_show_tour_no_hides_tour(): void
+    {
+        $this->assertFalse(intersoccer_pm_player_link_widget_show_tour_enabled(['show_tour' => '']));
+        $this->assertFalse(intersoccer_pm_player_link_widget_show_tour_enabled(['show_tour' => 'no']));
+    }
+
+    public function test_shepherd_asset_handle_is_prefixed(): void
+    {
+        $this->assertSame('intersoccer-pm-shepherd', intersoccer_pm_shepherd_asset_handle());
     }
 
     public function test_widget_does_not_reference_cdn_shepherd_urls(): void

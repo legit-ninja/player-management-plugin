@@ -100,7 +100,7 @@ class InterSoccer_Player_Management_Link_Widget extends \Elementor\Widget_Base {
                 'label_on' => esc_html__('Yes', 'player-management'),
                 'label_off' => esc_html__('No', 'player-management'),
                 'return_value' => 'yes',
-                'default' => '',
+                'default' => 'yes',
                 'description' => esc_html__('Show guided tour for users without registered players', 'player-management'),
             ]
         );
@@ -277,6 +277,10 @@ class InterSoccer_Player_Management_Link_Widget extends \Elementor\Widget_Base {
 
     protected function render() {
         $settings = $this->get_settings_for_display();
+        $stored_settings = $this->get_data('settings');
+        if (!is_array($stored_settings)) {
+            $stored_settings = [];
+        }
         
         // Check if we're in Elementor editor
         $is_editor = \Elementor\Plugin::$instance->editor->is_edit_mode();
@@ -300,7 +304,7 @@ class InterSoccer_Player_Management_Link_Widget extends \Elementor\Widget_Base {
         // Determine if tour should be shown (never in editor or on checkout/cart/order-pay)
         $show_tour = !$is_editor
             && !intersoccer_pm_shepherd_is_wc_blocked_context()
-            && $settings['show_tour'] === 'yes'
+            && intersoccer_pm_player_link_widget_show_tour_enabled($stored_settings)
             && !$has_players;
         $tour_auto_start = $settings['tour_auto_start'] === 'yes';
         $tour_delay = floatval($settings['tour_delay'] ?? 2);
@@ -442,7 +446,7 @@ class InterSoccer_Player_Management_Link_Widget extends \Elementor\Widget_Base {
         wp_enqueue_script(
             'intersoccer-player-tour',
             PLAYER_MANAGEMENT_URL . 'js/shepherd-tour.js',
-            ['shepherd-js', 'jquery'],
+            [intersoccer_pm_shepherd_asset_handle(), 'jquery'],
             PLAYER_MANAGEMENT_VERSION,
             true
         );
