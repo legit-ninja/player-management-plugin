@@ -203,13 +203,18 @@
             || $row.attr("data-medical-conditions")
             || "";
 
+        const $dobInput = $source.find('input[name="player_dob"]');
+        const $medicalInput = $source.find('textarea[name="player_medical"]');
+        const dobDisabled = $dobInput.length && $dobInput.prop("disabled");
+        const medicalDisabled = !$medicalInput.length || $medicalInput.prop("disabled");
+
         const playerData = {
             player_first_name: $source.find('input[name="player_first_name"]').val()?.trim(),
             player_last_name: $source.find('input[name="player_last_name"]').val()?.trim(),
-            player_dob: $source.find('input[name="player_dob"]').val()?.trim(),
+            player_dob: dobDisabled ? "" : $dobInput.val()?.trim(),
             player_gender: $source.find('select[name="player_gender"]').val()?.trim(),
             player_avs_number: $source.find('input[name="player_avs_number"]').val()?.trim() || "0000",
-            player_medical: $source.find('textarea[name="player_medical"]').val()?.trim() || (isEdit ? existingMedical : ""),
+            player_medical: medicalDisabled ? "" : ($medicalInput.val()?.trim() || (isEdit ? existingMedical : "")),
         };
 
         if (debugEnabled) console.log("InterSoccer: Player data before validation:", playerData, "mode:", isEdit ? "edit" : "add");
@@ -219,13 +224,19 @@
             return;
         }
 
-        if (!playerData.player_first_name || !playerData.player_last_name || !playerData.player_dob || !playerData.player_gender) {
-            $message.text("First name, last name, date of birth, and gender are required.").show();
+        if (!playerData.player_first_name || !playerData.player_last_name || !playerData.player_gender) {
+            $message.text("First name, last name, and gender are required.").show();
             setTimeout(() => $message.hide(), 5000);
             return;
         }
 
-        if (!/^\d{4}-\d{2}-\d{2}$/.test(playerData.player_dob) || !new Date(playerData.player_dob).getTime()) {
+        if (!dobDisabled && (!playerData.player_dob || !playerData.player_gender)) {
+            $message.text("Date of birth and gender are required.").show();
+            setTimeout(() => $message.hide(), 5000);
+            return;
+        }
+
+        if (!dobDisabled && (!/^\d{4}-\d{2}-\d{2}$/.test(playerData.player_dob) || !new Date(playerData.player_dob).getTime())) {
             $message.text("Invalid date of birth format. Use YYYY-MM-DD.").show();
             setTimeout(() => $message.hide(), 5000);
             return;
@@ -366,12 +377,15 @@
             return;
         }
 
+        const canViewDob = String($row.data("can-view-dob")) === "1";
         const firstName = player.first_name || "N/A";
         const lastName = player.last_name || "N/A";
-        const dob = player.dob || "N/A";
+        const dob = canViewDob && player.dob && player.dob !== "N/A" ? player.dob : "";
         const gender = player.gender || "N/A";
         const avsNumber = player.avs_number || "N/A";
         const medicalConditions = player.medical_conditions || "";
+        const dobDisabledAttr = canViewDob ? "" : ' disabled aria-disabled="true"';
+        const dobRequiredAttr = canViewDob ? ' required aria-required="true"' : "";
 
         $row.find(".display-first-name").html(`
             <input type="text" name="player_first_name" value="${firstName}" required aria-required="true" maxlength="50">
@@ -382,7 +396,7 @@
             <span class="error-message" style="display: none;"></span>
         `);
         $row.find(".display-dob").html(`
-            <input type="text" name="player_dob" class="date-picker" value="${dob}" required aria-required="true" maxlength="10">
+            <input type="text" name="player_dob" class="date-picker" value="${dob}"${dobRequiredAttr}${dobDisabledAttr} maxlength="10">
             <span class="error-message" style="display: none;"></span>
         `);
         $row.find(".display-gender").html(`
@@ -418,7 +432,7 @@
                 allowInput: true,
                 altInput: true,
                 altFormat: "F j, Y",
-                defaultDate: dob !== "N/A" ? dob : null,
+                defaultDate: canViewDob && dob ? dob : null,
                 onClose: function (selectedDates, dateStr, instance) {
                     instance.element.value = dateStr;
                 },
@@ -609,7 +623,9 @@
 
         const firstName = $section.find('[name="player_first_name"]').val()?.trim();
         const lastName = $section.find('[name="player_last_name"]').val()?.trim();
-        const dob = $section.find('[name="player_dob"]').val()?.trim();
+        const $dobField = $section.find('[name="player_dob"]');
+        const dobDisabled = $dobField.length && $dobField.prop("disabled");
+        const dob = dobDisabled ? "" : $dobField.val()?.trim();
         const gender = $section.find('[name="player_gender"]').val()?.trim();
         const avsNumber = $section.find('[name="player_avs_number"]').val()?.trim() || "0000";
         const medical = $section.find('[name="player_medical"]').val()?.trim() || "";
@@ -641,7 +657,7 @@
         }
 
         // Validate DOB
-        if (isAdd || dob) {
+        if ((isAdd || dob) && !dobDisabled) {
             if (!/^\d{4}-\d{2}-\d{2}$/.test(dob) || !new Date(dob).getTime()) {
                 $section.find('[name="player_dob"]').next(".error-message")
                     .text("Invalid date of birth format. Use YYYY-MM-DD.")

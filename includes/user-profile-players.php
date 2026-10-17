@@ -76,14 +76,8 @@ function intersoccer_add_user_profile_players($user) {
         'context' => 'user_profile',
         'nonce_refresh_url' => admin_url('admin-ajax.php?action=intersoccer_refresh_nonce'),
         'debug' => defined('WP_DEBUG') && WP_DEBUG ? '1' : '0',
-        'preload_players' => array_map(
-            static function ($player) use ($user) {
-                return is_array($player)
-                    ? intersoccer_pm_redact_player_for_response($player, (int) $user->ID)
-                    : $player;
-            },
-            $players ?: []
-        ),
+        'preload_players' => intersoccer_pm_redact_players_for_preload($players ?: [], (int) $user->ID),
+        'medical_field_denied_notice' => intersoccer_pm_medical_field_denied_notice(),
         'server_time' => current_time('mysql'),
     ];
     wp_localize_script('intersoccer-player-management-js', 'intersoccerPlayer', $localize_data);
@@ -120,10 +114,12 @@ function intersoccer_add_user_profile_players($user) {
                             data-first-name="<?php echo esc_attr($player['first_name'] ?? 'N/A'); ?>"
                             data-last-name="<?php echo esc_attr($player['last_name'] ?? 'N/A'); ?>"
                             data-dob="<?php echo esc_attr(intersoccer_pm_sensitive_value_for_data_attribute($player['dob'] ?? '', (int) $user->ID, 'N/A')); ?>"
+                            data-can-view-dob="<?php echo intersoccer_pm_can_view_player_dob((int) $user->ID) ? '1' : '0'; ?>"
+                            data-can-view-medical="<?php echo intersoccer_pm_can_view_player_medical((int) $user->ID) ? '1' : '0'; ?>"
                             data-gender="<?php echo esc_attr($player['gender'] ?? 'N/A'); ?>"
                             data-avs-number="<?php echo esc_attr($player['avs_number'] ?? 'N/A'); ?>"
                             data-event-count="<?php echo esc_attr($player['event_count'] ?? 0); ?>"
-                            data-medical-conditions="<?php echo esc_attr(intersoccer_pm_sensitive_value_for_data_attribute($player['medical_conditions'] ?? '', (int) $user->ID)); ?>"
+                            data-medical-conditions="<?php echo esc_attr(intersoccer_pm_sensitive_medical_value_for_data_attribute($player['medical_conditions'] ?? '', (int) $user->ID)); ?>"
                             <?php if ($is_admin): ?>
                             data-canton="<?php echo esc_attr($player['canton'] ?? get_user_meta($user->ID, 'billing_state', true) ?: ''); ?>"
                             data-city="<?php echo esc_attr($player['city'] ?? get_user_meta($user->ID, 'billing_city', true) ?: ''); ?>"

@@ -389,6 +389,8 @@ function intersoccer_get_player() {
         error_log('InterSoccer: Returning player data for user ' . $user_id . ' at index ' . $player_index);
     }
 
-    wp_send_json_success(['player' => intersoccer_pm_redact_player_for_response($player, $user_id)]);
+    wp_send_json_success([
+        'player' => intersoccer_pm_redact_player_for_response($player, $user_id, get_current_user_id()),
+    ]);
 }
 ?>

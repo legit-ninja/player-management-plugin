@@ -16,6 +16,7 @@ class MedicalGatingAjaxTest extends InterSoccer_Test_Case
         }
         wp_cache_flush();
         $_POST = [];
+        unset($GLOBALS['wp_stub_last_json_response']);
     }
 
     private function basePlayer(): array
@@ -32,20 +33,47 @@ class MedicalGatingAjaxTest extends InterSoccer_Test_Case
         ];
     }
 
+    /**
+     * @return array<string,mixed>
+     */
+    private function invokeAjaxSuccess(callable $callback): array
+    {
+        try {
+            $callback();
+            $this->fail('Expected wp_send_json_success to throw WPSendJsonExit');
+        } catch (WPSendJsonExit $e) {
+            $this->assertSame('success', $e->getMessage());
+            $this->assertIsArray($e->payload);
+
+            return $e->payload;
+        }
+    }
+
     private function mockParentAjaxAuth(int $user_id = 1): void
     {
         $GLOBALS['wp_stub_ajax_nonce_valid'] = true;
         $GLOBALS['wp_stub_user_can'] = true;
-        $GLOBALS['wp_stub_current_user_id'] = $user_id;
-        intersoccer_test_set_user_caps(['customer' => true, 'edit_users' => false, 'edit_user' => true]);
+        intersoccer_test_set_user_caps(['customer' => true, 'edit_users' => false, 'edit_user' => true], $user_id);
     }
 
     private function mockCoachAjaxAuth(): void
     {
         $GLOBALS['wp_stub_ajax_nonce_valid'] = true;
         $GLOBALS['wp_stub_user_can'] = true;
-        $GLOBALS['wp_stub_current_user_id'] = 99;
-        intersoccer_test_set_user_caps(['coach' => true, 'read' => true, 'edit_users' => true]);
+        intersoccer_test_set_user_caps(['coach' => true, 'read' => true, 'edit_users' => true], 99);
+    }
+
+    private function mockPrivacyGrantedStaffAuth(): void
+    {
+        $GLOBALS['wp_stub_ajax_nonce_valid'] = true;
+        $GLOBALS['wp_stub_user_can'] = true;
+        intersoccer_test_set_user_caps(['manage_woocommerce' => true, 'edit_users' => true], 50);
+        if (function_exists('get_userdata')) {
+            $GLOBALS['wp_stub_user_objects'][50] = (object) [
+                'ID' => 50,
+                'roles' => ['shop_manager'],
+            ];
+        }
     }
 
     public function test_parent_add_player_stores_medical_text(): void
@@ -65,11 +93,13 @@ class MedicalGatingAjaxTest extends InterSoccer_Test_Case
             'player_medical' => 'Nut allergy',
         ];
 
-        $this->expectException(WPSendJsonExit::class);
-        intersoccer_add_player();
+        $payload = $this->invokeAjaxSuccess(static function () {
+            intersoccer_add_player();
+        });
 
         $stored = get_user_meta(1, 'intersoccer_players', true)[0];
         $this->assertSame('Nut allergy', $stored['medical_conditions']);
+        $this->assertSame('Nut allergy', $payload['player']['medical_conditions'] ?? null);
     }
 
     public function test_parent_edit_own_child_updates_dob_and_medical(): void
@@ -92,8 +122,9 @@ class MedicalGatingAjaxTest extends InterSoccer_Test_Case
             'player_medical' => 'None',
         ];
 
-        $this->expectException(WPSendJsonExit::class);
-        intersoccer_edit_player();
+        $this->invokeAjaxSuccess(static function () {
+            intersoccer_edit_player();
+        });
 
         $stored = get_user_meta(1, 'intersoccer_players', true)[0];
         $this->assertSame('2014-08-20', $stored['dob']);
@@ -114,17 +145,12 @@ class MedicalGatingAjaxTest extends InterSoccer_Test_Case
             'player_index' => 0,
         ];
 
-        $captured = null;
-        try {
+        $payload = $this->invokeAjaxSuccess(static function () {
             intersoccer_get_player();
-        } catch (WPSendJsonExit $e) {
-            $captured = $e;
-        }
-        $this->assertNotNull($captured);
+        });
 
-        $redacted = intersoccer_pm_redact_player_for_response($this->basePlayer(), 1, 1);
-        $this->assertSame('2015-05-15', $redacted['dob']);
-        $this->assertSame('Peanuts', $redacted['medical_conditions']);
+        $this->assertSame('2015-05-15', $payload['player']['dob'] ?? null);
+        $this->assertSame('Peanuts', $payload['player']['medical_conditions'] ?? null);
     }
 
     public function test_coach_edit_other_users_child_preserves_medical_and_dob(): void
@@ -147,8 +173,9 @@ class MedicalGatingAjaxTest extends InterSoccer_Test_Case
             'player_medical' => 'Hacked',
         ];
 
-        $this->expectException(WPSendJsonExit::class);
-        intersoccer_edit_player();
+        $this->invokeAjaxSuccess(static function () {
+            intersoccer_edit_player();
+        });
 
         $stored = get_user_meta(1, 'intersoccer_players', true)[0];
         $this->assertSame('Janet', $stored['first_name']);
@@ -159,9 +186,23 @@ class MedicalGatingAjaxTest extends InterSoccer_Test_Case
     public function test_coach_get_other_users_player_redacts_sensitive_fields(): void
     {
         $this->mockCoachAjaxAuth();
-        $redacted = intersoccer_pm_redact_player_for_response($this->basePlayer(), 1, 99);
-        $this->assertSame('Restricted', $redacted['dob']);
-        $this->assertSame('Restricted', $redacted['medical_conditions']);
+
+        $this->setUserMeta(1, [
+            'intersoccer_players' => [$this->basePlayer()],
+        ]);
+
+        $_POST = [
+            'nonce' => 'valid_nonce',
+            'user_id' => 1,
+            'player_index' => 0,
+        ];
+
+        $payload = $this->invokeAjaxSuccess(static function () {
+            intersoccer_get_player();
+        });
+
+        $this->assertSame('Restricted', $payload['player']['dob'] ?? null);
+        $this->assertSame('Restricted', $payload['player']['medical_conditions'] ?? null);
     }
 
     public function test_coach_add_other_users_child_stores_dob_but_not_medical(): void
@@ -181,11 +222,73 @@ class MedicalGatingAjaxTest extends InterSoccer_Test_Case
             'player_medical' => 'Nut allergy',
         ];
 
-        $this->expectException(WPSendJsonExit::class);
-        intersoccer_add_player();
+        $this->invokeAjaxSuccess(static function () {
+            intersoccer_add_player();
+        });
 
         $stored = get_user_meta(1, 'intersoccer_players', true)[0];
         $this->assertSame('2015-08-20', $stored['dob']);
         $this->assertSame('', $stored['medical_conditions']);
+    }
+
+    public function test_denied_staff_cannot_inject_medical_on_legacy_row_missing_key(): void
+    {
+        $this->mockCoachAjaxAuth();
+
+        $legacy = $this->basePlayer();
+        unset($legacy['medical_conditions']);
+        $this->setUserMeta(1, ['intersoccer_players' => [$legacy]]);
+
+        $_POST = [
+            'nonce' => 'valid_nonce',
+            'user_id' => 1,
+            'player_index' => 0,
+            'player_first_name' => 'Jane',
+            'player_last_name' => 'Doe',
+            'player_dob' => '2015-05-15',
+            'player_gender' => 'female',
+            'player_avs_number' => '0000',
+            'player_medical' => 'Injected',
+        ];
+
+        $this->invokeAjaxSuccess(static function () {
+            intersoccer_edit_player();
+        });
+
+        $stored = get_user_meta(1, 'intersoccer_players', true)[0];
+        $this->assertSame('', $stored['medical_conditions'] ?? 'missing');
+    }
+
+    public function test_privacy_granted_staff_edit_saves_dob_and_medical(): void
+    {
+        if (!function_exists('intersoccer_user_can_view_medical') || !function_exists('intersoccer_user_can_view_dob')) {
+            $this->markTestSkipped('Reed #46 privacy helpers are not loaded in this worktree.');
+        }
+
+        $this->mockPrivacyGrantedStaffAuth();
+
+        $this->setUserMeta(1, [
+            'intersoccer_players' => [$this->basePlayer()],
+        ]);
+
+        $_POST = [
+            'nonce' => 'valid_nonce',
+            'user_id' => 1,
+            'player_index' => 0,
+            'player_first_name' => 'Jane',
+            'player_last_name' => 'Doe',
+            'player_dob' => '2014-03-03',
+            'player_gender' => 'female',
+            'player_avs_number' => '0000',
+            'player_medical' => 'Updated note',
+        ];
+
+        $this->invokeAjaxSuccess(static function () {
+            intersoccer_edit_player();
+        });
+
+        $stored = get_user_meta(1, 'intersoccer_players', true)[0];
+        $this->assertSame('2014-03-03', $stored['dob']);
+        $this->assertSame('Updated note', $stored['medical_conditions']);
     }
 }

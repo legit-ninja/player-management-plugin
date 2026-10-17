@@ -275,6 +275,7 @@ class Player_Management_List {
                                     data-gender="<?php echo esc_attr(strtolower($player['gender'] ?? '')); ?>"
                                     data-avs-number="<?php echo esc_attr($player['avs_number'] ?? ''); ?>"
                                     data-dob="<?php echo esc_attr(intersoccer_pm_sensitive_value_for_data_attribute($player['dob'] ?? '', $owner_user_id)); ?>"
+                                    data-can-view-dob="<?php echo intersoccer_pm_can_view_player_dob($owner_user_id) ? '1' : '0'; ?>"
                                     data-can-view-medical="<?php echo intersoccer_pm_can_view_player_medical($owner_user_id) ? '1' : '0'; ?>"
                                     data-field="player-row">
                                     <td class="display-name" data-label="<?php esc_attr_e('Name', 'player-management'); ?>" data-field="player-name">
@@ -512,11 +513,11 @@ class Player_Management_List {
                 var firstName = $row.data('first-name') || $row.find('.display-name strong').text().trim().split(' ')[0];
                 var lastName = $row.data('last-name') || $row.find('.display-name strong').text().trim().split(' ').slice(1).join(' ');
                 var dobRaw = $row.data('dob') || '';
-                var dobDisplay = $row.find('.display-dob').text().trim().split('\n')[0];
-                var restrictedLabel = '<?php echo esc_js(intersoccer_pm_medical_restricted_label()); ?>';
+                var canViewDob = String($row.data('can-view-dob')) === '1';
                 var gender = $row.data('gender') || $row.find('.display-gender').text().trim().toLowerCase();
                 var avs = $row.data('avs-number') || '';
-                var medical = $row.find('.display-medical').attr('title') || '';
+                var $medicalEl = $row.find('.display-medical .has-medical');
+                var medical = ($medicalEl.length ? $medicalEl.attr('title') : '') || '';
                 var canViewMedical = String($row.data('can-view-medical')) === '1';
 
                 // Map gender display text back to value
@@ -528,7 +529,7 @@ class Player_Management_List {
                 $('#edit-user-id').val(userId);
                 $('#edit-first-name').val(firstName);
                 $('#edit-last-name').val(lastName);
-                if (!dobRaw || dobDisplay === restrictedLabel) {
+                if (!canViewDob) {
                     $('#edit-dob').val('').prop('disabled', true).prop('required', false);
                 } else {
                     $('#edit-dob').val(dobRaw).prop('disabled', false).prop('required', true);
