@@ -1,0 +1,140 @@
+<?php
+/**
+ * WordPress stubs used by PrivacySettingsTest (apply_filters, roles, timezone).
+ */
+
+if (!isset($GLOBALS['wp_stub_filters'])) {
+	$GLOBALS['wp_stub_filters'] = [];
+}
+
+if (!isset($GLOBALS['wp_stub_register_setting_calls'])) {
+	$GLOBALS['wp_stub_register_setting_calls'] = [];
+}
+
+if (!isset($GLOBALS['wp_stub_user_objects'])) {
+	$GLOBALS['wp_stub_user_objects'] = [];
+}
+
+if (!function_exists('apply_filters')) {
+	/**
+	 * @param mixed $value
+	 * @return mixed
+	 */
+	function apply_filters($hook, $value, ...$args) {
+		$callbacks = [];
+		if (!empty($GLOBALS['wp_stub_filters'][ $hook ])) {
+			$callbacks = array_merge($callbacks, $GLOBALS['wp_stub_filters'][ $hook ]);
+		}
+		if (!empty($GLOBALS['wp_stub_actions'][ $hook ])) {
+			$callbacks = array_merge($callbacks, $GLOBALS['wp_stub_actions'][ $hook ]);
+		}
+
+		if ($callbacks === []) {
+			return $value;
+		}
+
+		usort(
+			$callbacks,
+			static function ($a, $b) {
+				return $a['priority'] <=> $b['priority'];
+			}
+		);
+
+		foreach ($callbacks as $entry) {
+			$callback = $entry['callback'];
+			$accepted = (int) $entry['accepted_args'];
+			if ($accepted >= 2 && count($args) >= 1) {
+				$value = $callback($value, $args[0]);
+			} elseif ($accepted >= 3 && count($args) >= 2) {
+				$value = $callback($value, $args[0], $args[1]);
+			} else {
+				$value = $callback($value);
+			}
+		}
+
+		return $value;
+	}
+}
+
+if (!function_exists('privacy_settings_stub_add_filter')) {
+	function privacy_settings_stub_add_filter($hook, $callback, $priority = 10, $accepted_args = 1) {
+		$GLOBALS['wp_stub_filters'][ $hook ][] = [
+			'callback'      => $callback,
+			'priority'      => $priority,
+			'accepted_args' => $accepted_args,
+		];
+	}
+}
+
+if (!function_exists('register_setting')) {
+	function register_setting($option_group, $option_name, $args = []) {
+		$GLOBALS['wp_stub_register_setting_calls'][] = [
+			'group' => $option_group,
+			'name'  => $option_name,
+			'args'  => $args,
+		];
+
+		return true;
+	}
+}
+
+if (!function_exists('add_option')) {
+	function add_option($option, $value = '', $deprecated = '', $autoload = 'yes') {
+		if (array_key_exists($option, $GLOBALS['wp_stub_options'])) {
+			return false;
+		}
+
+		$GLOBALS['wp_stub_options'][ $option ] = $value;
+
+		return true;
+	}
+}
+
+if (!function_exists('get_userdata')) {
+	function get_userdata($user_id) {
+		if (empty($GLOBALS['wp_stub_user_objects'][ $user_id ])) {
+			return false;
+		}
+
+		return $GLOBALS['wp_stub_user_objects'][ $user_id ];
+	}
+}
+
+if (!function_exists('wp_roles')) {
+	function wp_roles() {
+		if (!isset($GLOBALS['wp_stub_wp_roles'])) {
+			$GLOBALS['wp_stub_wp_roles'] = (object) [
+				'roles' => [
+					'administrator' => [],
+					'shop_manager'  => [],
+					'coach'         => [],
+					'customer'      => [],
+				],
+			];
+		}
+
+		return $GLOBALS['wp_stub_wp_roles'];
+	}
+}
+
+if (!function_exists('wp_timezone')) {
+	function wp_timezone() {
+		if (!empty($GLOBALS['wp_stub_timezone'])) {
+			return new DateTimeZone($GLOBALS['wp_stub_timezone']);
+		}
+
+		return new DateTimeZone('UTC');
+	}
+}
+
+if (!function_exists('do_action')) {
+	function do_action($hook, ...$args) {
+		if (empty($GLOBALS['wp_stub_actions'][ $hook ])) {
+			return;
+		}
+
+		foreach ($GLOBALS['wp_stub_actions'][ $hook ] as $entry) {
+			call_user_func_array($entry['callback'], $args);
+		}
+	}
+}

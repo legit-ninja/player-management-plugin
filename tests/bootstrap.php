@@ -9,6 +9,7 @@ require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 // Provide lightweight WordPress function shims for the test environment
 require_once __DIR__ . '/helpers/wp-stubs.php';
+require_once __DIR__ . '/helpers/privacy-settings-stubs.php';
 
 // Initialize WP_Mock
 WP_Mock::bootstrap();
