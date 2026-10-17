@@ -30,17 +30,14 @@ if (!function_exists('intersoccer_privacy_medical_notice_capability')) {
 
 if (!function_exists('intersoccer_privacy_medical_settings_admin_url')) {
 	function intersoccer_privacy_medical_settings_admin_url(): string {
-		if (class_exists('InterSoccer_Player_Management_Settings')) {
-			$default = InterSoccer_Player_Management_Settings::page_url('general');
-		} else {
-			$default = add_query_arg(
-				[
-					'page' => 'intersoccer-players-settings',
-					'tab'  => 'general',
-				],
-				admin_url('admin.php')
-			);
-		}
+		// Slug matches InterSoccer_Player_Management_Settings::PAGE_SLUG (Players → Settings).
+		$default = add_query_arg(
+			[
+				'page' => 'intersoccer-players-settings',
+				'tab'  => 'general',
+			],
+			admin_url('admin.php')
+		);
 
 		/**
 		 * URL for the medical roles settings screen.

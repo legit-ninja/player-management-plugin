@@ -322,7 +322,16 @@ class PrivacySettingsTest extends InterSoccer_Test_Case {
 	}
 
 	public function test_medical_settings_notice_links_to_players_settings_page(): void {
-		WP_Mock::userFunction( 'admin_url' )->andReturn( 'https://example.com/wp-admin/admin.php' );
+		WP_Mock::userFunction( 'add_query_arg' )->andReturnUsing(
+			static function ( $args, $url = '' ) {
+				if ( ! is_array( $args ) ) {
+					return (string) $url;
+				}
+				$sep = strpos( (string) $url, '?' ) !== false ? '&' : '?';
+
+				return (string) $url . $sep . http_build_query( $args );
+			}
+		);
 
 		$url = intersoccer_privacy_medical_settings_admin_url();
 

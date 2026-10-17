@@ -26,8 +26,8 @@ All functions are wrapped in `function_exists()` guards in `includes/privacy-set
 | `intersoccer_get_medical_roles()` | `string[]` | Always includes `administrator`. Reads option, sanitizes, `apply_filters('intersoccer_medical_roles')`, sanitizes again. |
 | `intersoccer_medical_roles_is_configured()` | `bool` | `true` when the stored medical roles option is an array (saved role list). |
 | `intersoccer_user_has_medical_role( $user_id )` | `bool` | `false` for invalid or unknown users. Accepts non-numeric input without TypeError (normalized to int). |
-| `intersoccer_user_can_view_medical( int $user_id )` | `bool` | Strict bool; see access policy below. Applies `intersoccer_can_view_medical`. |
-| `intersoccer_user_can_view_dob( int $user_id )` | `bool` | Same policy as medical; uses `intersoccer_can_view_dob`. |
+| `intersoccer_user_can_view_medical( $user_id )` | `bool` | Strict bool; see access policy below. `$user_id` is normalized: `null`, non-numeric values, `0`, and negatives → `false` (deny). Numeric strings (e.g. `'5'`) are cast to int. |
+| `intersoccer_user_can_view_dob( $user_id )` | `bool` | Same input rules and policy as medical; uses `intersoccer_can_view_dob`. |
 | `intersoccer_get_retention_months()` | `int` | `0` = off. Stored `0` skips `intersoccer_retention_months` filter. |
 | `intersoccer_is_retention_enabled()` | `bool` | `intersoccer_get_retention_months() > 0`. |
 | `intersoccer_get_retention_inactive_account_months()` | `int` | Stored `0` skips filter. |
@@ -50,7 +50,9 @@ The same rules apply to `intersoccer_user_can_view_medical`, `intersoccer_user_c
 3. **Configured** — once a valid array is saved, access is a strict allow-list: `administrator` plus the saved roles only (`true` / `false` only from filters).
 4. **Corrupt storage** — non-array stored value counts as unconfigured for access (pass-through), not allow-all.
 
-A dismissible **admin notice** warns users with `manage_options` (filterable) while access is unconfigured, linking to the medical settings URL (`intersoccer_privacy_medical_settings_admin_url`).
+A dismissible **admin notice** warns users with `manage_options` (filterable via `intersoccer_privacy_medical_notice_capability`) while access is unconfigured. The “Configure medical access” link targets the Players → Settings screen (`page=intersoccer-players-settings`, `tab=general`) via `intersoccer_privacy_medical_settings_admin_url()`.
+
+Dismissal is stored per user in usermeta `intersoccer_privacy_medical_roles_notice_dismissed` (`INTERSOCCER_PRIVACY_MEDICAL_NOTICE_DISMISS_META`) — the only usermeta exception to the options-only storage rule. Clicking the notice dismiss control POSTs to `admin-ajax.php` with action `intersoccer_dismiss_privacy_medical_notice` (`INTERSOCCER_PRIVACY_MEDICAL_NOTICE_AJAX_ACTION`), nonce action `intersoccer_dismiss_privacy_medical_notice`, capability check, then sets the meta. Script: `assets/js/privacy-medical-notice-dismiss.js` (enqueued only while the notice is shown).
 
 Parent/guardian access to their own children’s medical notes does **not** use these filters.
 
