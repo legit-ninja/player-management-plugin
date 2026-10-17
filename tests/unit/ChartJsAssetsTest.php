@@ -50,4 +50,15 @@ class ChartJsAssetsTest extends TestCase
         $this->assertIsString($contents);
         $this->assertStringNotContainsString('cdn.jsdelivr.net/npm/chart.js', $contents);
     }
+
+    public function test_overview_localizes_with_self_hosted_chart_handle(): void
+    {
+        $contents = file_get_contents(PLAYER_MANAGEMENT_PATH . 'includes/class-player-overview.php');
+        $this->assertIsString($contents);
+        $this->assertStringContainsString(
+            "wp_localize_script(intersoccer_pm_chart_js_asset_handle(), 'intersoccerChartLabels'",
+            $contents
+        );
+        $this->assertStringNotContainsString("wp_localize_script('chart-js'", $contents);
+    }
 }

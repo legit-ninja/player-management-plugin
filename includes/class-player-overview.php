@@ -212,7 +212,7 @@ class Player_Management_Overview {
      * @param array $data Overview payload.
      */
     private function render_html($data) {
-        wp_localize_script('chart-js', 'intersoccerChartLabels', [
+        wp_localize_script(intersoccer_pm_chart_js_asset_handle(), 'intersoccerChartLabels', [
             'noData' => __('No Data', 'player-management'),
             'chartLoadingFailed' => __('Chart loading failed', 'player-management'),
             'players' => __('Participants', 'player-management'),
