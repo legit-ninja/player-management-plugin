@@ -100,7 +100,7 @@ class InterSoccer_Player_Management_Link_Widget extends \Elementor\Widget_Base {
                 'label_on' => esc_html__('Yes', 'player-management'),
                 'label_off' => esc_html__('No', 'player-management'),
                 'return_value' => 'yes',
-                'default' => 'yes',
+                'default' => '',
                 'description' => esc_html__('Show guided tour for users without registered players', 'player-management'),
             ]
         );
@@ -297,8 +297,11 @@ class InterSoccer_Player_Management_Link_Widget extends \Elementor\Widget_Base {
             $has_players = intersoccer_user_has_players($user_id);
         }
         
-        // Determine if tour should be shown (never in editor)
-        $show_tour = !$is_editor && $settings['show_tour'] === 'yes' && !$has_players;
+        // Determine if tour should be shown (never in editor or on checkout/cart/order-pay)
+        $show_tour = !$is_editor
+            && !intersoccer_pm_shepherd_is_wc_blocked_context()
+            && $settings['show_tour'] === 'yes'
+            && !$has_players;
         $tour_auto_start = $settings['tour_auto_start'] === 'yes';
         $tour_delay = floatval($settings['tour_delay'] ?? 2);
         
@@ -429,23 +432,12 @@ class InterSoccer_Player_Management_Link_Widget extends \Elementor\Widget_Base {
      * Enqueue Shepherd.js and tour script
      */
     private function enqueue_tour_assets($auto_start, $delay) {
-        // Enqueue Shepherd.js CSS
-        wp_enqueue_style(
-            'shepherd-js',
-            'https://cdn.jsdelivr.net/npm/shepherd.js@latest/dist/css/shepherd.css',
-            [],
-            null
-        );
-        
-        // Enqueue Shepherd.js JS
-        wp_enqueue_script(
-            'shepherd-js',
-            'https://cdn.jsdelivr.net/npm/shepherd.js@latest/dist/js/shepherd.min.js',
-            [],
-            null,
-            true
-        );
-        
+        if (intersoccer_pm_shepherd_is_wc_blocked_context()) {
+            return;
+        }
+
+        intersoccer_pm_enqueue_shepherd_vendor_assets();
+
         // Enqueue tour script
         wp_enqueue_script(
             'intersoccer-player-tour',

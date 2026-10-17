@@ -84,6 +84,7 @@ $core_files = [
     'includes/ajax-handlers.php',
     'includes/data-deletion.php',
     'includes/checkout-player-assign.php', // Order meta from ATC player keys (cart picker removed)
+    'includes/shepherd-tour-assets.php',
 ];
 
 foreach ($core_files as $file) {
