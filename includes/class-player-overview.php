@@ -37,13 +37,7 @@ class Player_Management_Overview {
             }
         }
 
-        wp_enqueue_script(
-            'chart-js',
-            'https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js',
-            [],
-            '3.9.1',
-            true
-        );
+        intersoccer_pm_enqueue_chart_js_vendor_asset();
 
         $this->render_html($overview_data);
         $this->utils->log_memory('overview_render_complete');
@@ -218,7 +212,7 @@ class Player_Management_Overview {
      * @param array $data Overview payload.
      */
     private function render_html($data) {
-        wp_localize_script('chart-js', 'intersoccerChartLabels', [
+        wp_localize_script(intersoccer_pm_chart_js_asset_handle(), 'intersoccerChartLabels', [
             'noData' => __('No Data', 'player-management'),
             'chartLoadingFailed' => __('Chart loading failed', 'player-management'),
             'players' => __('Participants', 'player-management'),
