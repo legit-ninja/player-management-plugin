@@ -467,17 +467,8 @@ class InterSoccer_Player_Management_Link_Widget extends \Elementor\Widget_Base {
             'autoStart' => $auto_start,
             'delay' => $delay,
             'hasPlayers' => intersoccer_user_has_players(get_current_user_id()),
-            'managePlayersUrl' => $this->get_manage_players_url(),
-            'i18n' => [
-                'tourTitle' => __('Register Your Players', 'player-management'),
-                'tourIntro' => __('Before you can register for camps and courses, you need to add at least one player (attendee) to your account.', 'player-management'),
-                'tourHighlight' => __('Click here to manage your players and add your first attendee.', 'player-management'),
-                'tourAction' => __('Click this link to get started!', 'player-management'),
-                'tourDismiss' => __('Don\'t show again', 'player-management'),
-                'tourNext' => __('Next', 'player-management'),
-                'tourBack' => __('Back', 'player-management'),
-                'tourComplete' => __('Got it!', 'player-management'),
-            ],
+            'managePlayersUrl' => esc_url($this->get_manage_players_url()),
+            'i18n'             => intersoccer_pm_player_link_widget_tour_i18n(),
         ]);
     }
 }

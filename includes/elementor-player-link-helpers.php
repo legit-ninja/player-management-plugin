@@ -49,6 +49,32 @@ if (!function_exists('intersoccer_user_has_players')) {
  * @param array<string,mixed> $stored_settings Raw Elementor widget settings.
  * @param int                $user_id          User to evaluate.
  */
+/**
+ * Escaped i18n strings for the Shepherd guided tour (HTML context in Shepherd.js).
+ *
+ * @return array<string, string>
+ */
+if (!function_exists('intersoccer_pm_player_link_widget_tour_i18n')) {
+    function intersoccer_pm_player_link_widget_tour_i18n(): array {
+        return [
+            'tourTitle'     => esc_html__('Register Your Players', 'player-management'),
+            'tourIntro'     => esc_html__(
+                'Before you can register for camps and courses, you need to add at least one player (attendee) to your account.',
+                'player-management'
+            ),
+            'tourHighlight' => esc_html__(
+                'Click here to manage your players and add your first attendee.',
+                'player-management'
+            ),
+            'tourAction'    => esc_html__('Click this link to get started!', 'player-management'),
+            'tourDismiss'   => esc_html__('Don\'t show again', 'player-management'),
+            'tourNext'      => esc_html__('Next', 'player-management'),
+            'tourBack'      => esc_html__('Back', 'player-management'),
+            'tourComplete'  => esc_html__('Got it!', 'player-management'),
+        ];
+    }
+}
+
 if (!function_exists('intersoccer_pm_player_link_widget_should_show_tour')) {
     function intersoccer_pm_player_link_widget_should_show_tour(
         bool $is_editor,
