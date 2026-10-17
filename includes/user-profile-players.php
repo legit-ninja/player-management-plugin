@@ -76,7 +76,8 @@ function intersoccer_add_user_profile_players($user) {
         'context' => 'user_profile',
         'nonce_refresh_url' => admin_url('admin-ajax.php?action=intersoccer_refresh_nonce'),
         'debug' => defined('WP_DEBUG') && WP_DEBUG ? '1' : '0',
-        'preload_players' => $players ?: [],
+        'preload_players' => intersoccer_pm_redact_players_for_preload($players ?: [], (int) $user->ID),
+        'medical_field_denied_notice' => intersoccer_pm_medical_field_denied_notice(),
         'server_time' => current_time('mysql'),
     ];
     wp_localize_script('intersoccer-player-management-js', 'intersoccerPlayer', $localize_data);
@@ -112,11 +113,13 @@ function intersoccer_add_user_profile_players($user) {
                             data-user-id="<?php echo esc_attr($user->ID); ?>"
                             data-first-name="<?php echo esc_attr($player['first_name'] ?? 'N/A'); ?>"
                             data-last-name="<?php echo esc_attr($player['last_name'] ?? 'N/A'); ?>"
-                            data-dob="<?php echo esc_attr($player['dob'] ?? 'N/A'); ?>"
+                            data-dob="<?php echo esc_attr(intersoccer_pm_sensitive_value_for_data_attribute($player['dob'] ?? '', (int) $user->ID, 'N/A')); ?>"
+                            data-can-view-dob="<?php echo intersoccer_pm_can_view_player_dob((int) $user->ID) ? '1' : '0'; ?>"
+                            data-can-view-medical="<?php echo intersoccer_pm_can_view_player_medical((int) $user->ID) ? '1' : '0'; ?>"
                             data-gender="<?php echo esc_attr($player['gender'] ?? 'N/A'); ?>"
                             data-avs-number="<?php echo esc_attr($player['avs_number'] ?? 'N/A'); ?>"
                             data-event-count="<?php echo esc_attr($player['event_count'] ?? 0); ?>"
-                            data-medical-conditions="<?php echo esc_attr($player['medical_conditions'] ?? ''); ?>"
+                            data-medical-conditions="<?php echo esc_attr(intersoccer_pm_sensitive_medical_value_for_data_attribute($player['medical_conditions'] ?? '', (int) $user->ID)); ?>"
                             <?php if ($is_admin): ?>
                             data-canton="<?php echo esc_attr($player['canton'] ?? get_user_meta($user->ID, 'billing_state', true) ?: ''); ?>"
                             data-city="<?php echo esc_attr($player['city'] ?? get_user_meta($user->ID, 'billing_city', true) ?: ''); ?>"
@@ -124,10 +127,10 @@ function intersoccer_add_user_profile_players($user) {
                             <?php endif; ?>>
                             <td class="display-first-name" data-label="First Name"><?php echo esc_html($player['first_name'] ?? 'N/A'); ?></td>
                             <td class="display-last-name" data-label="Last Name"><?php echo esc_html($player['last_name'] ?? 'N/A'); ?></td>
-                            <td class="display-dob" data-label="DOB"><?php echo esc_html($player['dob'] ?? 'N/A'); ?></td>
+                            <td class="display-dob" data-label="DOB"><?php echo esc_html(intersoccer_pm_format_dob_display_value($player['dob'] ?? '', (int) $user->ID)); ?></td>
                             <td class="display-gender" data-label="Gender"><?php echo esc_html(intersoccer_translate_gender($player['gender'] ?? 'N/A')); ?></td>
                             <td class="display-avs-number" data-label="AVS Number"><?php echo esc_html($player['avs_number'] ?? 'N/A'); ?></td>
-                            <td class="display-medical-conditions" data-label="<?php esc_attr_e('Medical Conditions, Dietary Restrictions, and Allergies', 'player-management'); ?>"><?php echo esc_html(substr($player['medical_conditions'] ?? '', 0, 20) . (strlen($player['medical_conditions'] ?? '') > 20 ? '...' : '')); ?></td>
+                            <td class="display-medical-conditions" data-label="<?php esc_attr_e('Medical Conditions, Dietary Restrictions, and Allergies', 'player-management'); ?>"><?php echo esc_html(intersoccer_pm_format_medical_display_snippet($player['medical_conditions'] ?? '', (int) $user->ID)); ?></td>
                             <td class="display-event-count" data-label="Events">
                                 <?php
                                 $event_count = intersoccer_get_player_event_count($user->ID, $index);
@@ -181,13 +184,7 @@ function intersoccer_add_user_profile_players($user) {
                 <span class="avs-instruction"><?php esc_html_e('No AVS? Enter foreign insurance number or "0000" and email us the insurance details.', 'player-management'); ?></span>
                 <span class="error-message" style="display: none;"></span>
             </div>
-            <?php if ($is_admin): ?>
-            <div class="form-row add-player-medical">
-                <label for="player_medical"><?php esc_html_e('Medical Conditions, Dietary Restrictions, and Allergies', 'player-management'); ?></label>
-                <textarea id="player_medical" name="player_medical" maxlength="500"></textarea>
-                <span class="error-message" style="display: none;"></span>
-            </div>
-            <?php endif; ?>
+            <?php intersoccer_pm_render_medical_input_field((int) $user->ID); ?>
             <div class="form-actions">
                 <a href="#" class="player-submit button"><?php esc_html_e('Save', 'player-management'); ?></a>
                 <a href="#" class="cancel-add button"><?php esc_html_e('Cancel', 'player-management'); ?></a>

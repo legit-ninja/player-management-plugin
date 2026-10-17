@@ -43,3 +43,4 @@ wp-admin/
 # Cypress artifacts (if added later)
 cypress/videos/
 cypress/screenshots/
+info-scratch/
