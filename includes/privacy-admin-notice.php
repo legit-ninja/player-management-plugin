@@ -9,6 +9,14 @@ if (!defined('INTERSOCCER_PRIVACY_MEDICAL_NOTICE_DISMISS_META')) {
 	define('INTERSOCCER_PRIVACY_MEDICAL_NOTICE_DISMISS_META', 'intersoccer_privacy_medical_roles_notice_dismissed');
 }
 
+if (!defined('INTERSOCCER_PRIVACY_MEDICAL_NOTICE_AJAX_ACTION')) {
+	define('INTERSOCCER_PRIVACY_MEDICAL_NOTICE_AJAX_ACTION', 'intersoccer_dismiss_privacy_medical_notice');
+}
+
+if (!defined('INTERSOCCER_PRIVACY_MEDICAL_NOTICE_NONCE_ACTION')) {
+	define('INTERSOCCER_PRIVACY_MEDICAL_NOTICE_NONCE_ACTION', 'intersoccer_dismiss_privacy_medical_notice');
+}
+
 if (!function_exists('intersoccer_privacy_medical_notice_capability')) {
 	function intersoccer_privacy_medical_notice_capability(): string {
 		/**
@@ -70,15 +78,9 @@ if (!function_exists('intersoccer_privacy_render_medical_roles_admin_notice')) {
 		}
 
 		$settings_url = intersoccer_privacy_medical_settings_admin_url();
-		$dismiss_url  = wp_nonce_url(
-			add_query_arg('intersoccer_dismiss_privacy_medical_notice', '1'),
-			'intersoccer_dismiss_privacy_medical_notice',
-			'_intersoccer_privacy_notice_nonce'
-		);
 
 		printf(
-			'<div class="notice notice-warning is-dismissible" data-dismiss-url="%1$s"><p>%2$s <a href="%3$s">%4$s</a></p></div>',
-			esc_url($dismiss_url),
+			'<div class="notice notice-warning is-dismissible intersoccer-privacy-medical-notice"><p>%1$s <a href="%2$s">%3$s</a></p></div>',
 			esc_html__(
 				'Medical and date-of-birth access roles are not configured yet. Staff access will follow legacy rules until you save the medical roles setting.',
 				'player-management'
@@ -89,34 +91,83 @@ if (!function_exists('intersoccer_privacy_render_medical_roles_admin_notice')) {
 	}
 }
 
-if (!function_exists('intersoccer_privacy_handle_medical_notice_dismiss')) {
-	function intersoccer_privacy_handle_medical_notice_dismiss(): void {
+if (!function_exists('intersoccer_privacy_ajax_dismiss_medical_roles_notice')) {
+	function intersoccer_privacy_ajax_dismiss_medical_roles_notice(): void {
 		if (
-			empty($_GET['intersoccer_dismiss_privacy_medical_notice'])
-			|| ! function_exists('get_current_user_id')
-			|| ! function_exists('update_user_meta')
+			! check_ajax_referer(
+				INTERSOCCER_PRIVACY_MEDICAL_NOTICE_NONCE_ACTION,
+				'nonce',
+				false
+			)
 		) {
-			return;
+			wp_send_json_error(
+				[ 'message' => __( 'Invalid security token.', 'player-management' ) ],
+				403
+			);
 		}
 
 		if (
-			! isset($_GET['_intersoccer_privacy_notice_nonce'])
-			|| ! wp_verify_nonce(
-				sanitize_text_field(wp_unslash($_GET['_intersoccer_privacy_notice_nonce'])),
-				'intersoccer_dismiss_privacy_medical_notice'
-			)
+			! function_exists('get_current_user_id')
+			|| ! function_exists('current_user_can')
+			|| ! function_exists('update_user_meta')
 		) {
-			return;
+			wp_send_json_error(
+				[ 'message' => __( 'Forbidden.', 'player-management' ) ],
+				403
+			);
+		}
+
+		if (! current_user_can(intersoccer_privacy_medical_notice_capability())) {
+			wp_send_json_error(
+				[ 'message' => __( 'Forbidden.', 'player-management' ) ],
+				403
+			);
 		}
 
 		$user_id = get_current_user_id();
 		if ($user_id <= 0) {
-			return;
+			wp_send_json_error(
+				[ 'message' => __( 'Forbidden.', 'player-management' ) ],
+				403
+			);
 		}
 
 		update_user_meta($user_id, INTERSOCCER_PRIVACY_MEDICAL_NOTICE_DISMISS_META, '1');
+		wp_send_json_success();
 	}
 }
 
-add_action('admin_init', 'intersoccer_privacy_handle_medical_notice_dismiss');
+if (!function_exists('intersoccer_privacy_enqueue_medical_notice_assets')) {
+	function intersoccer_privacy_enqueue_medical_notice_assets(): void {
+		if (! function_exists('is_admin') || ! is_admin()) {
+			return;
+		}
+
+		if (! intersoccer_privacy_should_show_medical_roles_notice()) {
+			return;
+		}
+
+		if (! defined('PLAYER_MANAGEMENT_URL') || ! defined('PLAYER_MANAGEMENT_VERSION')) {
+			return;
+		}
+
+		$handle = 'intersoccer-privacy-medical-notice';
+		$src    = PLAYER_MANAGEMENT_URL . 'assets/js/privacy-medical-notice-dismiss.js';
+
+		wp_enqueue_script($handle, $src, [ 'jquery' ], PLAYER_MANAGEMENT_VERSION, true);
+
+		wp_localize_script(
+			$handle,
+			'intersoccerPrivacyMedicalNotice',
+			[
+				'ajaxUrl' => admin_url('admin-ajax.php'),
+				'action'  => INTERSOCCER_PRIVACY_MEDICAL_NOTICE_AJAX_ACTION,
+				'nonce'   => wp_create_nonce(INTERSOCCER_PRIVACY_MEDICAL_NOTICE_NONCE_ACTION),
+			]
+		);
+	}
+}
+
+add_action('wp_ajax_' . INTERSOCCER_PRIVACY_MEDICAL_NOTICE_AJAX_ACTION, 'intersoccer_privacy_ajax_dismiss_medical_roles_notice');
+add_action('admin_enqueue_scripts', 'intersoccer_privacy_enqueue_medical_notice_assets');
 add_action('admin_notices', 'intersoccer_privacy_render_medical_roles_admin_notice');

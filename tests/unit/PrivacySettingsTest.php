@@ -347,8 +347,6 @@ class PrivacySettingsTest extends InterSoccer_Test_Case {
 		$GLOBALS['wp_stub_current_user_id'] = 5;
 		$GLOBALS['wp_stub_user_caps']       = [ 'manage_options' => true ];
 		WP_Mock::userFunction( 'admin_url' )->andReturn( 'https://example.com/wp-admin/admin.php' );
-		WP_Mock::userFunction( 'add_query_arg' )->andReturn( 'https://example.com/wp-admin/dismiss' );
-		WP_Mock::userFunction( 'wp_nonce_url' )->andReturn( 'https://example.com/wp-admin/dismiss&nonce=1' );
 		WP_Mock::userFunction( 'esc_url' )->andReturnUsing(
 			static function ( $url ) {
 				return (string) $url;
@@ -370,7 +368,57 @@ class PrivacySettingsTest extends InterSoccer_Test_Case {
 		$html = ob_get_clean();
 
 		$this->assertStringContainsString( 'notice-warning', $html );
+		$this->assertStringContainsString( 'intersoccer-privacy-medical-notice', $html );
 		$this->assertStringContainsString( 'Configure medical access', $html );
+	}
+
+	public function test_ajax_dismiss_notice_sets_user_meta(): void {
+		$GLOBALS['wp_stub_current_user_id']  = 5;
+		$GLOBALS['wp_stub_user_caps']        = [ 'manage_options' => true ];
+		$GLOBALS['wp_stub_ajax_nonce_valid'] = true;
+		$_POST['nonce']                      = wp_create_nonce( INTERSOCCER_PRIVACY_MEDICAL_NOTICE_NONCE_ACTION );
+
+		try {
+			intersoccer_privacy_ajax_dismiss_medical_roles_notice();
+			$this->fail( 'Expected wp_send_json_success exit.' );
+		} catch ( WPSendJsonExit $e ) {
+			$this->assertSame( 'success', $e->getMessage() );
+		}
+
+		$this->assertSame( '1', get_user_meta( 5, INTERSOCCER_PRIVACY_MEDICAL_NOTICE_DISMISS_META, true ) );
+		$this->assertFalse( intersoccer_privacy_should_show_medical_roles_notice() );
+	}
+
+	public function test_ajax_dismiss_notice_rejects_bad_nonce(): void {
+		$GLOBALS['wp_stub_current_user_id']  = 5;
+		$GLOBALS['wp_stub_user_caps']        = [ 'manage_options' => true ];
+		$GLOBALS['wp_stub_ajax_nonce_valid'] = false;
+		$_POST['nonce']                      = 'invalid';
+
+		try {
+			intersoccer_privacy_ajax_dismiss_medical_roles_notice();
+			$this->fail( 'Expected wp_send_json_error exit.' );
+		} catch ( WPSendJsonExit $e ) {
+			$this->assertSame( 'error', $e->getMessage() );
+		}
+
+		$this->assertSame( '', get_user_meta( 5, INTERSOCCER_PRIVACY_MEDICAL_NOTICE_DISMISS_META, true ) );
+	}
+
+	public function test_ajax_dismiss_notice_rejects_user_without_capability(): void {
+		$GLOBALS['wp_stub_current_user_id']  = 5;
+		$GLOBALS['wp_stub_user_caps']        = [];
+		$GLOBALS['wp_stub_ajax_nonce_valid'] = true;
+		$_POST['nonce']                      = wp_create_nonce( INTERSOCCER_PRIVACY_MEDICAL_NOTICE_NONCE_ACTION );
+
+		try {
+			intersoccer_privacy_ajax_dismiss_medical_roles_notice();
+			$this->fail( 'Expected wp_send_json_error exit.' );
+		} catch ( WPSendJsonExit $e ) {
+			$this->assertSame( 'error', $e->getMessage() );
+		}
+
+		$this->assertSame( '', get_user_meta( 5, INTERSOCCER_PRIVACY_MEDICAL_NOTICE_DISMISS_META, true ) );
 	}
 
 	private function fixtureStaffMedicalAccess(int $user_id, bool $manage_options, bool $manage_woocommerce): bool {
