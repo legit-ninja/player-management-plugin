@@ -104,76 +104,7 @@ class InterSoccer_Player_Management_Elementor_Integration {
             return;
         }
 
-        // Register Player Management Link widget
-        try {
-            $widget_file = PLAYER_MANAGEMENT_PATH . 'elementor/widgets/player-management-link-widget.php';
-            if (!file_exists($widget_file)) {
-                if (defined('WP_DEBUG') && WP_DEBUG) {
-                    error_log('InterSoccer Player Management: Widget file not found: ' . $widget_file);
-                }
-                return;
-            }
-            
-            require_once $widget_file;
-            
-            if (!class_exists('InterSoccer_Player_Management_Link_Widget')) {
-                if (defined('WP_DEBUG') && WP_DEBUG) {
-                    error_log('InterSoccer Player Management: Widget class not found after requiring file');
-                }
-                return;
-            }
-            
-            $widgets_manager->register(new InterSoccer_Player_Management_Link_Widget());
-            
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('InterSoccer Player Management: Registered widget: intersoccer_player_management_link');
-            }
-        } catch (Exception $e) {
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('InterSoccer Player Management: Widget registration failed: ' . $e->getMessage());
-                error_log('InterSoccer Player Management: Stack trace: ' . $e->getTraceAsString());
-            }
-        }
-        
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('InterSoccer Player Management: Widget registration completed');
-        }
+        // Player Management Link widget is registered from player-management.php (load-order safe).
     }
 }
-
-/**
- * Helper function to check if a user has registered players
- * 
- * @param int $user_id User ID to check
- * @return bool True if user has at least one valid player, false otherwise
- */
-if (!function_exists('intersoccer_user_has_players')) {
-function intersoccer_user_has_players($user_id = null) {
-    if (!$user_id) {
-        $user_id = get_current_user_id();
-    }
-    
-    if (!$user_id) {
-        return false;
-    }
-    
-    $players = get_user_meta($user_id, 'intersoccer_players', true);
-    
-    if (!is_array($players) || empty($players)) {
-        return false;
-    }
-    
-    // Check if there's at least one valid player with required fields
-    foreach ($players as $player) {
-        if (is_array($player) && 
-            !empty($player['first_name']) && 
-            !empty($player['last_name'])) {
-            return true;
-        }
-    }
-    
-    return false;
-}
-}
-
 
