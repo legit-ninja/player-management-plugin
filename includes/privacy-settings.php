@@ -385,7 +385,10 @@ if (!function_exists('intersoccer_privacy_filter_can_view_sensitive')) {
 }
 
 if (!function_exists('intersoccer_user_can_view_medical')) {
-	function intersoccer_user_can_view_medical(int $user_id): bool {
+	/**
+	 * @param mixed $user_id User ID.
+	 */
+	function intersoccer_user_can_view_medical($user_id): bool {
 		$user_id = intersoccer_privacy_normalize_user_id($user_id);
 		if ($user_id <= 0) {
 			return false;
@@ -407,7 +410,10 @@ if (!function_exists('intersoccer_user_can_view_medical')) {
 }
 
 if (!function_exists('intersoccer_user_can_view_dob')) {
-	function intersoccer_user_can_view_dob(int $user_id): bool {
+	/**
+	 * @param mixed $user_id User ID.
+	 */
+	function intersoccer_user_can_view_dob($user_id): bool {
 		$user_id = intersoccer_privacy_normalize_user_id($user_id);
 		if ($user_id <= 0) {
 			return false;

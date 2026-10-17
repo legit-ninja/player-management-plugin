@@ -203,6 +203,24 @@ class PrivacySettingsTest extends InterSoccer_Test_Case {
 		$this->assertFalse( intersoccer_user_has_medical_role( null ) );
 		$this->assertFalse( intersoccer_user_has_medical_role( 'abc' ) );
 		$this->assertFalse( intersoccer_user_has_medical_role( 0 ) );
+		$this->assertFalse( intersoccer_user_has_medical_role( -1 ) );
+	}
+
+	public function test_public_view_helpers_reject_invalid_user_ids(): void {
+		foreach ( [ null, 'abc', 0, -1 ] as $invalid ) {
+			$this->assertFalse( intersoccer_user_can_view_medical( $invalid ) );
+			$this->assertFalse( intersoccer_user_can_view_dob( $invalid ) );
+			$this->assertSame( false, intersoccer_user_can_view_medical( $invalid ) );
+		}
+	}
+
+	public function test_public_view_helpers_accept_numeric_string_user_id(): void {
+		$this->configureMedicalRoles( [ 'administrator', 'coach' ] );
+		$this->setUserRoles( 5, [ 'coach' ] );
+		$this->setUserCaps( 5, [] );
+
+		$this->assertTrue( intersoccer_user_can_view_medical( '5' ) );
+		$this->assertTrue( intersoccer_user_can_view_dob( '5' ) );
 	}
 
 	public function test_filter_not_configured_passes_through(): void {
