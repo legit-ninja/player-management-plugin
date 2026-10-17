@@ -37,13 +37,7 @@ class Player_Management_Overview {
             }
         }
 
-        wp_enqueue_script(
-            'chart-js',
-            'https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js',
-            [],
-            '3.9.1',
-            true
-        );
+        intersoccer_pm_enqueue_chart_js_vendor_asset();
 
         $this->render_html($overview_data);
         $this->utils->log_memory('overview_render_complete');
