@@ -57,21 +57,32 @@ Parent/guardian access to their own children’s medical notes does **not** use 
 
 ## Cross-plugin contract
 
-Call helpers only behind `function_exists()`:
+Reports/Rosters and Product Variations must gate **medical notes and date-of-birth** behind `function_exists()` on the PM helpers they use (for example `intersoccer_user_has_medical_role` and the medical access flow that applies `intersoccer_can_view_medical`). When Player Management is missing, inactive, or WooCommerce is inactive so `includes/privacy-settings.php` never loaded, the fallback is **deny for everyone** — strict `false`, including administrators. Do not treat `manage_options` or the administrator role as sufficient when PM is absent.
 
 ```php
-$roles = function_exists( 'intersoccer_get_medical_roles' )
-    ? intersoccer_get_medical_roles()
-    : [ 'administrator' ];
+// Example: medical / DOB visibility when PM may be unloaded.
+if ( ! function_exists( 'intersoccer_user_has_medical_role' ) ) {
+	return false;
+}
+
+// When PM is loaded, follow RR/PV access rules (filter, configured roles, etc.).
 ```
 
-| PM / Woo state | Medical access fallback | Retention fallback |
-|----------------|-------------------------|-------------------|
-| PM inactive or Woo inactive (file not loaded) | Administrator only (`manage_options` / `administrator` role) at the **caller** | `0` months, cutoff `null` (nothing purged) |
+| PM / Woo state | Medical and DOB access fallback | Retention fallback |
+|----------------|--------------------------------|-------------------|
+| PM inactive or Woo inactive (file not loaded) | Strict `false` for every user at the **caller** | `0` months, cutoff `null` (nothing purged) |
+
+Retention helpers fall back to off when PM is not loaded:
+
+```php
+$months = function_exists( 'intersoccer_get_retention_months' )
+	? intersoccer_get_retention_months()
+	: 0;
+```
 
 Do not `require` PM files from other plugins. Do not type-hint PM classes.
 
-When PM is inactive, **nothing** hooks `intersoccer_can_view_medical`, so Reports/Rosters’ own base (admins and shop managers) still applies until RR changes its call site to administrator-only. That call-site change is **not** part of the PM privacy settings PR.
+When PM is inactive, nothing hooks `intersoccer_can_view_medical`; callers must not fall through to legacy admin or shop-manager allowances. **Reports/Rosters and Product Variations call sites and their PHPUnit coverage are not in this PR.** Each of RR and PV must add a test with PM unloaded that asserts medical and DOB access is denied for an administrator (strict `false`).
 
 ## Settings registration
 

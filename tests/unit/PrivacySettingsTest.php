@@ -233,18 +233,16 @@ class PrivacySettingsTest extends InterSoccer_Test_Case {
 		$this->assertTrue( $this->fixtureRrUserCanViewMedical( 12, false, false ) );
 	}
 
-	public function test_function_exists_fallback_pattern(): void {
-		$undefined = 'intersoccer_get_medical_roles_undefined_fixture';
-		$this->assertFalse( function_exists( $undefined ) );
+	public function test_function_exists_fallback_pattern_denies_when_pm_missing(): void {
+		$undefined_helper = 'intersoccer_user_has_medical_role_pm_missing_fixture';
+		$this->assertFalse( function_exists( $undefined_helper ) );
 
-		$roles = function_exists( 'intersoccer_get_medical_roles' )
-			? intersoccer_get_medical_roles()
-			: [ 'administrator' ];
+		$this->assertFalse( $this->fixtureCrossPluginMedicalAccessWhenPmMissing( 1, true, true ) );
+		$this->assertFalse( $this->fixtureCrossPluginMedicalAccessWhenPmMissing( 1, false, true ) );
 
-		$this->assertSame( [ 'administrator' ], $roles );
-
-		$fallback_only = function_exists( $undefined ) ? $undefined() : [ 'administrator' ];
-		$this->assertSame( [ 'administrator' ], $fallback_only );
+		$direct = function_exists( $undefined_helper ) ? $undefined_helper( 1 ) : false;
+		$this->assertFalse( $direct );
+		$this->assertSame( false, $direct );
 	}
 
 	public function test_privacy_settings_defaults_map(): void {
@@ -253,6 +251,21 @@ class PrivacySettingsTest extends InterSoccer_Test_Case {
 		$this->assertSame( 0, $defaults[ INTERSOCCER_OPT_RETENTION_MONTHS ] );
 		$this->assertSame( 0, $defaults[ INTERSOCCER_OPT_RETENTION_INACTIVE_ACCOUNT_MONTHS ] );
 		$this->assertSame( 1, $defaults[ INTERSOCCER_OPT_PRIVACY_SCHEMA_VERSION ] );
+	}
+
+	/**
+	 * Documented RR/PV fallback when PM helpers are not loaded (deny all users).
+	 */
+	private function fixtureCrossPluginMedicalAccessWhenPmMissing(
+		int $user_id,
+		bool $manage_options,
+		bool $manage_woocommerce
+	): bool {
+		if ( ! function_exists( 'intersoccer_user_has_medical_role_pm_missing_fixture' ) ) {
+			return false;
+		}
+
+		return $this->fixtureRrUserCanViewMedical( $user_id, $manage_options, $manage_woocommerce );
 	}
 
 	/**
