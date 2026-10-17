@@ -153,7 +153,7 @@ After cleanup, verify the changes:
 ### 3. Test Translation
 
 1. Switch to **French** (`fr_CH`)
-2. Visit: `https://intersoccer.legit.ninja/fr/mon-compte/`
+2. Visit: `https://test-site.example/fr/mon-compte/`
 3. Menu should show: **"Gérer les participants"**
 4. Visit the page
 5. Title should show: **"Gérer vos participants"**
@@ -161,7 +161,7 @@ After cleanup, verify the changes:
 ### 4. Test German
 
 1. Switch to **German** (`de_CH`)
-2. Visit: `https://intersoccer.legit.ninja/de/mein-konto/`
+2. Visit: `https://test-site.example/de/mein-konto/`
 3. Menu should show: **"Teilnehmer verwalten"**
 4. Visit the page
 5. Title should show: **"Verwalten Sie Ihre Teilnehmer"**
@@ -292,12 +292,12 @@ Before committing changes with translation strings:
 
 ### WPML String Translation URL
 ```
-https://intersoccer.legit.ninja/wp-admin/admin.php?page=wpml-string-translation/menu/string-translation.php
+https://test-site.example/wp-admin/admin.php?page=wpml-string-translation/menu/string-translation.php
 ```
 
 ### WPML Theme/Plugin Localization URL
 ```
-https://intersoccer.legit.ninja/wp-admin/admin.php?page=sitepress-multilingual-cms/menu/theme-localization.php
+https://test-site.example/wp-admin/admin.php?page=sitepress-multilingual-cms/menu/theme-localization.php
 ```
 
 ### Database Tables Used by WPML

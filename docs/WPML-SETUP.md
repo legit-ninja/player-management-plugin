@@ -48,17 +48,17 @@ This ensures WordPress regenerates rewrite rules with the translated slugs.
 ### Step 3: Verify Translations
 
 #### **Check French (fr_CH):**
-- URL should be: `https://intersoccer.legit.ninja/fr/mon-compte/gerer-participants/`
+- URL should be: `https://test-site.example/fr/mon-compte/gerer-participants/`
 - Menu should show: "Gérer les participants"
 - Page title should show: "Gérer vos participants"
 
 #### **Check German (de_CH):**
-- URL should be: `https://intersoccer.legit.ninja/de/mein-konto/teilnehmer-verwalten/`
+- URL should be: `https://test-site.example/de/mein-konto/teilnehmer-verwalten/`
 - Menu should show: "Teilnehmer verwalten"
 - Page title should show: "Verwalten Sie Ihre Teilnehmer"
 
 #### **Check English (en_CH):**
-- URL should be: `https://intersoccer.legit.ninja/en/my-account/manage-players/`
+- URL should be: `https://test-site.example/en/my-account/manage-players/`
 - Menu should show: "Manage Players"
 - Page title should show: "Manage Your Attendees"
 

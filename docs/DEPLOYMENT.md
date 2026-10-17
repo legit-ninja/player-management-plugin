@@ -17,7 +17,7 @@ This document explains how to deploy the InterSoccer Player Management plugin to
    Update these values:
    ```bash
    SERVER_USER="your-ssh-username"
-   SERVER_HOST="intersoccer.legit.ninja"
+   SERVER_HOST="test-site.example"
    SERVER_PATH="/var/www/html/wp-content/plugins/player-management"
    SSH_PORT="22"
    SSH_KEY="~/.ssh/id_rsa"
@@ -25,7 +25,7 @@ This document explains how to deploy the InterSoccer Player Management plugin to
 
 3. **Test SSH access:**
    ```bash
-   ssh -i ~/.ssh/id_rsa your-username@intersoccer.legit.ninja
+   ssh -i ~/.ssh/id_rsa your-username@test-site.example
    ```
 
 ## Usage

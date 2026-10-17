@@ -11,10 +11,14 @@ coverage/
 debug.log
 error_log
 
+# Exports
+*.csv
+
 # Secrets / local config
 .env
 .env.*
 deploy.local.sh
+.deploy-dryrun/
 
 # OS / IDE
 .DS_Store
