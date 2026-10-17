@@ -52,7 +52,7 @@ class MedicalAccessTest extends TestCase
     public function test_privacy_filter_grants_medical_and_dob_for_staff(): void
     {
         if (!function_exists('intersoccer_user_can_view_medical')) {
-            $this->markTestSkipped('Reed #46 privacy helpers are not loaded in this worktree.');
+            $this->markTestSkipped('Privacy helpers are not loaded in this worktree.');
         }
         intersoccer_test_set_user_caps(['coach' => true, 'read' => true], 99);
         $GLOBALS['wp_stub_user_objects'][99] = (object) ['ID' => 99, 'roles' => ['coach']];

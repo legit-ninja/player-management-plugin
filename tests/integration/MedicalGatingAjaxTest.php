@@ -8,6 +8,8 @@ require_once __DIR__ . '/../../includes/ajax-handlers.php';
 
 class MedicalGatingAjaxTest extends InterSoccer_Test_Case
 {
+    private static bool $privacy_booted = false;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -17,6 +19,23 @@ class MedicalGatingAjaxTest extends InterSoccer_Test_Case
         wp_cache_flush();
         $_POST = [];
         unset($GLOBALS['wp_stub_last_json_response']);
+    }
+
+    private function bootPrivacyPluginIfAvailable(): void
+    {
+        if (self::$privacy_booted) {
+            return;
+        }
+        $privacy = dirname(__DIR__, 2) . '/includes/privacy-settings.php';
+        if (!is_readable($privacy)) {
+            return;
+        }
+        $stubs = dirname(__DIR__) . '/helpers/privacy-settings-stubs.php';
+        if (is_readable($stubs)) {
+            require_once $stubs;
+        }
+        require_once $privacy;
+        self::$privacy_booted = true;
     }
 
     private function basePlayer(): array
@@ -282,12 +301,9 @@ class MedicalGatingAjaxTest extends InterSoccer_Test_Case
 
     public function test_privacy_granted_staff_edit_saves_dob_and_medical(): void
     {
-        $privacy_settings = dirname(__DIR__, 2) . '/../pm-privacy-settings-getters/includes/privacy-settings.php';
-        if (is_readable($privacy_settings)) {
-            require_once $privacy_settings;
-        }
+        $this->bootPrivacyPluginIfAvailable();
         if (!function_exists('intersoccer_user_can_view_medical') || !function_exists('intersoccer_user_can_view_dob')) {
-            $this->markTestSkipped('Reed #46 privacy helpers are not loaded in this worktree.');
+            $this->markTestSkipped('Privacy helpers are not loaded in this worktree.');
         }
 
         $this->mockPrivacyGrantedStaffAuth();

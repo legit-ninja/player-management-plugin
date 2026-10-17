@@ -202,7 +202,8 @@
         const rawExistingMedical = existingPlayer?.medical_conditions
             || $row.attr("data-medical-conditions")
             || "";
-        const existingMedical = rawExistingMedical && rawExistingMedical !== "Restricted"
+        const canViewMedical = String($row.data("can-view-medical")) === "1";
+        const existingMedical = canViewMedical && rawExistingMedical
             ? String(rawExistingMedical).trim()
             : "";
 
@@ -213,11 +214,13 @@
         const medicalDisabled = $medicalInput.length > 0 && $medicalInput.prop("disabled");
 
         let playerMedical = "";
-        if (medicalDisabled) {
+        if (!isEdit) {
+            playerMedical = $medicalInput.length && !medicalDisabled ? ($medicalInput.val() || "").trim() : "";
+        } else if (!canViewMedical || medicalDisabled) {
             playerMedical = "";
         } else if ($medicalInput.length) {
-            playerMedical = $medicalInput.val()?.trim() || (isEdit ? existingMedical : "");
-        } else if (isEdit) {
+            playerMedical = ($medicalInput.val() || "").trim();
+        } else {
             playerMedical = existingMedical;
         }
 
