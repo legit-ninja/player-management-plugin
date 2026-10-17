@@ -32,3 +32,12 @@ tasks:
       # Cleanup should occur in reverse of dependencies, e.g. Ansible needs the venv to
       # still exist to clean up the Molecule instances
       - task: common:clean
+
+  build:
+    desc: Build plugin zip (runtime allowlist; matches deploy.sh)
+    cmds:
+      - rm -f ../player-management.zip
+      - >-
+        zip -r ../player-management.zip
+        player-management.php wpml-config.xml README.md
+        includes css js languages elementor assets

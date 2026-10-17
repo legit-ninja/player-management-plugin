@@ -18,6 +18,7 @@ error_log
 .env
 .env.*
 deploy.local.sh
+.deploy-dryrun/
 
 # OS / IDE
 .DS_Store
