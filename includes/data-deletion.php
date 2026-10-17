@@ -95,7 +95,7 @@ function intersoccer_data_deletion_admin_page()
             // rather than reassigning them — intentional for GDPR erasure.
             wp_delete_user($user_id, 0);
             wp_update_post(['ID' => $request_id, 'post_status' => 'completed']);
-            error_log(sprintf('Data deletion completed for user ID %d on %s', $user_id, current_time('mysql')));
+            intersoccer_log_data_deletion_completed($user_id);
             echo '<div class="notice notice-success"><p>' . esc_html__('User data deleted.', 'player-management') . '</p></div>';
         }
     }
@@ -136,5 +136,18 @@ function intersoccer_data_deletion_admin_page()
         </table>
     </div>
 <?php
+}
+
+/**
+ * Write a server log line when admin data deletion processing completes.
+ * Logs the user ID only (no email, name, or other personal fields).
+ */
+function intersoccer_log_data_deletion_completed($user_id)
+{
+    error_log(sprintf(
+        'Data deletion completed for user ID %d on %s',
+        absint($user_id),
+        current_time('mysql')
+    ));
 }
 ?>
