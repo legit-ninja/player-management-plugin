@@ -68,12 +68,30 @@ class MedicalGatingAjaxTest extends InterSoccer_Test_Case
         $GLOBALS['wp_stub_ajax_nonce_valid'] = true;
         $GLOBALS['wp_stub_user_can'] = true;
         intersoccer_test_set_user_caps(['manage_woocommerce' => true, 'edit_users' => true], 50);
-        if (function_exists('get_userdata')) {
-            $GLOBALS['wp_stub_user_objects'][50] = (object) [
-                'ID' => 50,
-                'roles' => ['shop_manager'],
-            ];
+        if (!function_exists('get_userdata')) {
+            function get_userdata($user_id) {
+                $user_id = (int) $user_id;
+                if (isset($GLOBALS['wp_stub_user_objects'][$user_id])) {
+                    return $GLOBALS['wp_stub_user_objects'][$user_id];
+                }
+
+                return null;
+            }
         }
+        if (!function_exists('user_can')) {
+            function user_can($user, $capability) {
+                $user_id = is_object($user) ? (int) ($user->ID ?? 0) : (int) $user;
+                if ($user_id === (int) get_current_user_id() && isset($GLOBALS['wp_stub_user_caps'][$capability])) {
+                    return (bool) $GLOBALS['wp_stub_user_caps'][$capability];
+                }
+
+                return !empty($GLOBALS['wp_stub_user_can']);
+            }
+        }
+        $GLOBALS['wp_stub_user_objects'][50] = (object) [
+            'ID' => 50,
+            'roles' => ['shop_manager'],
+        ];
     }
 
     public function test_parent_add_player_stores_medical_text(): void
@@ -222,13 +240,16 @@ class MedicalGatingAjaxTest extends InterSoccer_Test_Case
             'player_medical' => 'Nut allergy',
         ];
 
-        $this->invokeAjaxSuccess(static function () {
+        $payload = $this->invokeAjaxSuccess(static function () {
             intersoccer_add_player();
         });
-
-        $stored = get_user_meta(1, 'intersoccer_players', true)[0];
-        $this->assertSame('2015-08-20', $stored['dob']);
-        $this->assertSame('', $stored['medical_conditions']);
+        $players = get_user_meta(1, 'intersoccer_players', true);
+        $this->assertCount(1, $players);
+        $this->assertSame('2015-08-20', $players[0]['dob']);
+        $this->assertArrayHasKey('medical_conditions', $players[0]);
+        $this->assertSame('', $players[0]['medical_conditions']);
+        $this->assertSame('Restricted', $payload['player']['medical_conditions'] ?? null);
+        $this->assertSame('Restricted', $payload['player']['dob'] ?? null);
     }
 
     public function test_denied_staff_cannot_inject_medical_on_legacy_row_missing_key(): void
@@ -261,6 +282,10 @@ class MedicalGatingAjaxTest extends InterSoccer_Test_Case
 
     public function test_privacy_granted_staff_edit_saves_dob_and_medical(): void
     {
+        $privacy_settings = dirname(__DIR__, 2) . '/../pm-privacy-settings-getters/includes/privacy-settings.php';
+        if (is_readable($privacy_settings)) {
+            require_once $privacy_settings;
+        }
         if (!function_exists('intersoccer_user_can_view_medical') || !function_exists('intersoccer_user_can_view_dob')) {
             $this->markTestSkipped('Reed #46 privacy helpers are not loaded in this worktree.');
         }

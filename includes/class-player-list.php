@@ -285,7 +285,7 @@ class Player_Management_List {
                                         <?php
                                         echo esc_html(intersoccer_pm_format_dob_display_value($player['dob'] ?? '', $owner_user_id));
                                         ?>
-                                        <?php if (intersoccer_pm_can_view_player_medical($owner_user_id) && !empty($player['age'])): ?>
+                                        <?php if (intersoccer_pm_can_view_player_dob($owner_user_id) && !empty($player['age'])): ?>
                                             <br><small>(<?php echo esc_html($player['age']); ?> <?php _e('years', 'player-management'); ?>)</small>
                                         <?php endif; ?>
                                     </td>

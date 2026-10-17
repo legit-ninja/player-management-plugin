@@ -199,14 +199,27 @@
         const existingPlayer = isEdit && intersoccerPlayer.preload_players
             ? (intersoccerPlayer.preload_players[intersoccerState.editingIndex] || intersoccerPlayer.preload_players[$row.data("player-index")])
             : null;
-        const existingMedical = existingPlayer?.medical_conditions
+        const rawExistingMedical = existingPlayer?.medical_conditions
             || $row.attr("data-medical-conditions")
             || "";
+        const existingMedical = rawExistingMedical && rawExistingMedical !== "Restricted"
+            ? String(rawExistingMedical).trim()
+            : "";
 
         const $dobInput = $source.find('input[name="player_dob"]');
-        const $medicalInput = $source.find('textarea[name="player_medical"]');
+        const $medicalScope = isEdit ? $row.add($row.next(".medical-row")) : $source;
+        const $medicalInput = $medicalScope.find('textarea[name="player_medical"]');
         const dobDisabled = $dobInput.length && $dobInput.prop("disabled");
-        const medicalDisabled = !$medicalInput.length || $medicalInput.prop("disabled");
+        const medicalDisabled = $medicalInput.length > 0 && $medicalInput.prop("disabled");
+
+        let playerMedical = "";
+        if (medicalDisabled) {
+            playerMedical = "";
+        } else if ($medicalInput.length) {
+            playerMedical = $medicalInput.val()?.trim() || (isEdit ? existingMedical : "");
+        } else if (isEdit) {
+            playerMedical = existingMedical;
+        }
 
         const playerData = {
             player_first_name: $source.find('input[name="player_first_name"]').val()?.trim(),
@@ -214,7 +227,7 @@
             player_dob: dobDisabled ? "" : $dobInput.val()?.trim(),
             player_gender: $source.find('select[name="player_gender"]').val()?.trim(),
             player_avs_number: $source.find('input[name="player_avs_number"]').val()?.trim() || "0000",
-            player_medical: medicalDisabled ? "" : ($medicalInput.val()?.trim() || (isEdit ? existingMedical : "")),
+            player_medical: playerMedical,
         };
 
         if (debugEnabled) console.log("InterSoccer: Player data before validation:", playerData, "mode:", isEdit ? "edit" : "add");
