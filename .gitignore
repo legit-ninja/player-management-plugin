@@ -11,6 +11,9 @@ coverage/
 debug.log
 error_log
 
+# Exports
+*.csv
+
 # Secrets / local config
 .env
 .env.*
