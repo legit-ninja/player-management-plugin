@@ -78,6 +78,7 @@ if (!is_plugin_active('woocommerce/woocommerce.php')) {
 // Include core files (check if they exist first)
 $core_files = [
     'includes/player-data.php',
+    'includes/privacy-settings.php',
     'includes/player-management.php',
     'includes/account-dashboard.php',
     'includes/overview-metrics.php',
