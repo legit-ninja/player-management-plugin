@@ -76,7 +76,14 @@ function intersoccer_add_user_profile_players($user) {
         'context' => 'user_profile',
         'nonce_refresh_url' => admin_url('admin-ajax.php?action=intersoccer_refresh_nonce'),
         'debug' => defined('WP_DEBUG') && WP_DEBUG ? '1' : '0',
-        'preload_players' => $players ?: [],
+        'preload_players' => array_map(
+            static function ($player) use ($user) {
+                return is_array($player)
+                    ? intersoccer_pm_redact_player_for_response($player, (int) $user->ID)
+                    : $player;
+            },
+            $players ?: []
+        ),
         'server_time' => current_time('mysql'),
     ];
     wp_localize_script('intersoccer-player-management-js', 'intersoccerPlayer', $localize_data);
@@ -181,13 +188,7 @@ function intersoccer_add_user_profile_players($user) {
                 <span class="avs-instruction"><?php esc_html_e('No AVS? Enter foreign insurance number or "0000" and email us the insurance details.', 'player-management'); ?></span>
                 <span class="error-message" style="display: none;"></span>
             </div>
-            <?php if ($is_admin): ?>
-            <div class="form-row add-player-medical">
-                <label for="player_medical"><?php esc_html_e('Medical Conditions, Dietary Restrictions, and Allergies', 'player-management'); ?></label>
-                <textarea id="player_medical" name="player_medical" maxlength="500"></textarea>
-                <span class="error-message" style="display: none;"></span>
-            </div>
-            <?php endif; ?>
+            <?php intersoccer_pm_render_medical_input_field((int) $user->ID); ?>
             <div class="form-actions">
                 <a href="#" class="player-submit button"><?php esc_html_e('Save', 'player-management'); ?></a>
                 <a href="#" class="cancel-add button"><?php esc_html_e('Cancel', 'player-management'); ?></a>

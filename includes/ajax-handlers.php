@@ -184,17 +184,25 @@ function intersoccer_edit_player() {
 
     $existing_player = $players[$player_index];
 
-    $first_name = isset($_POST['player_first_name']) ? sanitize_text_field(urldecode($_POST['player_first_name'])) : '';
-    $last_name = isset($_POST['player_last_name']) ? sanitize_text_field(urldecode($_POST['player_last_name'])) : '';
-    $dob = isset($_POST['player_dob']) ? sanitize_text_field($_POST['player_dob']) : '';
-    $gender = isset($_POST['player_gender']) ? sanitize_text_field($_POST['player_gender']) : '';
-    $avs_number = isset($_POST['player_avs_number']) ? sanitize_text_field($_POST['player_avs_number']) : '0000';
-    $medical_conditions = isset($_POST['player_medical']) ? sanitize_textarea_field(urldecode($_POST['player_medical'])) : '';
+    $incoming_player = intersoccer_pm_preserve_sensitive_fields_on_save(
+        $existing_player,
+        [
+            'first_name' => isset($_POST['player_first_name']) ? sanitize_text_field(urldecode($_POST['player_first_name'])) : '',
+            'last_name' => isset($_POST['player_last_name']) ? sanitize_text_field(urldecode($_POST['player_last_name'])) : '',
+            'dob' => isset($_POST['player_dob']) ? sanitize_text_field($_POST['player_dob']) : '',
+            'gender' => isset($_POST['player_gender']) ? sanitize_text_field($_POST['player_gender']) : '',
+            'avs_number' => isset($_POST['player_avs_number']) ? sanitize_text_field($_POST['player_avs_number']) : '0000',
+            'medical_conditions' => isset($_POST['player_medical']) ? sanitize_textarea_field(urldecode($_POST['player_medical'])) : '',
+        ],
+        $user_id
+    );
 
-    if (!intersoccer_pm_can_view_player_medical($user_id)) {
-        $dob = (string) ($existing_player['dob'] ?? '');
-        $medical_conditions = (string) ($existing_player['medical_conditions'] ?? '');
-    }
+    $first_name = $incoming_player['first_name'] ?? '';
+    $last_name = $incoming_player['last_name'] ?? '';
+    $dob = $incoming_player['dob'] ?? '';
+    $gender = $incoming_player['gender'] ?? '';
+    $avs_number = $incoming_player['avs_number'] ?? '0000';
+    $medical_conditions = $incoming_player['medical_conditions'] ?? '';
 
     if (!$first_name || !$last_name || !$dob || !$gender) {
         wp_send_json_error(['message' => __('All required fields must be provided', 'player-management')], 400);

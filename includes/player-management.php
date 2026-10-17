@@ -423,7 +423,7 @@ function intersoccer_render_players_form($is_admin = false, $settings = []) {
                                     data-canton="<?php echo esc_attr($player['canton'] ?? ''); ?>"
                                     data-city="<?php echo esc_attr($player['city'] ?? ''); ?>"
                                     data-creation-timestamp="<?php echo esc_attr($player['creation_timestamp'] ?? ''); ?>"
-                                    data-event-age-groups="<?php echo esc_attr(implode(',', $player['event_age_groups'] ?? [])); ?>"
+                                    data-event-age-groups="<?php echo esc_attr(intersoccer_pm_can_view_player_medical($owner_user_id) ? implode(',', $player['event_age_groups'] ?? []) : ''); ?>"
                                     data-event-types="<?php echo esc_attr(implode(',', $player['event_types'] ?? [])); ?>"
                                     data-medical-conditions="<?php echo esc_attr(intersoccer_pm_sensitive_value_for_data_attribute($player['medical_conditions'] ?? '', $owner_user_id)); ?>">
                                     <?php if ($is_admin) : ?>
@@ -519,12 +519,16 @@ function intersoccer_render_players_form($is_admin = false, $settings = []) {
                             <span class="error-message" style="display: none;"></span>
                         </div>
                     <?php endif; ?>
-                    <div class="form-row">
-                        <label for="player_medical"><?php esc_html_e('Medical Conditions, Dietary Restrictions, and Allergies:', 'player-management'); ?></label>
-                        <textarea id="player_medical" name="player_medical" maxlength="500" aria-describedby="medical-instructions"></textarea>
-                        <span id="medical-instructions" class="screen-reader-text"><?php esc_html_e('Optional field for medical conditions, dietary restrictions, and allergies.', 'player-management'); ?></span>
-                        <span class="error-message" style="display: none;"></span>
-                    </div>
+                    <?php
+                    intersoccer_pm_render_medical_input_field(
+                        (int) $user_id,
+                        [
+                            'textarea_id' => 'player_medical',
+                            'instructions_id' => 'medical-instructions',
+                            'wrap_class' => 'form-row',
+                        ]
+                    );
+                    ?>
                     <div class="form-actions">
                         <a href="#" id="save-player" aria-label="<?php esc_attr_e('Save Player', 'player-management'); ?>">
                             <?php esc_html_e('Save', 'player-management'); ?>
@@ -571,7 +575,14 @@ function intersoccer_render_user_profile_players($user) {
         'is_admin' => '1',
         'nonce_refresh_url' => admin_url('admin-ajax.php?action=intersoccer_refresh_nonce'),
         'debug' => defined('WP_DEBUG') && WP_DEBUG ? '1' : '0',
-        'preload_players' => $players,
+        'preload_players' => array_map(
+            static function ($player) use ($user) {
+                return is_array($player)
+                    ? intersoccer_pm_redact_player_for_response($player, (int) $user->ID)
+                    : $player;
+            },
+            $players
+        ),
         'server_time' => current_time('mysql'),
     ];
     if (defined('WP_DEBUG') && WP_DEBUG) {
@@ -673,11 +684,7 @@ function intersoccer_render_user_profile_players($user) {
                 <span class="avs-instruction"><?php esc_html_e('No AVS? Enter foreign insurance number or "0000" and email us the insurance details.', 'player-management'); ?></span>
                 <span class="error-message" style="display: none;"></span>
             </div>
-            <div class="form-row">
-                <label for="player_medical"><?php esc_html_e('Medical Conditions, Dietary Restrictions, and Allergies', 'player-management'); ?></label>
-                <textarea name="player_medical" maxlength="500"></textarea>
-                <span class="error-message" style="display: none;"></span>
-            </div>
+            <?php intersoccer_pm_render_medical_input_field((int) $user->ID); ?>
             <div class="form-actions">
                 <a href="#" class="player-submit button"><?php esc_html_e('Save', 'player-management'); ?></a>
                 <a href="#" class="cancel-add button"><?php esc_html_e('Cancel', 'player-management'); ?></a>

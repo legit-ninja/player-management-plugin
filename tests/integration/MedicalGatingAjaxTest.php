@@ -16,7 +16,6 @@ class MedicalGatingAjaxTest extends InterSoccer_Test_Case
         }
         wp_cache_flush();
         $_POST = [];
-        unset($GLOBALS['intersoccer_medical_access_test_filters']);
     }
 
     private function basePlayer(): array
@@ -163,5 +162,30 @@ class MedicalGatingAjaxTest extends InterSoccer_Test_Case
         $redacted = intersoccer_pm_redact_player_for_response($this->basePlayer(), 1, 99);
         $this->assertSame('Restricted', $redacted['dob']);
         $this->assertSame('Restricted', $redacted['medical_conditions']);
+    }
+
+    public function test_coach_add_other_users_child_stores_dob_but_not_medical(): void
+    {
+        $this->mockCoachAjaxAuth();
+
+        $this->setUserMeta(1, ['intersoccer_players' => []]);
+
+        $_POST = [
+            'nonce' => 'valid_nonce',
+            'user_id' => 1,
+            'player_first_name' => 'Sam',
+            'player_last_name' => 'Kid',
+            'player_dob' => '2015-08-20',
+            'player_gender' => 'male',
+            'player_avs_number' => '0000',
+            'player_medical' => 'Nut allergy',
+        ];
+
+        $this->expectException(WPSendJsonExit::class);
+        intersoccer_add_player();
+
+        $stored = get_user_meta(1, 'intersoccer_players', true)[0];
+        $this->assertSame('2015-08-20', $stored['dob']);
+        $this->assertSame('', $stored['medical_conditions']);
     }
 }

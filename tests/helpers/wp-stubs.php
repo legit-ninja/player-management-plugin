@@ -430,22 +430,6 @@ if (!function_exists('add_filter')) {
     }
 }
 
-if (!function_exists('apply_filters')) {
-    function apply_filters($hook, $value, ...$args) {
-        if ($hook === 'intersoccer_can_view_medical'
-            && !empty($GLOBALS['intersoccer_medical_access_test_filters'])
-            && is_array($GLOBALS['intersoccer_medical_access_test_filters'])) {
-            foreach ($GLOBALS['intersoccer_medical_access_test_filters'] as $callback) {
-                if (is_callable($callback)) {
-                    $value = $callback($value, ...$args);
-                }
-            }
-        }
-
-        return $value;
-    }
-}
-
 if (!function_exists('intersoccer_test_set_user_caps')) {
     /**
      * @param array<string,bool> $caps
@@ -459,5 +443,29 @@ if (!function_exists('intersoccer_test_set_user_caps')) {
 if (!function_exists('__')) {
     function __($text, $domain = 'default') {
         return $text;
+    }
+}
+
+if (!function_exists('esc_html')) {
+    function esc_html($text) {
+        return htmlspecialchars((string) $text, ENT_QUOTES, 'UTF-8');
+    }
+}
+
+if (!function_exists('esc_attr')) {
+    function esc_attr($text) {
+        return htmlspecialchars((string) $text, ENT_QUOTES, 'UTF-8');
+    }
+}
+
+if (!function_exists('esc_html__')) {
+    function esc_html__($text, $domain = 'default') {
+        return esc_html(__($text, $domain));
+    }
+}
+
+if (!function_exists('esc_html_e')) {
+    function esc_html_e($text, $domain = 'default') {
+        echo esc_html__($text, $domain);
     }
 }
