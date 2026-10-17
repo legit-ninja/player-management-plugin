@@ -273,8 +273,11 @@ class Player_Management_List {
                                         <strong><?php echo esc_html(($player['first_name'] ?? '') . ' ' . ($player['last_name'] ?? '')); ?></strong>
                                     </td>
                                     <td class="display-dob" data-label="<?php esc_attr_e('DOB', 'player-management'); ?>" data-field="player-dob">
-                                        <?php echo esc_html(intersoccer_pm_format_dob_display_value($player['dob'] ?? '')); ?>
-                                        <?php if (intersoccer_pm_current_user_can_view_medical() && !empty($player['age'])): ?>
+                                        <?php
+                                        $owner_user_id = (int) ($player['user_id'] ?? 0);
+                                        echo esc_html(intersoccer_pm_format_dob_display_value($player['dob'] ?? '', $owner_user_id));
+                                        ?>
+                                        <?php if (intersoccer_pm_can_view_player_medical($owner_user_id) && !empty($player['age'])): ?>
                                             <br><small>(<?php echo esc_html($player['age']); ?> <?php _e('years', 'player-management'); ?>)</small>
                                         <?php endif; ?>
                                     </td>
@@ -295,8 +298,8 @@ class Player_Management_List {
                                     </td>
                                     <td class="display-medical" data-label="<?php esc_attr_e('Medical/Dietary', 'player-management'); ?>" data-field="player-medical">
                                         <?php
-                                        $medical = intersoccer_pm_format_medical_display_value($player['medical_conditions'] ?? '');
-                                        if (!intersoccer_pm_current_user_can_view_medical()) {
+                                        $medical = intersoccer_pm_format_medical_display_value($player['medical_conditions'] ?? '', $owner_user_id);
+                                        if (!intersoccer_pm_can_view_player_medical($owner_user_id)) {
                                             echo esc_html($medical);
                                         } elseif ($medical !== '') {
                                             echo '<span class="has-medical" title="' . esc_attr($medical) . '">⚕️ ';
@@ -967,9 +970,17 @@ class Player_Management_List {
         
         $users = get_users($user_query_args);
         $all_players = $this->utils->process_player_batch($users, $search, $per_page);
-        
+        $players_for_response = array_map(
+            static function ($player) {
+                $owner_user_id = (int) ($player['user_id'] ?? 0);
+
+                return intersoccer_pm_redact_player_for_response($player, $owner_user_id);
+            },
+            $all_players
+        );
+
         wp_send_json_success([
-            'players' => $all_players,
+            'players' => $players_for_response,
             'has_more' => count($users) === $per_page,
             'player_count' => count($all_players)
         ]);

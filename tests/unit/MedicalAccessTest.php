@@ -9,6 +9,7 @@ class MedicalAccessTest extends TestCase
         unset(
             $GLOBALS['wp_stub_user_caps'],
             $GLOBALS['wp_stub_user_can'],
+            $GLOBALS['wp_stub_current_user_id'],
             $GLOBALS['intersoccer_medical_access_test_filters']
         );
         parent::tearDown();
@@ -60,27 +61,44 @@ class MedicalAccessTest extends TestCase
         $this->assertFalse(intersoccer_pm_current_user_can_view_medical());
     }
 
-    public function test_denied_user_sees_restricted_medical_display(): void
+    public function test_account_owner_can_view_own_player_medical_despite_filter(): void
     {
-        intersoccer_test_set_user_caps(['coach' => true]);
-        $display = intersoccer_pm_format_medical_display_value('SECRET peanut allergy');
+        intersoccer_test_set_user_caps(['customer' => true]);
+        $GLOBALS['wp_stub_current_user_id'] = 7;
+        $GLOBALS['intersoccer_medical_access_test_filters'] = [
+            static function () {
+                return false;
+            },
+        ];
+        $this->assertFalse(intersoccer_pm_current_user_can_view_medical(7));
+        $this->assertTrue(intersoccer_pm_can_view_player_medical(7, 7));
+    }
+
+    public function test_coach_cannot_view_other_users_player_medical(): void
+    {
+        intersoccer_test_set_user_caps(['coach' => true, 'read' => true]);
+        $GLOBALS['wp_stub_current_user_id'] = 99;
+        $this->assertFalse(intersoccer_pm_can_view_player_medical(1, 99));
+        $display = intersoccer_pm_format_medical_display_value('SECRET peanut allergy', 1, 99);
         $this->assertSame('Restricted', $display);
     }
 
-    public function test_strip_sensitive_fields_on_save_for_denied_user(): void
+    public function test_strip_sensitive_fields_on_save_for_denied_non_owner(): void
     {
         intersoccer_test_set_user_caps(['coach' => true]);
+        $GLOBALS['wp_stub_current_user_id'] = 99;
         $stripped = intersoccer_pm_strip_medical_from_player_update_data([
             'first_name' => 'Kid',
             'dob' => '1970-01-01',
             'medical_conditions' => 'Hacked',
-        ]);
+        ], 1, 99);
         $this->assertSame(['first_name' => 'Kid'], $stripped);
     }
 
-    public function test_preserve_sensitive_fields_on_save_for_denied_user(): void
+    public function test_preserve_sensitive_fields_on_save_for_denied_non_owner(): void
     {
         intersoccer_test_set_user_caps(['coach' => true]);
+        $GLOBALS['wp_stub_current_user_id'] = 99;
         $existing = [
             'dob' => '2015-01-01',
             'medical_conditions' => 'Asthma',
@@ -90,7 +108,7 @@ class MedicalAccessTest extends TestCase
             'medical_conditions' => '',
             'first_name' => 'New',
         ];
-        $merged = intersoccer_pm_preserve_sensitive_fields_on_save($existing, $incoming);
+        $merged = intersoccer_pm_preserve_sensitive_fields_on_save($existing, $incoming, 1, 99);
         $this->assertSame('2015-01-01', $merged['dob']);
         $this->assertSame('Asthma', $merged['medical_conditions']);
         $this->assertSame('New', $merged['first_name']);

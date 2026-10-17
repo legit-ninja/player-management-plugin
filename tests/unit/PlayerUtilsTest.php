@@ -360,6 +360,38 @@ class PlayerUtilsTest extends InterSoccer_Test_Case
     }
 
     /**
+     * Internal batch data must keep real DOB/medical (gating is display/AJAX only).
+     */
+    public function test_process_player_batch_keeps_real_dob_for_internal_callers(): void
+    {
+        require_once dirname(__DIR__, 2) . '/includes/medical-access.php';
+        intersoccer_test_set_user_caps(['coach' => true, 'read' => true]);
+        $GLOBALS['wp_stub_current_user_id'] = 99;
+
+        $player = $this->fixtures['valid_player'];
+        $player['medical_conditions'] = 'Asthma';
+
+        $mockUser = (object) ['ID' => 1, 'user_email' => 'user@example.com', 'display_name' => 'Parent'];
+        $this->setUserMeta(1, [
+            'intersoccer_players' => [$player],
+            'billing_state' => 'ZH',
+            'billing_city' => 'Zurich',
+            'billing_country' => 'CH',
+        ]);
+
+        WP_Mock::userFunction('current_time', [
+            'args' => ['mysql'],
+            'return' => '2023-06-15 12:00:00',
+        ]);
+
+        $result = $this->utils->process_player_batch([$mockUser], '', 50);
+        $this->assertNotEmpty($result);
+        $this->assertSame($player['dob'], $result[0]['dob']);
+        $this->assertSame('Asthma', $result[0]['medical_conditions']);
+        $this->assertNotSame('Restricted', $result[0]['dob']);
+    }
+
+    /**
      * Test process_player_batch with search filter
      */
     public function test_process_player_batch_with_search()

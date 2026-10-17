@@ -73,7 +73,7 @@ function intersoccer_add_player() {
     $avs_number = isset($_POST['player_avs_number']) ? sanitize_text_field($_POST['player_avs_number']) : '0000';
     $medical_conditions = isset($_POST['player_medical']) ? sanitize_textarea_field(urldecode($_POST['player_medical'])) : '';
 
-    if (!intersoccer_pm_current_user_can_view_medical()) {
+    if (!intersoccer_pm_can_view_player_medical($user_id)) {
         $medical_conditions = '';
     }
 
@@ -139,7 +139,7 @@ function intersoccer_add_player() {
                 'player_index' => $new_index,
                 'user_id' => $user_id,
                 'event_count' => 0, // New players have no events
-            ])),
+            ]), $user_id),
         ]);
     } else {
         if (defined('WP_DEBUG') && WP_DEBUG) {
@@ -191,7 +191,7 @@ function intersoccer_edit_player() {
     $avs_number = isset($_POST['player_avs_number']) ? sanitize_text_field($_POST['player_avs_number']) : '0000';
     $medical_conditions = isset($_POST['player_medical']) ? sanitize_textarea_field(urldecode($_POST['player_medical'])) : '';
 
-    if (!intersoccer_pm_current_user_can_view_medical()) {
+    if (!intersoccer_pm_can_view_player_medical($user_id)) {
         $dob = (string) ($existing_player['dob'] ?? '');
         $medical_conditions = (string) ($existing_player['medical_conditions'] ?? '');
     }
@@ -245,7 +245,7 @@ function intersoccer_edit_player() {
         'player_index' => $player_index,
         'user_id' => $user_id,
         'event_count' => intersoccer_get_player_event_count($user_id, $player_index),
-    ]));
+    ]), $user_id);
 
     // update_user_meta() returns false when the value is unchanged — treat as success (AUDIT-004).
     if ($existing_player == $updated_player) {
@@ -381,6 +381,6 @@ function intersoccer_get_player() {
         error_log('InterSoccer: Returning player data for user ' . $user_id . ' at index ' . $player_index);
     }
 
-    wp_send_json_success(['player' => intersoccer_pm_redact_player_for_response($player)]);
+    wp_send_json_success(['player' => intersoccer_pm_redact_player_for_response($player, $user_id)]);
 }
 ?>

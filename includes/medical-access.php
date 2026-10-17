@@ -42,6 +42,25 @@ function intersoccer_pm_current_user_can_view_medical($user_id = null): bool {
     return apply_filters('intersoccer_can_view_medical', $allowed, $user_id) === true;
 }
 
+/**
+ * Owner-aware medical/DOB access for a specific player's account.
+ *
+ * Account owners always pass; staff/coach access uses intersoccer_pm_current_user_can_view_medical().
+ *
+ * @param int      $owner_user_id WordPress user ID that owns the player row.
+ * @param int|null $viewer_id     Viewer user ID (defaults to current user).
+ */
+function intersoccer_pm_can_view_player_medical(int $owner_user_id, $viewer_id = null): bool {
+    $viewer_id = $viewer_id !== null ? (int) $viewer_id : (int) get_current_user_id();
+    $owner_user_id = (int) $owner_user_id;
+
+    if ($viewer_id > 0 && $owner_user_id > 0 && $viewer_id === $owner_user_id) {
+        return true;
+    }
+
+    return intersoccer_pm_current_user_can_view_medical($viewer_id);
+}
+
 if (!function_exists('intersoccer_pm_medical_restricted_label')) {
     function intersoccer_pm_medical_restricted_label(): string {
         return (string) __('Restricted', INTERSOCCER_PLAYER_TEXT_DOMAIN);
@@ -52,10 +71,12 @@ if (!function_exists('intersoccer_pm_format_medical_display_value')) {
     /**
      * Medical/dietary/allergy cell text (caller escapes HTML).
      *
-     * @param mixed $raw Stored medical text.
+     * @param mixed    $raw
+     * @param int      $owner_user_id
+     * @param int|null $viewer_id
      */
-    function intersoccer_pm_format_medical_display_value($raw): string {
-        if (!intersoccer_pm_current_user_can_view_medical()) {
+    function intersoccer_pm_format_medical_display_value($raw, int $owner_user_id, $viewer_id = null): string {
+        if (!intersoccer_pm_can_view_player_medical($owner_user_id, $viewer_id)) {
             return intersoccer_pm_medical_restricted_label();
         }
 
@@ -67,14 +88,18 @@ if (!function_exists('intersoccer_pm_format_medical_display_snippet')) {
     /**
      * Truncated medical column text for tables (caller escapes HTML).
      *
-     * @param mixed $raw
-     * @param int   $max_len
+     * @param mixed    $raw
+     * @param int      $owner_user_id
+     * @param int      $max_len
+     * @param int|null $viewer_id
      */
-    function intersoccer_pm_format_medical_display_snippet($raw, int $max_len = 20): string {
-        $text = intersoccer_pm_format_medical_display_value($raw);
-        if (!intersoccer_pm_current_user_can_view_medical()) {
-            return $text;
+    function intersoccer_pm_format_medical_display_snippet($raw, int $owner_user_id, int $max_len = 20, $viewer_id = null): string {
+        $can_view = intersoccer_pm_can_view_player_medical($owner_user_id, $viewer_id);
+        if (!$can_view) {
+            return intersoccer_pm_medical_restricted_label();
         }
+
+        $text = trim((string) $raw);
         if ($text === '') {
             return '';
         }
@@ -87,10 +112,12 @@ if (!function_exists('intersoccer_pm_format_dob_display_value')) {
     /**
      * DOB cell text (caller escapes HTML).
      *
-     * @param mixed $raw
+     * @param mixed    $raw
+     * @param int      $owner_user_id
+     * @param int|null $viewer_id
      */
-    function intersoccer_pm_format_dob_display_value($raw): string {
-        if (!intersoccer_pm_current_user_can_view_medical()) {
+    function intersoccer_pm_format_dob_display_value($raw, int $owner_user_id, $viewer_id = null): string {
+        if (!intersoccer_pm_can_view_player_medical($owner_user_id, $viewer_id)) {
             return intersoccer_pm_medical_restricted_label();
         }
 
@@ -104,11 +131,13 @@ if (!function_exists('intersoccer_pm_sensitive_value_for_data_attribute')) {
     /**
      * Value for data-* attributes (empty when access denied so JS cannot read secrets).
      *
-     * @param mixed  $raw
-     * @param string $fallback When allowed and value empty.
+     * @param mixed    $raw
+     * @param int      $owner_user_id
+     * @param string   $fallback When allowed and value empty.
+     * @param int|null $viewer_id
      */
-    function intersoccer_pm_sensitive_value_for_data_attribute($raw, string $fallback = ''): string {
-        if (!intersoccer_pm_current_user_can_view_medical()) {
+    function intersoccer_pm_sensitive_value_for_data_attribute($raw, int $owner_user_id, string $fallback = '', $viewer_id = null): string {
+        if (!intersoccer_pm_can_view_player_medical($owner_user_id, $viewer_id)) {
             return '';
         }
 
@@ -123,10 +152,12 @@ if (!function_exists('intersoccer_pm_redact_player_for_response')) {
      * Strip sensitive fields from player payloads (AJAX / batch APIs).
      *
      * @param array<string,mixed> $player
+     * @param int                 $owner_user_id
+     * @param int|null            $viewer_id
      * @return array<string,mixed>
      */
-    function intersoccer_pm_redact_player_for_response(array $player): array {
-        if (intersoccer_pm_current_user_can_view_medical()) {
+    function intersoccer_pm_redact_player_for_response(array $player, int $owner_user_id, $viewer_id = null): array {
+        if (intersoccer_pm_can_view_player_medical($owner_user_id, $viewer_id)) {
             return $player;
         }
 
@@ -146,10 +177,12 @@ if (!function_exists('intersoccer_pm_strip_medical_from_player_update_data')) {
      * Prevent denied users from overwriting stored medical/DOB on save.
      *
      * @param array<string,mixed> $update_data
+     * @param int                 $owner_user_id
+     * @param int|null            $viewer_id
      * @return array<string,mixed>
      */
-    function intersoccer_pm_strip_medical_from_player_update_data(array $update_data): array {
-        if (intersoccer_pm_current_user_can_view_medical()) {
+    function intersoccer_pm_strip_medical_from_player_update_data(array $update_data, int $owner_user_id, $viewer_id = null): array {
+        if (intersoccer_pm_can_view_player_medical($owner_user_id, $viewer_id)) {
             return $update_data;
         }
 
@@ -167,10 +200,12 @@ if (!function_exists('intersoccer_pm_preserve_sensitive_fields_on_save')) {
      *
      * @param array<string,mixed> $existing
      * @param array<string,mixed> $incoming
+     * @param int                 $owner_user_id
+     * @param int|null            $viewer_id
      * @return array<string,mixed>
      */
-    function intersoccer_pm_preserve_sensitive_fields_on_save(array $existing, array $incoming): array {
-        if (intersoccer_pm_current_user_can_view_medical()) {
+    function intersoccer_pm_preserve_sensitive_fields_on_save(array $existing, array $incoming, int $owner_user_id, $viewer_id = null): array {
+        if (intersoccer_pm_can_view_player_medical($owner_user_id, $viewer_id)) {
             return $incoming;
         }
 
