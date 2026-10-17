@@ -134,6 +134,19 @@ if (! function_exists('wp_roles')) {
 	}
 }
 
+if (! function_exists('add_query_arg')) {
+	function add_query_arg($args, $url = '') {
+		if (is_array($args)) {
+			$query = http_build_query($args);
+			$sep   = (strpos((string) $url, '?') !== false) ? '&' : '?';
+
+			return (string) $url . $sep . $query;
+		}
+
+		return (string) $url;
+	}
+}
+
 if (! function_exists('wp_timezone')) {
 	function wp_timezone() {
 		if (! empty($GLOBALS['wp_stub_timezone'])) {

@@ -321,6 +321,15 @@ class PrivacySettingsTest extends InterSoccer_Test_Case {
 		$this->assertTrue( intersoccer_user_can_view_dob( 2 ) );
 	}
 
+	public function test_medical_settings_notice_links_to_players_settings_page(): void {
+		WP_Mock::userFunction( 'admin_url' )->andReturn( 'https://example.com/wp-admin/admin.php' );
+
+		$url = intersoccer_privacy_medical_settings_admin_url();
+
+		$this->assertStringContainsString( 'intersoccer-players-settings', $url );
+		$this->assertStringContainsString( 'tab=general', $url );
+	}
+
 	public function test_admin_notice_visible_for_capable_user_when_unconfigured(): void {
 		$GLOBALS['wp_stub_current_user_id'] = 5;
 		$GLOBALS['wp_stub_user_caps']       = [ 'manage_options' => true ];
