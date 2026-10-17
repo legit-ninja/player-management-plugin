@@ -99,11 +99,10 @@ foreach ($core_files as $file) {
     }
 }
 
-// Bootstrap Elementor widgets when Elementor loads
-add_action('elementor/loaded', function () {
-    require_once PLAYER_MANAGEMENT_PATH . 'includes/class-elementor-bootstrap.php';
-    InterSoccer_Player_Elementor_Bootstrap::init();
-});
+// Elementor: register link widget on elementor/widgets/register (works regardless of plugin load order).
+require_once PLAYER_MANAGEMENT_PATH . 'includes/elementor-player-link-widget.php';
+add_action('elementor/widgets/register', 'intersoccer_pm_register_player_link_elementor_widget', 10);
+add_action('plugins_loaded', 'intersoccer_pm_setup_elementor_player_link_widget', 20);
 
 // Include admin files only in admin context
 if (is_admin()) {

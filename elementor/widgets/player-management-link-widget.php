@@ -32,7 +32,16 @@ class InterSoccer_Player_Management_Link_Widget extends \Elementor\Widget_Base {
     public function get_keywords() {
         return ['intersoccer', 'player', 'management', 'attendee', 'registration'];
     }
-    
+
+    /**
+     * Prevent Elementor from caching empty frontend output for logged-out visitors.
+     *
+     * @since 3.22.0 Elementor Element_Base API
+     */
+    protected function is_dynamic_content(): bool {
+        return true;
+    }
+
     public function get_style_depends() {
         return ['intersoccer-player-widget'];
     }

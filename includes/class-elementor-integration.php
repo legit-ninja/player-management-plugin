@@ -104,40 +104,7 @@ class InterSoccer_Player_Management_Elementor_Integration {
             return;
         }
 
-        // Register Player Management Link widget
-        try {
-            $widget_file = PLAYER_MANAGEMENT_PATH . 'elementor/widgets/player-management-link-widget.php';
-            if (!file_exists($widget_file)) {
-                if (defined('WP_DEBUG') && WP_DEBUG) {
-                    error_log('InterSoccer Player Management: Widget file not found: ' . $widget_file);
-                }
-                return;
-            }
-            
-            require_once $widget_file;
-            
-            if (!class_exists('InterSoccer_Player_Management_Link_Widget')) {
-                if (defined('WP_DEBUG') && WP_DEBUG) {
-                    error_log('InterSoccer Player Management: Widget class not found after requiring file');
-                }
-                return;
-            }
-            
-            $widgets_manager->register(new InterSoccer_Player_Management_Link_Widget());
-            
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('InterSoccer Player Management: Registered widget: intersoccer_player_management_link');
-            }
-        } catch (Exception $e) {
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('InterSoccer Player Management: Widget registration failed: ' . $e->getMessage());
-                error_log('InterSoccer Player Management: Stack trace: ' . $e->getTraceAsString());
-            }
-        }
-        
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('InterSoccer Player Management: Widget registration completed');
-        }
+        // Player Management Link widget is registered from player-management.php (load-order safe).
     }
 }
 
