@@ -157,5 +157,38 @@ class DataDeletionTest extends InterSoccer_Test_Case
         unset($_POST['deletion_nonce']);
         unset($_POST['request_id']);
     }
+
+    /**
+     * Deletion processing must log user ID only, not email or other personal fields.
+     */
+    public function test_deletion_processing_log_contains_user_id_not_email()
+    {
+        $user_id = 42;
+        $distinct_email = 'must-not-appear-in-deletion-log@example.com';
+
+        WP_Mock::userFunction('absint')->andReturnUsing(function ($val) {
+            return abs((int) $val);
+        });
+        WP_Mock::userFunction('current_time')->andReturn('2023-06-15 12:00:00');
+
+        $log_file = tempnam(sys_get_temp_dir(), 'pm-deletion-log-');
+        $previous_log = ini_get('error_log');
+        ini_set('error_log', $log_file);
+        ini_set('log_errors', '1');
+
+        try {
+            intersoccer_log_data_deletion_completed($user_id);
+
+            $logged = (string) file_get_contents($log_file);
+            $this->assertStringContainsString('user ID 42', $logged);
+            $this->assertStringNotContainsString($distinct_email, $logged);
+            $this->assertStringNotContainsString('@', $logged);
+        } finally {
+            if ($previous_log !== false && $previous_log !== '') {
+                ini_set('error_log', $previous_log);
+            }
+            @unlink($log_file);
+        }
+    }
 }
 
