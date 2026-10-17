@@ -85,6 +85,10 @@ if (!function_exists('intersoccer_pm_player_link_widget_should_show_tour')) {
             return false;
         }
 
+        if (!is_user_logged_in()) {
+            return false;
+        }
+
         return !intersoccer_pm_shepherd_is_wc_blocked_context()
             && intersoccer_pm_player_link_widget_show_tour_enabled($stored_settings)
             && !intersoccer_user_has_players($user_id);

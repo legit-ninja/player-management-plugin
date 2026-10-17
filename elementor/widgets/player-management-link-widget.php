@@ -439,7 +439,7 @@ class InterSoccer_Player_Management_Link_Widget extends \Elementor\Widget_Base {
      * Enqueue Shepherd.js and tour script
      */
     private function enqueue_tour_assets($auto_start, $delay) {
-        if (intersoccer_pm_shepherd_is_wc_blocked_context()) {
+        if (!is_user_logged_in() || intersoccer_pm_shepherd_is_wc_blocked_context()) {
             return;
         }
 
