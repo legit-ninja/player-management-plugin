@@ -452,9 +452,7 @@ if (!function_exists('intersoccer_test_set_user_caps')) {
      */
     function intersoccer_test_set_user_caps(array $caps): void {
         $GLOBALS['wp_stub_user_caps'] = $caps;
-        if (!isset($GLOBALS['wp_stub_current_user_id'])) {
-            $GLOBALS['wp_stub_current_user_id'] = 42;
-        }
+        $GLOBALS['wp_stub_current_user_id'] = 42;
     }
 }
 

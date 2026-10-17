@@ -49,6 +49,17 @@ class MedicalAccessTest extends TestCase
         $this->assertTrue(intersoccer_pm_current_user_can_view_medical());
     }
 
+    public function test_filter_truthy_without_strict_true_denies(): void
+    {
+        intersoccer_test_set_user_caps(['coach' => true]);
+        $GLOBALS['intersoccer_medical_access_test_filters'] = [
+            static function ($allowed) {
+                return 1;
+            },
+        ];
+        $this->assertFalse(intersoccer_pm_current_user_can_view_medical());
+    }
+
     public function test_denied_user_sees_restricted_medical_display(): void
     {
         intersoccer_test_set_user_caps(['coach' => true]);

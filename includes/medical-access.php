@@ -22,40 +22,24 @@ if (!function_exists('intersoccer_pm_medical_sensitive_field_keys')) {
     }
 }
 
-if (!function_exists('intersoccer_pm_current_user_can_view_medical')) {
-    /**
-     * Whether the user may see or change medical/allergy/dietary text and DOB in PM UI.
-     *
-     * @param int|null $user_id Optional user ID (defaults to current user).
-     */
-    function intersoccer_pm_current_user_can_view_medical($user_id = null): bool {
-        $user_id = $user_id ? (int) $user_id : (int) get_current_user_id();
-        $allowed = false;
+/**
+ * Whether the user may see or change medical/allergy/dietary text and DOB in PM UI.
+ *
+ * @param int|null $user_id Optional user ID (defaults to current user).
+ */
+function intersoccer_pm_current_user_can_view_medical($user_id = null): bool {
+    $user_id = $user_id ? (int) $user_id : (int) get_current_user_id();
+    $allowed = false;
 
-        if ($user_id > 0) {
-            if ($user_id === (int) get_current_user_id()) {
-                $allowed = current_user_can('manage_options') || current_user_can('manage_woocommerce');
-            } elseif (function_exists('user_can')) {
-                $allowed = user_can($user_id, 'manage_options') || user_can($user_id, 'manage_woocommerce');
-            }
+    if ($user_id > 0) {
+        if ($user_id === (int) get_current_user_id()) {
+            $allowed = current_user_can('manage_options') || current_user_can('manage_woocommerce');
+        } elseif (function_exists('user_can')) {
+            $allowed = user_can($user_id, 'manage_options') || user_can($user_id, 'manage_woocommerce');
         }
-
-        /**
-         * Filter medical visibility (e.g. role settings from site plugin).
-         *
-         * @param bool $allowed
-         * @param int  $user_id
-         */
-        $filtered = apply_filters('intersoccer_can_view_medical', $allowed, $user_id);
-        if ($filtered === true) {
-            return true;
-        }
-        if ($filtered === false) {
-            return false;
-        }
-
-        return (bool) $allowed;
     }
+
+    return apply_filters('intersoccer_can_view_medical', $allowed, $user_id) === true;
 }
 
 if (!function_exists('intersoccer_pm_medical_restricted_label')) {
