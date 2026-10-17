@@ -168,13 +168,13 @@ WPML automatically compiles .mo files when you save translations in the admin in
 
 ### French
 1. Switch language to **French (fr_CH)**
-2. Visit: `https://intersoccer.legit.ninja/fr/mon-compte/gerer-participants/`
+2. Visit: `https://test-site.example/fr/mon-compte/gerer-participants/`
 3. Verify menu shows: "Gérer les participants"
 4. Verify page title shows: "Gérer vos participants"
 
 ### German
 1. Switch language to **German (de_CH)**
-2. Visit: `https://intersoccer.legit.ninja/de/mein-konto/teilnehmer-verwalten/`
+2. Visit: `https://test-site.example/de/mein-konto/teilnehmer-verwalten/`
 3. Verify menu shows: "Teilnehmer verwalten"
 4. Verify page title shows: "Verwalten Sie Ihre Teilnehmer"
 

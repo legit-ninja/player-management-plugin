@@ -9,7 +9,7 @@
 
 | Decision | Status | Notes |
 |----------|--------|-------|
-| **Host model** | ✅ KEEP | Single origin `https://plugins.underdogunlimited.com` with channel query param (`release` / `prerelease` / `dev`). Do NOT add `dev.underdogunlimited.com` as plugin update host (that domain is for Next site deploy). |
+| **Host model** | ✅ KEEP | Single origin `https://plugins.underdogunlimited.com` with channel query param (`release` / `prerelease` / `dev`). Do NOT add `dev-host.example` as plugin update host (that domain is for Next site deploy). |
 | **Tip A: Reusable publish workflow** | ✅ Soft-OK | Create in `intersoccer-ci`, wire caller workflows to all plugins |
 | **Tip B: First-party updater** | ✅ Soft-OK | Publish existing `intersoccer-updates` to `legit-ninja` org |
 | **Tip C: Update URI headers** | ✅ Soft-OK | Add to 3 missing plugins |
@@ -93,7 +93,7 @@ composer.lock, package.json, package-lock.json, phpunit.xml, Taskfile.yaml,
 **Host model (LOCKED):**
 - Single origin: `https://plugins.underdogunlimited.com`
 - Channel selection via query param: `?channel=release` / `?channel=prerelease` / `?channel=dev`
-- **NO** dual-origin with `dev.underdogunlimited.com` (that domain is for Next site deploy)
+- **NO** dual-origin with `dev-host.example` (that domain is for Next site deploy)
 
 **Per-plugin wiring:**
 - `Update URI: https://plugins.underdogunlimited.com` in plugin header
