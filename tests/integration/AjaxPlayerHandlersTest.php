@@ -29,6 +29,8 @@ class AjaxPlayerHandlersTest extends InterSoccer_Test_Case
     {
         $GLOBALS['wp_stub_ajax_nonce_valid'] = true;
         $GLOBALS['wp_stub_user_can'] = true;
+        $GLOBALS['wp_stub_user_caps'] = ['manage_options' => true];
+        $GLOBALS['wp_stub_current_user_id'] = 1;
     }
 
     /**

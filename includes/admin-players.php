@@ -247,6 +247,13 @@ class Player_Management_Admin {
                         $creation_date = gmdate('Y-m-d', (int)$ts);
                     }
 
+                    if (!intersoccer_pm_current_user_can_view_medical()) {
+                        $restricted = intersoccer_pm_medical_restricted_label();
+                        $dob = $restricted;
+                        $medical = $restricted;
+                        $age = $restricted;
+                    }
+
                     $row = [
                         intersoccer_sanitize_csv_cell((string)$user->ID),
                         intersoccer_sanitize_csv_cell((string)($user->user_email ?? '')),

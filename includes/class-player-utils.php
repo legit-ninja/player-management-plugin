@@ -349,7 +349,9 @@ class Player_Management_Utils {
             }
         }
         
-        return $enhanced;
+        return function_exists('intersoccer_pm_redact_player_for_response')
+            ? intersoccer_pm_redact_player_for_response($enhanced)
+            : $enhanced;
     }
     
     /**

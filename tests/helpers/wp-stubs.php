@@ -430,6 +430,34 @@ if (!function_exists('add_filter')) {
     }
 }
 
+if (!function_exists('apply_filters')) {
+    function apply_filters($hook, $value, ...$args) {
+        if ($hook === 'intersoccer_can_view_medical'
+            && !empty($GLOBALS['intersoccer_medical_access_test_filters'])
+            && is_array($GLOBALS['intersoccer_medical_access_test_filters'])) {
+            foreach ($GLOBALS['intersoccer_medical_access_test_filters'] as $callback) {
+                if (is_callable($callback)) {
+                    $value = $callback($value, ...$args);
+                }
+            }
+        }
+
+        return $value;
+    }
+}
+
+if (!function_exists('intersoccer_test_set_user_caps')) {
+    /**
+     * @param array<string,bool> $caps
+     */
+    function intersoccer_test_set_user_caps(array $caps): void {
+        $GLOBALS['wp_stub_user_caps'] = $caps;
+        if (!isset($GLOBALS['wp_stub_current_user_id'])) {
+            $GLOBALS['wp_stub_current_user_id'] = 42;
+        }
+    }
+}
+
 if (!function_exists('__')) {
     function __($text, $domain = 'default') {
         return $text;

@@ -112,11 +112,11 @@ function intersoccer_add_user_profile_players($user) {
                             data-user-id="<?php echo esc_attr($user->ID); ?>"
                             data-first-name="<?php echo esc_attr($player['first_name'] ?? 'N/A'); ?>"
                             data-last-name="<?php echo esc_attr($player['last_name'] ?? 'N/A'); ?>"
-                            data-dob="<?php echo esc_attr($player['dob'] ?? 'N/A'); ?>"
+                            data-dob="<?php echo esc_attr(intersoccer_pm_sensitive_value_for_data_attribute($player['dob'] ?? '', 'N/A')); ?>"
                             data-gender="<?php echo esc_attr($player['gender'] ?? 'N/A'); ?>"
                             data-avs-number="<?php echo esc_attr($player['avs_number'] ?? 'N/A'); ?>"
                             data-event-count="<?php echo esc_attr($player['event_count'] ?? 0); ?>"
-                            data-medical-conditions="<?php echo esc_attr($player['medical_conditions'] ?? ''); ?>"
+                            data-medical-conditions="<?php echo esc_attr(intersoccer_pm_sensitive_value_for_data_attribute($player['medical_conditions'] ?? '')); ?>"
                             <?php if ($is_admin): ?>
                             data-canton="<?php echo esc_attr($player['canton'] ?? get_user_meta($user->ID, 'billing_state', true) ?: ''); ?>"
                             data-city="<?php echo esc_attr($player['city'] ?? get_user_meta($user->ID, 'billing_city', true) ?: ''); ?>"
@@ -124,10 +124,10 @@ function intersoccer_add_user_profile_players($user) {
                             <?php endif; ?>>
                             <td class="display-first-name" data-label="First Name"><?php echo esc_html($player['first_name'] ?? 'N/A'); ?></td>
                             <td class="display-last-name" data-label="Last Name"><?php echo esc_html($player['last_name'] ?? 'N/A'); ?></td>
-                            <td class="display-dob" data-label="DOB"><?php echo esc_html($player['dob'] ?? 'N/A'); ?></td>
+                            <td class="display-dob" data-label="DOB"><?php echo esc_html(intersoccer_pm_format_dob_display_value($player['dob'] ?? '')); ?></td>
                             <td class="display-gender" data-label="Gender"><?php echo esc_html(intersoccer_translate_gender($player['gender'] ?? 'N/A')); ?></td>
                             <td class="display-avs-number" data-label="AVS Number"><?php echo esc_html($player['avs_number'] ?? 'N/A'); ?></td>
-                            <td class="display-medical-conditions" data-label="<?php esc_attr_e('Medical Conditions, Dietary Restrictions, and Allergies', 'player-management'); ?>"><?php echo esc_html(substr($player['medical_conditions'] ?? '', 0, 20) . (strlen($player['medical_conditions'] ?? '') > 20 ? '...' : '')); ?></td>
+                            <td class="display-medical-conditions" data-label="<?php esc_attr_e('Medical Conditions, Dietary Restrictions, and Allergies', 'player-management'); ?>"><?php echo esc_html(intersoccer_pm_format_medical_display_snippet($player['medical_conditions'] ?? '')); ?></td>
                             <td class="display-event-count" data-label="Events">
                                 <?php
                                 $event_count = intersoccer_get_player_event_count($user->ID, $index);

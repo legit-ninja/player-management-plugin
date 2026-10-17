@@ -273,8 +273,8 @@ class Player_Management_List {
                                         <strong><?php echo esc_html(($player['first_name'] ?? '') . ' ' . ($player['last_name'] ?? '')); ?></strong>
                                     </td>
                                     <td class="display-dob" data-label="<?php esc_attr_e('DOB', 'player-management'); ?>" data-field="player-dob">
-                                        <?php echo esc_html($player['dob'] ?? 'N/A'); ?>
-                                        <?php if (!empty($player['age'])): ?>
+                                        <?php echo esc_html(intersoccer_pm_format_dob_display_value($player['dob'] ?? '')); ?>
+                                        <?php if (intersoccer_pm_current_user_can_view_medical() && !empty($player['age'])): ?>
                                             <br><small>(<?php echo esc_html($player['age']); ?> <?php _e('years', 'player-management'); ?>)</small>
                                         <?php endif; ?>
                                     </td>
@@ -294,9 +294,11 @@ class Player_Management_List {
                                         <?php endif; ?>
                                     </td>
                                     <td class="display-medical" data-label="<?php esc_attr_e('Medical/Dietary', 'player-management'); ?>" data-field="player-medical">
-                                        <?php 
-                                        $medical = $player['medical_conditions'] ?? '';
-                                        if ($medical !== '') {
+                                        <?php
+                                        $medical = intersoccer_pm_format_medical_display_value($player['medical_conditions'] ?? '');
+                                        if (!intersoccer_pm_current_user_can_view_medical()) {
+                                            echo esc_html($medical);
+                                        } elseif ($medical !== '') {
                                             echo '<span class="has-medical" title="' . esc_attr($medical) . '">⚕️ ';
                                             echo esc_html(strlen($medical) > 30 ? substr($medical, 0, 30) . '...' : $medical);
                                             echo '</span>';
