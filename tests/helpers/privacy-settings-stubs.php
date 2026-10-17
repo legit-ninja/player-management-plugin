@@ -1,31 +1,37 @@
 <?php
 /**
- * WordPress stubs used by PrivacySettingsTest (apply_filters, roles, timezone).
+ * Test-only helpers for privacy settings unit tests (loaded from PrivacySettingsTest only).
  */
 
-if (!isset($GLOBALS['wp_stub_filters'])) {
+if (! isset($GLOBALS['wp_stub_filters'])) {
 	$GLOBALS['wp_stub_filters'] = [];
 }
 
-if (!isset($GLOBALS['wp_stub_register_setting_calls'])) {
+if (! isset($GLOBALS['wp_stub_register_setting_calls'])) {
 	$GLOBALS['wp_stub_register_setting_calls'] = [];
 }
 
-if (!isset($GLOBALS['wp_stub_user_objects'])) {
+if (! isset($GLOBALS['wp_stub_user_objects'])) {
 	$GLOBALS['wp_stub_user_objects'] = [];
 }
 
-if (!function_exists('apply_filters')) {
+if (! isset($GLOBALS['wp_stub_user_caps_by_user'])) {
+	$GLOBALS['wp_stub_user_caps_by_user'] = [];
+}
+
+if (! function_exists('intersoccer_privacy_test_apply_filters')) {
 	/**
+	 * Run filters registered via wp-stub add_filter / privacy_settings_stub_add_filter.
+	 *
 	 * @param mixed $value
 	 * @return mixed
 	 */
-	function apply_filters($hook, $value, ...$args) {
+	function intersoccer_privacy_test_apply_filters($hook, $value, ...$args) {
 		$callbacks = [];
-		if (!empty($GLOBALS['wp_stub_filters'][ $hook ])) {
+		if (! empty($GLOBALS['wp_stub_filters'][ $hook ])) {
 			$callbacks = array_merge($callbacks, $GLOBALS['wp_stub_filters'][ $hook ]);
 		}
-		if (!empty($GLOBALS['wp_stub_actions'][ $hook ])) {
+		if (! empty($GLOBALS['wp_stub_actions'][ $hook ])) {
 			$callbacks = array_merge($callbacks, $GLOBALS['wp_stub_actions'][ $hook ]);
 		}
 
@@ -42,21 +48,17 @@ if (!function_exists('apply_filters')) {
 
 		foreach ($callbacks as $entry) {
 			$callback = $entry['callback'];
-			$accepted = (int) $entry['accepted_args'];
-			if ($accepted >= 2 && count($args) >= 1) {
-				$value = $callback($value, $args[0]);
-			} elseif ($accepted >= 3 && count($args) >= 2) {
-				$value = $callback($value, $args[0], $args[1]);
-			} else {
-				$value = $callback($value);
-			}
+			$accepted = max(1, (int) $entry['accepted_args']);
+			$invoke   = array_merge([ $value ], $args);
+			$invoke   = array_slice($invoke, 0, $accepted);
+			$value    = call_user_func_array($callback, $invoke);
 		}
 
 		return $value;
 	}
 }
 
-if (!function_exists('privacy_settings_stub_add_filter')) {
+if (! function_exists('privacy_settings_stub_add_filter')) {
 	function privacy_settings_stub_add_filter($hook, $callback, $priority = 10, $accepted_args = 1) {
 		$GLOBALS['wp_stub_filters'][ $hook ][] = [
 			'callback'      => $callback,
@@ -66,7 +68,7 @@ if (!function_exists('privacy_settings_stub_add_filter')) {
 	}
 }
 
-if (!function_exists('register_setting')) {
+if (! function_exists('register_setting')) {
 	function register_setting($option_group, $option_name, $args = []) {
 		$GLOBALS['wp_stub_register_setting_calls'][] = [
 			'group' => $option_group,
@@ -78,7 +80,7 @@ if (!function_exists('register_setting')) {
 	}
 }
 
-if (!function_exists('add_option')) {
+if (! function_exists('add_option')) {
 	function add_option($option, $value = '', $deprecated = '', $autoload = 'yes') {
 		if (array_key_exists($option, $GLOBALS['wp_stub_options'])) {
 			return false;
@@ -90,7 +92,7 @@ if (!function_exists('add_option')) {
 	}
 }
 
-if (!function_exists('get_userdata')) {
+if (! function_exists('get_userdata')) {
 	function get_userdata($user_id) {
 		if (empty($GLOBALS['wp_stub_user_objects'][ $user_id ])) {
 			return false;
@@ -100,9 +102,24 @@ if (!function_exists('get_userdata')) {
 	}
 }
 
-if (!function_exists('wp_roles')) {
+if (! function_exists('user_can')) {
+	function user_can($user, $capability) {
+		$user_id = is_object($user) ? (int) $user->ID : (int) $user;
+		if (! empty($GLOBALS['wp_stub_user_caps_by_user'][ $user_id ][ $capability ])) {
+			return true;
+		}
+
+		if (isset($GLOBALS['wp_stub_user_caps'][ $capability ])) {
+			return (bool) $GLOBALS['wp_stub_user_caps'][ $capability ];
+		}
+
+		return false;
+	}
+}
+
+if (! function_exists('wp_roles')) {
 	function wp_roles() {
-		if (!isset($GLOBALS['wp_stub_wp_roles'])) {
+		if (! isset($GLOBALS['wp_stub_wp_roles'])) {
 			$GLOBALS['wp_stub_wp_roles'] = (object) [
 				'roles' => [
 					'administrator' => [],
@@ -117,9 +134,9 @@ if (!function_exists('wp_roles')) {
 	}
 }
 
-if (!function_exists('wp_timezone')) {
+if (! function_exists('wp_timezone')) {
 	function wp_timezone() {
-		if (!empty($GLOBALS['wp_stub_timezone'])) {
+		if (! empty($GLOBALS['wp_stub_timezone'])) {
 			return new DateTimeZone($GLOBALS['wp_stub_timezone']);
 		}
 
@@ -127,14 +144,3 @@ if (!function_exists('wp_timezone')) {
 	}
 }
 
-if (!function_exists('do_action')) {
-	function do_action($hook, ...$args) {
-		if (empty($GLOBALS['wp_stub_actions'][ $hook ])) {
-			return;
-		}
-
-		foreach ($GLOBALS['wp_stub_actions'][ $hook ] as $entry) {
-			call_user_func_array($entry['callback'], $args);
-		}
-	}
-}

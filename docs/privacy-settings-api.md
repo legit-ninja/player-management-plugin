@@ -1,6 +1,6 @@
 # Privacy settings API (Player Management)
 
-Medical-role access and booking retention settings live in **Player Management** as plain WordPress options. Finn’s admin screens will save through the `intersoccer_privacy` settings group; this document is the stable getter contract for Reports/Rosters, Product Variations, and other plugins.
+Medical-role access, date-of-birth visibility, and booking retention settings live in **Player Management** as plain WordPress options. Admin screens will save through the `intersoccer_privacy` settings group; this document is the stable getter contract for Reports/Rosters, Product Variations, and other plugins.
 
 ## Load conditions
 
@@ -10,10 +10,10 @@ Medical-role access and booking retention settings live in **Player Management**
 
 | Constant | Option name | Type | When absent | Notes |
 |----------|-------------|------|-------------|--------|
-| `INTERSOCCER_OPT_MEDICAL_ROLES` | `intersoccer_medical_roles` | `string[]` role slugs | Not configured | Getter returns `['administrator']`. Filter `intersoccer_can_view_medical` is a no-op until the option is saved at least once. Registered **without** a `default` so `get_option(..., null) === null` means unconfigured. |
-| `INTERSOCCER_OPT_RETENTION_MONTHS` | `intersoccer_retention_months` | `int` | `0` (off) | Clamped 0–120 after save. |
-| `INTERSOCCER_OPT_RETENTION_INACTIVE_ACCOUNT_MONTHS` | `intersoccer_retention_inactive_account_months` | `int` | `0` (off) | Accounts with players but no booking for N months (Bay A.5). |
-| `INTERSOCCER_OPT_PRIVACY_SCHEMA_VERSION` | `intersoccer_privacy_settings_schema_version` | `int` | `1` | Written once via `add_option()` on `init` when missing. Never decreased. |
+| `INTERSOCCER_OPT_MEDICAL_ROLES` | `intersoccer_medical_roles` | `string[]` role slugs | Not configured | Getter returns `['administrator']` for role lists. Access policy uses “configured” only when the stored value is an **array**. Filter hooks are a no-op for access until a valid array is saved. Registered **without** a `default` so `get_option(..., null) === null` means never saved. |
+| `INTERSOCCER_OPT_RETENTION_MONTHS` | `intersoccer_retention_months` | `int` | `0` (off) | Clamped 0–120 after save. Stored `0` disables retention before filters run. |
+| `INTERSOCCER_OPT_RETENTION_INACTIVE_ACCOUNT_MONTHS` | `intersoccer_retention_inactive_account_months` | `int` | `0` (off) | Inactive accounts with players but no recent booking. Stored `0` disables before filters run. |
+| `INTERSOCCER_OPT_PRIVACY_SCHEMA_VERSION` | `intersoccer_privacy_settings_schema_version` | `int` | `1` | Internal schema marker; **not** in the `intersoccer_privacy` settings group. Written once via `add_option()` on `init` when missing. |
 
 No values are seeded on existing sites until an administrator saves settings.
 
@@ -24,66 +24,67 @@ All functions are wrapped in `function_exists()` guards in `includes/privacy-set
 | Function | Returns | Behaviour |
 |----------|---------|-----------|
 | `intersoccer_get_medical_roles()` | `string[]` | Always includes `administrator`. Reads option, sanitizes, `apply_filters('intersoccer_medical_roles')`, sanitizes again. |
-| `intersoccer_medical_roles_is_configured()` | `bool` | `true` when the medical roles option exists in the database. |
-| `intersoccer_user_has_medical_role( int $user_id )` | `bool` | `false` for invalid or unknown users. |
-| `intersoccer_get_retention_months()` | `int` | `0` = off. Filter: `intersoccer_retention_months`. |
+| `intersoccer_medical_roles_is_configured()` | `bool` | `true` when the stored medical roles option is an array (saved role list). |
+| `intersoccer_user_has_medical_role( $user_id )` | `bool` | `false` for invalid or unknown users. Accepts non-numeric input without TypeError (normalized to int). |
+| `intersoccer_user_can_view_medical( int $user_id )` | `bool` | Strict bool; see access policy below. Applies `intersoccer_can_view_medical`. |
+| `intersoccer_user_can_view_dob( int $user_id )` | `bool` | Same policy as medical; uses `intersoccer_can_view_dob`. |
+| `intersoccer_get_retention_months()` | `int` | `0` = off. Stored `0` skips `intersoccer_retention_months` filter. |
 | `intersoccer_is_retention_enabled()` | `bool` | `intersoccer_get_retention_months() > 0`. |
-| `intersoccer_get_retention_inactive_account_months()` | `int` | Filter: `intersoccer_retention_inactive_account_months`. |
-| `intersoccer_get_retention_cutoff_date( ?DateTimeImmutable $now = null )` | `?string` | `Y-m-d` in `wp_timezone()`, or `null` when retention is off. Cutoff is “today minus N months” for criterion 101 (last roster `end_date` before cutoff ⇒ due). |
+| `intersoccer_get_retention_inactive_account_months()` | `int` | Stored `0` skips filter. |
+| `intersoccer_get_retention_cutoff_date( ?DateTimeImmutable $now = null )` | `?string` | `Y-m-d` in `wp_timezone()`, or `null` when retention is off. Subtracts whole months with calendar clamping (e.g. 31 Aug minus six months → last day of February, not March overflow). |
 | `intersoccer_privacy_settings_schema_version()` | `int` | Current schema version (minimum 1). |
-| `intersoccer_sanitize_medical_roles( $value )` | `string[]` | Settings API sanitizer; unknown roles dropped when `wp_roles()` is available; `administrator` always kept. |
+| `intersoccer_sanitize_medical_roles( $value )` | `string[]` | Settings API sanitizer. |
 | `intersoccer_sanitize_retention_months( $value )` | `int` | Settings API sanitizer; 0–120. |
 | `intersoccer_privacy_settings_defaults()` | `array` | Option name ⇒ default value map. |
-| `intersoccer_filter_can_view_medical( $allowed, $user_id )` | `mixed` | Registered on `intersoccer_can_view_medical` at priority 10. |
+| `intersoccer_filter_can_view_medical( $allowed, $user_id )` | `mixed` | Filter callback on `intersoccer_can_view_medical` (priority 10). |
+| `intersoccer_filter_can_view_dob( $allowed, $user_id )` | `mixed` | Same logic on `intersoccer_can_view_dob`. |
 
 Getters do not write options.
 
-## `intersoccer_can_view_medical` filter
+## Access policy (medical and DOB)
 
-Reports/Rosters (draft medical access helper) computes a base allowance (`manage_options` or `manage_woocommerce`), then:
+The same rules apply to `intersoccer_user_can_view_medical`, `intersoccer_user_can_view_dob`, and their filter callbacks:
+
+1. **Administrator** — users with the `administrator` role are always allowed (`true`).
+2. **Unconfigured** — no valid saved role array yet: return the caller’s `$allowed` value unchanged (type preserved in filters) so existing staff (including shop managers) keep legacy access after upgrade until settings are saved.
+3. **Configured** — once a valid array is saved, access is a strict allow-list: `administrator` plus the saved roles only (`true` / `false` only from filters).
+4. **Corrupt storage** — non-array stored value counts as unconfigured for access (pass-through), not allow-all.
+
+A dismissible **admin notice** warns users with `manage_options` (filterable) while access is unconfigured, linking to the medical settings URL (`intersoccer_privacy_medical_settings_admin_url`).
+
+Parent/guardian access to their own children’s medical notes does **not** use these filters.
+
+## Filters
+
+Callers that compute a baseline `$allowed` (for example `manage_options` or `manage_woocommerce`) should use:
 
 ```php
 $filtered = apply_filters( 'intersoccer_can_view_medical', $allowed, $user_id );
+$filtered = apply_filters( 'intersoccer_can_view_dob', $allowed, $user_id );
 ```
 
-Player Management registers `intersoccer_filter_can_view_medical`:
+Prefer the public helpers when Player Management is loaded:
 
-1. **Not configured** — return `$allowed` unchanged (type preserved). Existing sites keep admins and shop managers until medical roles are saved.
-2. **Configured** — strict `true` if `intersoccer_user_has_medical_role( $user_id )`, else strict `false`. Saving only `administrator` removes shop managers unless their role is ticked.
-3. Invalid or missing user — `false` when configured; pass-through when not configured.
-4. When configured, never return a non-boolean.
-
-Parent/guardian access to their own children’s medical notes does **not** use this filter.
+```php
+if ( ! function_exists( 'intersoccer_user_can_view_medical' ) ) {
+	return false;
+}
+$can_view = intersoccer_user_can_view_medical( $user_id );
+```
 
 ## Cross-plugin contract
 
-Reports/Rosters and Product Variations must gate **medical notes and date-of-birth** behind `function_exists()` on the PM helpers they use (for example `intersoccer_user_has_medical_role` and the medical access flow that applies `intersoccer_can_view_medical`). When Player Management is missing, inactive, or WooCommerce is inactive so `includes/privacy-settings.php` never loaded, the fallback is **deny for everyone** — strict `false`, including administrators. Do not treat `manage_options` or the administrator role as sufficient when PM is absent.
+When Player Management is missing, inactive, or WooCommerce is inactive (privacy file not loaded):
 
-```php
-// Example: medical / DOB visibility when PM may be unloaded.
-if ( ! function_exists( 'intersoccer_user_has_medical_role' ) ) {
-	return false;
-}
-
-// When PM is loaded, follow RR/PV access rules (filter, configured roles, etc.).
-```
-
-| PM / Woo state | Medical and DOB access fallback | Retention fallback |
-|----------------|--------------------------------|-------------------|
-| PM inactive or Woo inactive (file not loaded) | Strict `false` for every user at the **caller** | `0` months, cutoff `null` (nothing purged) |
-
-Retention helpers fall back to off when PM is not loaded:
-
-```php
-$months = function_exists( 'intersoccer_get_retention_months' )
-	? intersoccer_get_retention_months()
-	: 0;
-```
+| Data | Fallback |
+|------|----------|
+| Medical notes and DOB | **Deny everyone** — strict `false`, including administrators. Use `function_exists()` on `intersoccer_user_can_view_medical` / `intersoccer_user_can_view_dob` (or equivalent) and return `false` when absent. |
+| Retention | Off — `0` months, cutoff `null`. |
 
 Do not `require` PM files from other plugins. Do not type-hint PM classes.
 
-When PM is inactive, nothing hooks `intersoccer_can_view_medical`; callers must not fall through to legacy admin or shop-manager allowances. **Reports/Rosters and Product Variations call sites and their PHPUnit coverage are not in this PR.** Each of RR and PV must add a test with PM unloaded that asserts medical and DOB access is denied for an administrator (strict `false`).
+**Reports/Rosters and Product Variations call sites are not in this PR.** Each plugin must add a test with PM unloaded that asserts medical and DOB access is denied for an administrator.
 
 ## Settings registration
 
-On `init`, options register under group `intersoccer_privacy` with `show_in_rest => false`. Finn should use `settings_fields( 'intersoccer_privacy' )` on the medical and retention screens.
+On `init`, user-facing options register under group `intersoccer_privacy` with `show_in_rest => false`. Use `settings_fields( 'intersoccer_privacy' )` on admin screens.
