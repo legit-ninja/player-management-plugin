@@ -2288,3 +2288,27 @@ msgstr "Keine Teilnehmer gefunden."
 msgid "Medical Conditions:"
 msgstr "Medizinische Angaben:"
 
+#: includes/player-management.php
+msgid "Player Assignment:"
+msgstr "Teilnehmerzuweisung:"
+
+#: includes/player-management.php
+msgid "Guest order - no registered players available."
+msgstr "Gastbestellung – keine registrierten Teilnehmer verfügbar."
+
+#: includes/player-management.php
+msgid "Customer has no registered players."
+msgstr "Der Kunde hat keine registrierten Teilnehmer."
+
+#: includes/player-management.php
+msgid "Assigned Player:"
+msgstr "Zugewiesener Teilnehmer:"
+
+#: includes/player-management.php
+msgid "-- Select Player --"
+msgstr "-- Teilnehmer wählen --"
+
+#: includes/player-management.php
+msgid "Current:"
+msgstr "Aktuell:"
+

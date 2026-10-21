@@ -260,6 +260,26 @@ if (!function_exists('wp_delete_user')) {
 
 if (!function_exists('wp_mail')) {
     function wp_mail($to, $subject, $message, $headers = '', $attachments = []) {
+        $GLOBALS['wp_stub_last_wp_mail'] = [
+            'to' => $to,
+            'subject' => $subject,
+            'message' => $message,
+        ];
+        return true;
+    }
+}
+
+if (!function_exists('switch_to_locale')) {
+    function switch_to_locale($locale) {
+        $GLOBALS['wp_stub_locale_switch_log'][] = $locale;
+        $GLOBALS['wp_stub_locale_switch_history'][] = $locale;
+        return true;
+    }
+}
+
+if (!function_exists('restore_previous_locale')) {
+    function restore_previous_locale() {
+        array_pop($GLOBALS['wp_stub_locale_switch_log']);
         return true;
     }
 }
