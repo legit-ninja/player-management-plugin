@@ -881,7 +881,7 @@ msgstr ""
 
 #: includes/class-player-list.php:313
 msgid "View"
-msgstr ""
+msgstr "Anzeigen"
 
 #: includes/class-player-list.php:319
 #: includes/player-management.php:462
@@ -1098,7 +1098,7 @@ msgstr "Fehler: Benutzerdaten konnten nicht geladen werden."
 #: includes/player-management.php:263
 #: includes/user-profile-players.php:103
 msgid "Events"
-msgstr "Events"
+msgstr "Veranstaltungen"
 
 #: includes/player-management.php:265
 msgid "Manage All Players"
@@ -1357,11 +1357,11 @@ msgstr "Die Teilnehmerverwaltung ist nicht verfügbar."
 
 #: player-management.php:326
 msgid "Coach"
-msgstr ""
+msgstr "Trainer"
 
 #: player-management.php:329
 msgid "Organizer"
-msgstr ""
+msgstr "Organisator"
 
 #: player-management.php:555
 msgid "Player Management:"
@@ -1858,7 +1858,7 @@ msgstr "Geburtsdatum:"
 #: includes/class-player-list-elementor-widget.php:346
 #: includes/class-player-list-elementor-widget.php:457
 msgid "Events:"
-msgstr "Events:"
+msgstr "Veranstaltungen:"
 
 #: includes/class-player-list-elementor-widget.php:353
 msgid "Medical:"
@@ -2140,31 +2140,31 @@ msgstr ""
 
 #: includes/class-elementor-widget-base.php:528
 msgid "Age Group:"
-msgstr ""
+msgstr "Altersgruppe:"
 
 #: includes/class-elementor-widget-base.php:541
 msgid "Activity:"
-msgstr ""
+msgstr "Aktivität:"
 
 #: includes/class-elementor-widget-base.php:553
 msgid "Reset Filters"
-msgstr ""
+msgstr "Filter zurücksetzen"
 
 #: includes/class-elementor-widget-base.php:577
 msgid "No data found."
-msgstr ""
+msgstr "Keine Daten gefunden."
 
 #: includes/class-elementor-widget-base.php:629
 msgid "Camp"
-msgstr ""
+msgstr "Camp"
 
 #: includes/class-elementor-widget-base.php:631
 msgid "Course"
-msgstr ""
+msgstr "Kurs"
 
 #: includes/class-elementor-widget-base.php:633
 msgid "Birthday Party"
-msgstr ""
+msgstr "Geburtstagsfeier"
 
 #: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:98
 msgid "Players Overview Dashboard"
@@ -2259,7 +2259,7 @@ msgstr ""
 
 #: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-elementor-manager.php:128
 msgid "An error occurred. Please try again."
-msgstr ""
+msgstr "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
 
 #: /home/jeremy-lee/projects/underdog/intersoccer/player-management/vendor/deliciousbrains/wp-background-processing/classes/wp-background-process.php:777
 msgid "Every Minute"
