@@ -69,6 +69,16 @@ function intersoccer_add_user_profile_players($user) {
         'debug' => defined('WP_DEBUG') && WP_DEBUG ? '1' : '0',
         'preload_players' => $players ?: [],
         'server_time' => current_time('mysql'),
+        'i18n' => $is_admin ? [] : array_merge(
+            intersoccer_pm_frontend_js_i18n(),
+            [
+                'gender' => [
+                    'male' => __('Male', INTERSOCCER_PLAYER_TEXT_DOMAIN),
+                    'female' => __('Female', INTERSOCCER_PLAYER_TEXT_DOMAIN),
+                    'other' => __('Other', INTERSOCCER_PLAYER_TEXT_DOMAIN),
+                ],
+            ]
+        ),
     ];
     wp_localize_script('intersoccer-player-management-js', 'intersoccerPlayer', $localize_data);
     if (defined('WP_DEBUG') && WP_DEBUG) {

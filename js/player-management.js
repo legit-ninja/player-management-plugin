@@ -13,6 +13,25 @@
     const $tableBody = $managePlayers.find("#player-table tbody");
     const $message = $managePlayers.find(".intersoccer-message");
     const debugEnabled = intersoccerPlayer.debug === "1";
+    const pmStrings = intersoccerPlayer.i18n || {};
+
+    function pmT(key, fallback) {
+        return pmStrings[key] || fallback;
+    }
+
+    function pmFmt(key, fallback, value) {
+        const template = pmT(key, fallback);
+        return template.replace("%s", value);
+    }
+
+    function playerActionLinks(index, userId, firstName) {
+        const editLabel = pmFmt("edit_player_aria", "Edit player %s", firstName);
+        const deleteLabel = pmFmt("delete_player_aria", "Delete player %s", firstName);
+        return `
+            <a href="#" class="edit-player" data-index="${escapeHtml(index)}" data-user-id="${escapeHtml(userId)}" aria-label="${escapeHtml(editLabel)}" aria-expanded="false">${escapeHtml(pmT("edit", "Edit"))}</a>
+            <a href="#" class="delete-player" data-index="${escapeHtml(index)}" aria-label="${escapeHtml(deleteLabel)}">${escapeHtml(pmT("delete", "Delete"))}</a>
+        `;
+    }
 
     /**
      * Translate gender value for display
@@ -137,17 +156,14 @@
                         <td class="display-avs-number">${escapeHtml(avsNumber)}</td>
                         <td class="display-medical-conditions">${escapeHtml(medicalPreview)}</td>
                         <td class="display-event-count">${escapeHtml(eventCount)}</td>
-                        <td class="actions">
-                            <a href="#" class="edit-player" data-index="${escapeHtml(index)}" data-user-id="${escapeHtml(userId)}" aria-label="Edit player ${escapeHtml(firstName)}" aria-expanded="false">Edit</a>
-                            <a href="#" class="delete-player" data-index="${escapeHtml(index)}" aria-label="Delete player ${escapeHtml(firstName)}">Delete</a>
-                        </td>
+                        <td class="actions">${playerActionLinks(index, userId, firstName)}</td>
                     </tr>
                 `;
                 $tableBody.append(rowHtml);
             });
         } else {
             if (debugEnabled) console.log("InterSoccer: No valid players to display, showing empty table");
-            $tableBody.html(`<tr class="no-players"><td colspan="${colspan}">No attendees added yet.</td></tr>`);
+            $tableBody.html(`<tr class="no-players"><td colspan="${colspan}">${escapeHtml(pmT("no_attendees", "No attendees added yet."))}</td></tr>`);
         }
     }
 
@@ -167,10 +183,7 @@
         $row.find(".display-avs-number").text(avsNumber);
         $row.find(".display-event-count").text(eventCount);
         $row.find(".display-medical-conditions").text(medicalPreview);
-        $row.find(".actions").html(`
-            <a href="#" class="edit-player" data-index="${escapeHtml(index)}" data-user-id="${escapeHtml(userId)}" aria-label="Edit player ${escapeHtml(firstName)}" aria-expanded="false">Edit</a>
-            <a href="#" class="delete-player" data-index="${escapeHtml(index)}" aria-label="Delete player ${escapeHtml(firstName)}">Delete</a>
-        `);
+        $row.find(".actions").html(playerActionLinks(index, userId, firstName));
         $row.attr("data-first-name", firstName);
         $row.attr("data-last-name", lastName);
         $row.attr("data-dob", dob);
@@ -220,13 +233,13 @@
         }
 
         if (!playerData.player_first_name || !playerData.player_last_name || !playerData.player_dob || !playerData.player_gender) {
-            $message.text("First name, last name, date of birth, and gender are required.").show();
+            $message.text(pmT("required_fields", "First name, last name, date of birth, and gender are required.")).show();
             setTimeout(() => $message.hide(), 5000);
             return;
         }
 
         if (!/^\d{4}-\d{2}-\d{2}$/.test(playerData.player_dob) || !new Date(playerData.player_dob).getTime()) {
-            $message.text("Invalid date of birth format. Use YYYY-MM-DD.").show();
+            $message.text(pmT("invalid_dob", "Invalid date of birth format. Use YYYY-MM-DD.")).show();
             setTimeout(() => $message.hide(), 5000);
             return;
         }
@@ -268,7 +281,7 @@
                             intersoccerPlayer.preload_players = intersoccerPlayer.preload_players || [];
                             intersoccerPlayer.preload_players[playerIndex] = response.data.player;
                             restorePlayerRowDisplay($row, response.data.player, playerIndex, userId);
-                            $message.text(response.data.message || "Player updated successfully.").show();
+                            $message.text(response.data.message || pmT("player_updated", "Player updated successfully.")).show();
                         } else {
                             $section.find("input, select, textarea").val("");
                             $section.removeClass("active").hide();
@@ -279,11 +292,11 @@
                                 intersoccerPlayer.preload_players[newIndex] = response.data.player;
                             }
                             populatePlayers();
-                            $message.text(response.data.message || "Player added successfully.").show();
+                            $message.text(response.data.message || pmT("player_added", "Player added successfully.")).show();
                         }
                         setTimeout(() => $message.hide(), 5000);
                     } else {
-                        $message.text(response.data.message || "Error saving player.").show();
+                        $message.text(response.data.message || pmT("error_saving", "Error saving player.")).show();
                         setTimeout(() => $message.hide(), 5000);
                         if (response.data.new_nonce) {
                             intersoccerPlayer.nonce = response.data.new_nonce;
@@ -292,7 +305,7 @@
                 },
                 error: function (xhr, status, error) {
                     console.error("InterSoccer: Save player error:", status, error, xhr.responseText);
-                    $message.text("Error saving player: " + (xhr.responseText || "Unknown error")).show();
+                    $message.text(pmFmt("error_saving_detail", "Error saving player: %s", xhr.responseText || pmT("unknown_error", "Unknown error"))).show();
                     setTimeout(() => $message.hide(), 5000);
                     if (xhr.status === 403 && !intersoccerState.nonceRetryAttempted) {
                         intersoccerState.nonceRetryAttempted = true;
@@ -359,7 +372,7 @@
 
         if (!player.first_name || !player.last_name) {
             console.error("InterSoccer: Player data not found for index:", index);
-            $message.text("Error: Could not load player data for editing.").show();
+            $message.text(pmT("error_load_edit", "Error: Could not load player data for editing.")).show();
             setTimeout(() => $message.hide(), 10000);
             $row.removeClass("editing");
             intersoccerState.editingIndex = null;
@@ -387,21 +400,21 @@
         `);
         $row.find(".display-gender").html(`
             <select name="player_gender" required aria-required="true">
-                <option value="">Select Gender</option>
-                <option value="male" ${gender === "male" ? "selected" : ""}>Male</option>
-                <option value="female" ${gender === "female" ? "selected" : ""}>Female</option>
-                <option value="other" ${gender === "other" ? "selected" : ""}>Other</option>
+                <option value="">${escapeHtml(pmT("select_gender", "Select Gender"))}</option>
+                <option value="male" ${gender === "male" ? "selected" : ""}>${escapeHtml(translateGender("male"))}</option>
+                <option value="female" ${gender === "female" ? "selected" : ""}>${escapeHtml(translateGender("female"))}</option>
+                <option value="other" ${gender === "other" ? "selected" : ""}>${escapeHtml(translateGender("other"))}</option>
             </select>
             <span class="error-message" style="display: none;"></span>
         `);
         $row.find(".display-avs-number").html(`
             <input type="text" name="player_avs_number" value="${avsNumber}" aria-required="true" maxlength="50">
-            <span class="avs-instruction">No AVS? Enter foreign insurance number or "0000" and email us the insurance details.</span>
+            <span class="avs-instruction">${escapeHtml(pmT("avs_instruction", "No AVS? Enter foreign insurance number or \"0000\" and email us the insurance details."))}</span>
             <span class="error-message" style="display: none;"></span>
         `);
         $row.find(".actions").html(`
-            <a href="#" class="player-submit" aria-label="Save Player">Save</a> /
-            <a href="#" class="cancel-edit" aria-label="Cancel Edit">Cancel</a>
+            <a href="#" class="player-submit" aria-label="${escapeHtml(pmT("save_player_aria", "Save Player"))}">${escapeHtml(pmT("save", "Save"))}</a> /
+            <a href="#" class="cancel-edit" aria-label="${escapeHtml(pmT("cancel_edit_aria", "Cancel Edit"))}">${escapeHtml(pmT("cancel", "Cancel"))}</a>
         `);
 
         $tableBody.find(`tr[data-player-index]`).not($row).each(function () {
@@ -455,7 +468,7 @@
 
         restorePlayerRowDisplay($row, player, index, userId);
 
-        $message.text("Edit canceled.").show();
+        $message.text(pmT("edit_canceled", "Edit canceled.")).show();
         setTimeout(() => $message.hide(), 5000);
         if (debugEnabled) console.log("InterSoccer: Edit canceled for player index:", index);
     });
@@ -472,7 +485,7 @@
         const index = $row.data("player-index").toString();
         const userId = $row.data("user-id") || intersoccerPlayer.user_id;
 
-        if (!confirm("Are you sure you want to delete this player?")) {
+        if (!confirm(pmT("confirm_delete", "Are you sure you want to delete this player?"))) {
             if (debugEnabled) console.log("InterSoccer: Delete canceled by user");
             return;
         }
@@ -500,7 +513,7 @@
                     if (debugEnabled) console.log("InterSoccer: Player deleted successfully:", response.data);
 
                     if ($tableBody.find("tr[data-player-index]").length === 0) {
-                        $tableBody.append(`<tr class="no-players"><td colspan="${colspan}">No attendees added yet.</td></tr>`);
+                        $tableBody.append(`<tr class="no-players"><td colspan="${colspan}">${escapeHtml(pmT("no_attendees", "No attendees added yet."))}</td></tr>`);
                     }
                     if (intersoccerPlayer.preload_players) {
                         delete intersoccerPlayer.preload_players[index];
@@ -508,7 +521,7 @@
                     populatePlayers();
                 } else {
                     console.error("InterSoccer: Failed to delete player:", response.data?.message);
-                    $message.text(response.data.message || "Failed to delete player.").show();
+                    $message.text(response.data.message || pmT("failed_delete", "Failed to delete player.")).show();
                     setTimeout(() => $message.hide(), 10000);
                     if (response.data.new_nonce) {
                         intersoccerPlayer.nonce = response.data.new_nonce;
@@ -524,12 +537,12 @@
                         $.ajax(this);
                     }).catch((error) => {
                         console.error("InterSoccer: Nonce refresh failed:", error);
-                        $message.text("Error: Failed to refresh security token.").show();
+                        $message.text(pmT("error_refresh_nonce", "Error: Failed to refresh security token.")).show();
                         setTimeout(() => $message.hide(), 10000);
                         intersoccerState.nonceRetryAttempted = false;
                     });
                 } else {
-                    $message.text("Error: Unable to delete player - " + (xhr.responseText || "Unknown error")).show();
+                    $message.text(pmFmt("error_delete_detail", "Error: Unable to delete player - %s", xhr.responseText || pmT("unknown_error", "Unknown error"))).show();
                     setTimeout(() => $message.hide(), 10000);
                     intersoccerState.nonceRetryAttempted = false;
                 }
@@ -597,7 +610,7 @@
         $addSection.find(".error-message").hide();
         $(".toggle-add-player").attr("aria-expanded", "false").focus();
 
-        $message.text("Add player canceled.").show();
+        $message.text(pmT("add_canceled", "Add player canceled.")).show();
         setTimeout(() => $message.hide(), 5000);
         if (debugEnabled) console.log("InterSoccer: Add player canceled");
     });

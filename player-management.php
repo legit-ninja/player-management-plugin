@@ -77,6 +77,8 @@ if (!is_plugin_active('woocommerce/woocommerce.php')) {
 
 // Include core files (check if they exist first)
 $core_files = [
+    'includes/admin-locale.php',
+    'includes/frontend-i18n.php',
     'includes/player-data.php',
     'includes/privacy-settings.php',
     'includes/player-management.php',
@@ -480,14 +482,16 @@ add_action('wp_enqueue_scripts', function () {
             'preload_players' => $preload_players,
             'server_time' => current_time('mysql'),
             'version' => PLAYER_MANAGEMENT_VERSION,
-            // Gender translations for JavaScript
-            'i18n' => [
-                'gender' => [
-                    'male' => __('Male', 'player-management'),
-                    'female' => __('Female', 'player-management'),
-                    'other' => __('Other', 'player-management'),
-                ],
-            ],
+            'i18n' => array_merge(
+                intersoccer_pm_frontend_js_i18n(),
+                [
+                    'gender' => [
+                        'male' => __('Male', INTERSOCCER_PLAYER_TEXT_DOMAIN),
+                        'female' => __('Female', INTERSOCCER_PLAYER_TEXT_DOMAIN),
+                        'other' => __('Other', INTERSOCCER_PLAYER_TEXT_DOMAIN),
+                    ],
+                ]
+            ),
         ];
 
         if (defined('WP_DEBUG') && WP_DEBUG) {
