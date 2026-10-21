@@ -1,41 +1,2170 @@
-# French translations for PACKAGE package.
-# Copyright (C) 2025 THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# Jeremy Lee <jlee@underdogunlimited.com>, 2025.
-#
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-17 08:26-0400\n"
-"PO-Revision-Date: 2025-10-17 08:26-0400\n"
-"Last-Translator: Jeremy Lee <jlee@underdogunlimited.com>\n"
-"Language-Team: French <traduc@traduc.org>\n"
-"Language: fr_CH\n"
+"Last-Translator: \n"
+"Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"POT-Creation-Date: 2026-10-21T11:32:30+00:00\n"
+"PO-Revision-Date: 2026-10-21T11:32:30+00:00\n"
+"Language: \n"
 
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/player-management.php:135
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/player-management.php:140
+
+#: player-management.php
+msgid "Player Management"
+msgstr ""
+
+#: player-management.php
+msgid "https://github.com/legit-ninja/player-management-plugin"
+msgstr ""
+
+#: player-management.php
+msgid "Manages players for InterSoccer events, integrating with WooCommerce My Account page and providing an admin dashboard."
+msgstr ""
+
+#: player-management.php
+msgid "Jeremy Lee"
+msgstr ""
+
+#: player-management.php
+msgid "https://underdogunlimited.com"
+msgstr ""
+
+#: elementoridgets/player-management-link-widget.php:21
+msgid "Player Management Link"
+msgstr "Lien de gestion des participants"
+
+#: elementoridgets/player-management-link-widget.php:49
+msgid "Content Settings"
+msgstr ""
+
+#: elementoridgets/player-management-link-widget.php:57
+msgid "Display Type"
+msgstr ""
+
+#: elementoridgets/player-management-link-widget.php:60
+msgid "Icon + Text"
+msgstr "Icône + texte"
+
+#: elementoridgets/player-management-link-widget.php:61
+msgid "Icon Only"
+msgstr "Icône seule"
+
+#: elementoridgets/player-management-link-widget.php:62
+msgid "Text Only"
+msgstr "Texte seul"
+
+#: elementoridgets/player-management-link-widget.php:71
+msgid "Icon"
+msgstr ""
+
+#: elementoridgets/player-management-link-widget.php:86
+msgid "Link Text"
+msgstr "Texte du lien"
+
+#: elementoridgets/player-management-link-widget.php:88
 msgid "Manage Players"
 msgstr "Gérer les participants"
 
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/player-management.php:136
+#: elementoridgets/player-management-link-widget.php:98
+msgid "Enable Shepherd.js Tour"
+msgstr ""
+
+#: elementoridgets/player-management-link-widget.php:100
+#: elementoridgets/player-management-link-widget.php:113
+msgid "Yes"
+msgstr "Oui"
+
+#: elementoridgets/player-management-link-widget.php:101
+#: elementoridgets/player-management-link-widget.php:114
+msgid "No"
+msgstr "Non"
+
+#: elementoridgets/player-management-link-widget.php:104
+msgid "Show guided tour for users without registered players"
+msgstr ""
+
+#: elementoridgets/player-management-link-widget.php:111
+msgid "Auto-start Tour"
+msgstr "Démarrer la visite automatiquement"
+
+#: elementoridgets/player-management-link-widget.php:126
+msgid "Tour Delay (seconds)"
+msgstr ""
+
+#: elementoridgets/player-management-link-widget.php:145
+msgid "Style"
+msgstr ""
+
+#: elementoridgets/player-management-link-widget.php:153
+msgid "Icon Size"
+msgstr ""
+
+#: elementoridgets/player-management-link-widget.php:184
+msgid "Icon Color"
+msgstr ""
+
+#: elementoridgets/player-management-link-widget.php:202
+msgid "Text Color"
+msgstr ""
+
+#: elementoridgets/player-management-link-widget.php:227
+msgid "Alignment"
+msgstr ""
+
+#: elementoridgets/player-management-link-widget.php:231
+msgid "Left"
+msgstr "Gauche"
+
+#: elementoridgets/player-management-link-widget.php:235
+msgid "Center"
+msgstr "Centre"
+
+#: elementoridgets/player-management-link-widget.php:239
+msgid "Right"
+msgstr "Droite"
+
+#: elementoridgets/player-management-link-widget.php:253
+msgid "Icon-Text Spacing"
+msgstr ""
+
+#: elementoridgets/player-management-link-widget.php:473
+msgid "Register Your Players"
+msgstr "Enregistrer vos participants"
+
+#: elementoridgets/player-management-link-widget.php:474
+msgid "Before you can register for camps and courses, you need to add at least one player (attendee) to your account."
+msgstr "Avant de réserver un camp ou un cours, vous devez ajouter au moins un participant à votre compte."
+
+#: elementoridgets/player-management-link-widget.php:475
+msgid "Click here to manage your players and add your first attendee."
+msgstr "Cliquez ici pour gérer vos participants et ajouter votre premier participant."
+
+#: elementoridgets/player-management-link-widget.php:476
+msgid "Click this link to get started!"
+msgstr "Cliquez sur ce lien pour commencer !"
+
+#: elementoridgets/player-management-link-widget.php:477
+msgid "Don't show again"
+msgstr "Ne plus afficher"
+
+#: elementoridgets/player-management-link-widget.php:478
+#: includes/class-player-list.php:630
+msgid "Next"
+msgstr "Suivant"
+
+#: elementoridgets/player-management-link-widget.php:479
+msgid "Back"
+msgstr "Retour"
+
+#: elementoridgets/player-management-link-widget.php:480
+msgid "Got it!"
+msgstr "Compris !"
+
+#: includes/account-dashboard.php:159
+msgid "Add your participants below, then book a camp or course."
+msgstr "Ajoutez vos participants ci-dessous, puis réservez un camp ou un cours."
+
+#: includes/admin-advanced.php:53
+msgid "Camp Terms"
+msgstr ""
+
+#: includes/admin-advanced.php:62
+msgid "Please install the wp-background-processing library for asynchronous attribute creation in Player Management."
+msgstr ""
+
+#: includes/admin-advanced.php:71
+msgid "You do not have permission to perform this action."
+msgstr ""
+
+#: includes/admin-advanced.php:242
+#: includes/admin-settings.php:209
+#: includes/data-deletion.php:76
+msgid "You do not have permission to access this page."
+msgstr ""
+
+#: includes/admin-advanced.php:275
+msgid "Attribute creation queued. Check status in Site Health > Info."
+msgstr ""
+
+#: includes/admin-advanced.php:299
+msgid "Attributes created synchronously."
+msgstr ""
+
+#: includes/admin-advanced.php:306
+msgid "Please confirm user cleanup by checking the confirmation box."
+msgstr ""
+
+msgid "User cleanup completed: %d users deleted, %d users preserved (had activity)."
+msgstr ""
+
+msgid "Preview: %d users would be affected by cleanup."
+msgstr ""
+
+#: includes/admin-advanced.php:331
+msgid "Player ID backfill is unavailable. Update Player Management plugin."
+msgstr ""
+
+msgid "Player ID backfill batch complete: %1$d users processed, %2$d users updated, %3$d players assigned UUIDs."
+msgstr ""
+
+msgid "More users remain — run again with offset %d or submit another batch."
+msgstr ""
+
+#: includes/admin-advanced.php:362
+#: includes/admin-advanced.php:390
+msgid "Invalid file type. Only CSV files are allowed."
+msgstr ""
+
+#: includes/admin-advanced.php:376
+msgid "Camp terms imported successfully."
+msgstr ""
+
+#: includes/admin-advanced.php:379
+msgid "No CSV file uploaded."
+msgstr ""
+
+#: includes/admin-advanced.php:440
+msgid "Users and players imported successfully."
+msgstr ""
+
+#: includes/admin-advanced.php:443
+msgid "No CSV file uploaded for import."
+msgstr ""
+
+#: includes/admin-advanced.php:481
+msgid "Please confirm player flagging."
+msgstr ""
+
+msgid "Flagged %d players as ineligible."
+msgstr ""
+
+#: includes/admin-advanced.php:510
+msgid "Advanced Settings"
+msgstr ""
+
+#: includes/admin-advanced.php:520
+msgid "🗄️ Database Cleanup"
+msgstr ""
+
+#: includes/admin-advanced.php:521
+msgid "Remove user accounts that have no players and no activity (orders, posts, etc.)."
+msgstr ""
+
+#: includes/admin-advanced.php:525
+msgid "Age Threshold"
+msgstr ""
+
+#: includes/admin-advanced.php:528
+msgid "Only delete accounts older than this many days."
+msgstr ""
+
+#: includes/admin-advanced.php:532
+msgid "Safety Check"
+msgstr ""
+
+#: includes/admin-advanced.php:536
+msgid "I understand this will permanently delete user accounts with no players and no activity."
+msgstr ""
+
+#: includes/admin-advanced.php:544
+msgid "Preview Cleanup"
+msgstr ""
+
+#: includes/admin-advanced.php:546
+msgid "Run Cleanup"
+msgstr ""
+
+#: includes/admin-advanced.php:555
+msgid "Preview of Users to be Cleaned Up"
+msgstr ""
+
+msgid "... and %d more users."
+msgstr ""
+
+#: includes/admin-advanced.php:586
+msgid "Last Cleanup Results"
+msgstr ""
+
+#: includes/admin-advanced.php:588
+msgid "Date:"
+msgstr ""
+
+#: includes/admin-advanced.php:589
+msgid "Deleted:"
+msgstr ""
+
+#: includes/admin-advanced.php:590
+msgid "Preserved:"
+msgstr ""
+
+#: includes/admin-advanced.php:598
+msgid "🆔 Backfill Player IDs"
+msgstr ""
+
+#: includes/admin-advanced.php:599
+msgid "Assign stable UUID player_id values to existing player rows missing them. Run before order meta backfill in Product Variations."
+msgstr ""
+
+#: includes/admin-advanced.php:605
+msgid "Last run:"
+msgstr ""
+
+msgid "Processed %1$d users, updated %2$d users, %3$d players."
+msgstr ""
+
+#: includes/admin-advanced.php:616
+msgid "Batch size"
+msgstr ""
+
+#: includes/admin-advanced.php:618
+msgid "Offset"
+msgstr ""
+
+#: includes/admin-advanced.php:621
+msgid "Backfill Player IDs"
+msgstr ""
+
+#: includes/admin-advanced.php:626
+msgid "⚙️ Auto-Create Attributes"
+msgstr ""
+
+#: includes/admin-advanced.php:627
+msgid "Create WooCommerce product attributes for InterSoccer events."
+msgstr ""
+
+#: includes/admin-advanced.php:628
+msgid "Create Attributes"
+msgstr ""
+
+#: includes/admin-advanced.php:633
+msgid "📁 Import/Export"
+msgstr ""
+
+#: includes/admin-advanced.php:635
+msgid "Import Camp Terms from CSV"
+msgstr ""
+
+#: includes/admin-advanced.php:637
+msgid "Import Terms"
+msgstr ""
+
+#: includes/admin-advanced.php:639
+msgid "Import Users and Players from CSV"
+msgstr ""
+
+#: includes/admin-advanced.php:641
+msgid "Import Users & Players"
+msgstr ""
+
+#: includes/admin-advanced.php:643
+msgid "Export Users and Players"
+msgstr ""
+
+#: includes/admin-advanced.php:644
+#: includes/class-player-list.php:193
+msgid "Export to CSV"
+msgstr ""
+
+#: includes/admin-advanced.php:649
+msgid "👥 Player Management"
+msgstr ""
+
+#: includes/admin-advanced.php:651
+msgid "Flag Older Players"
+msgstr ""
+
+msgid "Flag players born before %s as ineligible."
+msgstr ""
+
+#: includes/admin-advanced.php:653
+msgid "Confirm Flagging"
+msgstr ""
+
+#: includes/admin-advanced.php:654
+msgid "Flag Players"
+msgstr ""
+
+#: includes/admin-advanced.php:659
+msgid "🔧 Advanced Configuration"
+msgstr ""
+
+#: includes/admin-advanced.php:660
+msgid "Custom JSON Attributes"
+msgstr ""
+
+#: includes/admin-advanced.php:662
+msgid "Save JSON"
+msgstr ""
+
+#: includes/admin-advanced.php:667
+msgid "📊 System Information"
+msgstr ""
+
+#: includes/admin-advanced.php:689
+msgid "Total Users:"
+msgstr ""
+
+#: includes/admin-advanced.php:693
+msgid "Users with Players:"
+msgstr ""
+
+#: includes/admin-advanced.php:697
+msgid "Users without Players:"
+msgstr ""
+
+#: includes/admin-advanced.php:701
+msgid "Total Orders:"
+msgstr ""
+
+#: includes/admin-advanced.php:705
+msgid "PHP Memory Limit:"
+msgstr ""
+
+#: includes/admin-advanced.php:709
+msgid "Current Memory Usage:"
+msgstr ""
+
+#: includes/admin-advanced.php:713
+msgid "WordPress Version:"
+msgstr ""
+
+#: includes/admin-advanced.php:717
+msgid "WooCommerce Version:"
+msgstr ""
+
+#: includes/admin-advanced.php:725
+msgid "❓ Help & Documentation"
+msgstr ""
+
+#: includes/admin-advanced.php:727
+msgid "Database Cleanup Guidelines:"
+msgstr ""
+
+#: includes/admin-advanced.php:729
+msgid "Always run a preview before performing cleanup"
+msgstr ""
+
+#: includes/admin-advanced.php:730
+msgid "Users with orders, posts, or comments will be preserved"
+msgstr ""
+
+#: includes/admin-advanced.php:731
+msgid "Users with billing information will be preserved"
+msgstr ""
+
+#: includes/admin-advanced.php:732
+msgid "Recommended to backup database before major cleanups"
+msgstr ""
+
+#: includes/admin-advanced.php:735
+msgid "Performance Tips:"
+msgstr ""
+
+#: includes/admin-advanced.php:737
+msgid "Regular cleanup helps maintain database performance"
+msgstr ""
+
+#: includes/admin-advanced.php:738
+msgid "Use 30-90 day age thresholds for safety"
+msgstr ""
+
+#: includes/admin-advanced.php:739
+msgid "Monitor memory usage during large operations"
+msgstr ""
+
+#: includes/admin-advanced.php:760
+#: includes/admin-advanced.php:768
+msgid "Please check the confirmation box first."
+msgstr ""
+
+#: includes/admin-advanced.php:778
+msgid "Warning: Very short age thresholds may delete recent accounts."
+msgstr ""
+
+#: includes/admin-players.php:43
+#: includes/admin-players.php:44
+msgid "Players"
+msgstr ""
+
+#: includes/admin-players.php:54
+#: includes/admin-players.php:55
+msgid "Overview"
+msgstr ""
+
+#: includes/admin-players.php:63
+#: includes/admin-players.php:64
+#: includes/class-player-list.php:148
+msgid "All Players"
+msgstr ""
+
+#: includes/admin-players.php:72
+#: includes/admin-players.php:73
+msgid "Advanced"
+msgstr ""
+
+#: includes/admin-players.php:81
+#: includes/admin-players.php:82
+#: player-management.php:530
+msgid "Settings"
+msgstr "Paramètres"
+
+#: includes/admin-players.php:107
+msgid "Players per page"
+msgstr ""
+
+#: includes/admin-players.php:135
+#: includes/class-player-list.php:30
+msgid "You do not have sufficient permissions to access this page."
+msgstr ""
+
+#: includes/admin-players.php:161
+msgid "Unable to open output stream."
+msgstr ""
+
+#: includes/admin-players.php:175
+#: includes/player-management.php:384
+#: includes/player-management.php:441
+#: includes/player-management.php:589
+#: includes/player-management.php:666
+#: includes/user-profile-players.php:102
+#: includes/user-profile-players.php:131
+#: includes/user-profile-players.php:187
+msgid "Medical Conditions, Dietary Restrictions, and Allergies"
+msgstr "Conditions médicales, restrictions alimentaires et allergies"
+
+#: includes/admin-settings.php:69
+#: includes/admin-settings.php:70
+msgid "Updates"
+msgstr ""
+
+#: includes/admin-settings.php:216
+msgid "Player Management Settings"
+msgstr ""
+
+#: includes/admin-settings.php:218
+msgid "Settings tabs"
+msgstr ""
+
+#: includes/admin-settings.php:220
+msgid "General"
+msgstr ""
+
+#: includes/admin-settings.php:223
+msgid "License"
+msgstr ""
+
+#: includes/admin-settings.php:251
+msgid "Settings saved."
+msgstr ""
+
+#: includes/admin-settings.php:256
+msgid "The InterSoccer Updates plugin is not active. Update Stream is saved, but automatic updates from plugins.underdogunlimited.com require InterSoccer Updates."
+msgstr ""
+
+#: includes/admin-settings.php:264
+msgid "Enable beta updates"
+msgstr ""
+
+#: includes/admin-settings.php:268
+msgid "Receive beta and release-candidate versions of this plugin"
+msgstr ""
+
+#: includes/admin-settings.php:271
+msgid "When enabled, this plugin prefers the latest beta or release candidate from Underdog. When disabled, only stable releases are offered."
+msgstr ""
+
+#: includes/admin-settings.php:275
+msgid "Beta updates require the InterSoccer Updates plugin to be active."
+msgstr ""
+
+#: includes/admin-settings.php:281
+#: includes/admin-settings.php:284
+msgid "Update Stream"
+msgstr ""
+
+#: includes/admin-settings.php:288
+msgid "Release"
+msgstr ""
+
+#: includes/admin-settings.php:289
+msgid "Stable builds (e.g. v2.7.1)."
+msgstr ""
+
+#: includes/admin-settings.php:294
+msgid "Dev"
+msgstr ""
+
+#: includes/admin-settings.php:295
+msgid "Bleeding-edge development builds for staging sites only."
+msgstr ""
+
+#: includes/admin-settings.php:299
+msgid "Applies site-wide to all InterSoccer plugins updated from plugins.underdogunlimited.com."
+msgstr ""
+
+#: includes/admin-settings.php:306
+msgid "Save changes"
+msgstr ""
+
+#: includes/admin-settings.php:404
+msgid "Site token saved."
+msgstr ""
+
+#: includes/admin-settings.php:406
+msgid "Site token revoked."
+msgstr ""
+
+#: includes/admin-settings.php:411
+msgid "InterSoccer Updates is not active. You can still save a site token here; activate InterSoccer Updates to check for and install plugin updates."
+msgstr ""
+
+#: includes/admin-settings.php:417
+msgid "INTERSOCCER_UU_SITE_TOKEN is defined in wp-config.php and overrides any token stored here. Save and Revoke are disabled until the constant is removed."
+msgstr ""
+
+#: includes/admin-settings.php:421
+msgid "Enter a site token from your Underdog Unlimited account (Account → Plugins). Tokens start with udpl_ and are used only for plugin update checks and downloads — never for CI publish."
+msgstr ""
+
+#: includes/admin-settings.php:427
+msgid "Update host"
+msgstr ""
+
+#: includes/admin-settings.php:432
+msgid "Site token"
+msgstr ""
+
+#: includes/admin-settings.php:444
+msgid "•••••••• (saved — enter a new token to replace)"
+msgstr ""
+
+#: includes/admin-settings.php:445
+msgid "udpl_…"
+msgstr ""
+
+#: includes/admin-settings.php:448
+msgid "A site token is currently stored. Enter a new token to replace it, or use Revoke to remove it."
+msgstr ""
+
+#: includes/admin-settings.php:455
+msgid "Save token"
+msgstr ""
+
+#: includes/admin-settings.php:458
+msgid "Revoke the stored site token?"
+msgstr ""
+
+#: includes/admin-settings.php:459
+msgid "Revoke token"
+msgstr ""
+
+#: includes/admin-settings.php:465
+msgid "Open Dashboard → Updates"
+msgstr ""
+
+#: includes/ajax-handlers.php:49
+#: includes/ajax-handlers.php:152
+#: includes/ajax-handlers.php:283
+#: includes/ajax-handlers.php:332
+msgid "Security check failed"
+msgstr "Échec de la vérification de sécurité"
+
+#: includes/ajax-handlers.php:56
+msgid "Invalid user or insufficient permissions"
+msgstr "Utilisateur invalide ou droits insuffisants"
+
+#: includes/ajax-handlers.php:67
+#: includes/ajax-handlers.php:170
+msgid "All required fields must be provided"
+msgstr "Tous les champs obligatoires doivent être renseignés"
+
+#: includes/ajax-handlers.php:72
+#: includes/ajax-handlers.php:175
+msgid "Player name contains invalid characters."
+msgstr "Le nom du participant contient des caractères non valides."
+
+#: includes/ajax-handlers.php:75
+#: includes/ajax-handlers.php:178
+msgid "Invalid gender selection."
+msgstr "Sélection de genre non valide."
+
+#: includes/ajax-handlers.php:79
+#: includes/ajax-handlers.php:182
+msgid "Invalid date of birth format"
+msgstr "Format de date de naissance non valide"
+
+#: includes/ajax-handlers.php:85
+#: includes/ajax-handlers.php:188
+msgid "Player must be between 3 and 13 years old."
+msgstr "Le participant doit avoir entre 3 et 13 ans."
+
+#: includes/ajax-handlers.php:99
+#: includes/ajax-handlers.php:207
+msgid "This player already exists. Please check the player list or edit an existing player."
+msgstr "Ce participant existe déjà. Vérifiez la liste ou modifiez un participant existant."
+
+#: includes/ajax-handlers.php:123
+msgid "Player added successfully"
+msgstr "Participant ajouté avec succès"
+
+#: includes/ajax-handlers.php:134
+msgid "Failed to save player"
+msgstr "Échec de l'enregistrement du participant"
+
+#: includes/ajax-handlers.php:159
+#: includes/ajax-handlers.php:290
+#: includes/ajax-handlers.php:339
+msgid "Invalid user, index, or insufficient permissions"
+msgstr "Utilisateur, index ou droits non valides"
+
+#: includes/ajax-handlers.php:197
+#: includes/ajax-handlers.php:299
+#: includes/ajax-handlers.php:348
+msgid "Player not found"
+msgstr "Participant introuvable"
+
+#: includes/ajax-handlers.php:232
+#: includes/ajax-handlers.php:254
+msgid "No changes detected, player data unchanged"
+msgstr "Aucune modification détectée, données inchangées"
+
+#: includes/ajax-handlers.php:245
+msgid "Player updated successfully"
+msgstr "Participant mis à jour avec succès"
+
+#: includes/ajax-handlers.php:262
+msgid "Failed to update player"
+msgstr "Échec de la mise à jour du participant"
+
+#: includes/ajax-handlers.php:309
+msgid "Player deleted successfully"
+msgstr "Participant supprimé avec succès"
+
+#: includes/ajax-handlers.php:314
+msgid "Failed to delete player"
+msgstr "Échec de la suppression du participant"
+
+#: includes/class-elementor-integration.php:85
+#: includes/player-management.php:578
+#: includes/user-profile-players.php:91
+msgid "InterSoccer Players"
+msgstr "Participants InterSoccer"
+
+#: includes/class-player-list.php:159
+#: includes/class-player-management-admin.php:407
+msgid "Nurture queue: Overview filter “Never booked (lifetime)”. Prioritize parents of players with 0 events — use Events column = 0 and export for outreach."
+msgstr ""
+
+#: includes/class-player-list.php:161
+#: includes/class-player-management-admin.php:409
+msgid "Nurture queue: Overview filter “Parents with 0 kids”. These are customer accounts without player profiles — invite them to Manage Players."
+msgstr ""
+
+#: includes/class-player-list.php:163
+#: includes/class-player-management-admin.php:411
+msgid "Nurture queue: Overview filter “Incomplete profiles”. Ask parents to complete DOB and medical/dietary/allergies."
+msgstr ""
+
+#: includes/class-player-list.php:166
+#: includes/class-player-management-admin.php:414
+msgid "Back to Overview"
+msgstr ""
+
+#: includes/class-player-list.php:188
+msgid "Search by player name, parent name/email, AVS..."
+msgstr ""
+
+#: includes/class-player-list.php:191
+msgid "Search"
+msgstr ""
+
+#: includes/class-player-list.php:197
+msgid "Clear Search"
+msgstr ""
+
+#: includes/class-player-list.php:205
+msgid "Showing:"
+msgstr ""
+
+msgid "Page %d of %d | %d players on this page | %d total items | %d users without players"
+msgstr ""
+
+#: includes/class-player-list.php:215
+msgid "Search results for:"
+msgstr ""
+
+#: includes/class-player-list.php:222
+msgid "Players on Page"
+msgstr ""
+
+#: includes/class-player-list.php:226
+msgid "Male (Page)"
+msgstr ""
+
+#: includes/class-player-list.php:230
+msgid "Female (Page)"
+msgstr ""
+
+#: includes/class-player-list.php:234
+msgid "Total Pages"
+msgstr ""
+
+#: includes/class-player-list.php:247
+#: includes/class-player-list.php:272
+#: includes/class-player-list.php:477
+#: includes/player-management.php:370
+#: includes/player-management.php:427
+msgid "Name"
+msgstr "Nom"
+
+#: includes/class-player-list.php:248
+#: includes/class-player-list.php:275
+#: includes/player-management.php:260
+#: includes/player-management.php:586
+#: includes/user-profile-players.php:99
+msgid "DOB"
+msgstr "Date de naissance"
+
+#: includes/class-player-list.php:249
+#: includes/class-player-list.php:281
+#: includes/class-player-list.php:480
+msgid "Parent"
+msgstr ""
+
+#: includes/class-player-list.php:250
+#: includes/class-player-list.php:287
+#: includes/class-player-list.php:355
+#: includes/class-player-list.php:479
+#: includes/player-management.php:261
+#: includes/player-management.php:587
+#: includes/player-management.php:650
+#: includes/user-profile-players.php:100
+#: includes/user-profile-players.php:170
+msgid "Gender"
+msgstr "Genre"
+
+#: includes/class-player-list.php:251
+#: includes/class-player-list.php:290
+#: includes/player-management.php:367
+#: includes/player-management.php:424
+msgid "Canton"
+msgstr "Canton"
+
+#: includes/class-player-list.php:252
+#: includes/class-player-list.php:296
+msgid "Medical/Dietary"
+msgstr ""
+
+#: includes/class-player-list.php:253
+#: includes/class-player-list.php:308
+#: includes/data-deletion.php:108
+#: includes/player-management.php:264
+#: includes/player-management.php:590
+#: includes/user-profile-players.php:104
+msgid "Actions"
+msgstr "Actions"
+
+#: includes/class-player-list.php:261
+msgid "No players found matching your search."
+msgstr ""
+
+#: includes/class-player-list.php:263
+msgid "No players found on this page."
+msgstr ""
+
+#: includes/class-player-list.php:278
+msgid "years"
+msgstr ""
+
+#: includes/class-player-list.php:313
+msgid "View"
+msgstr "Voir"
+
+#: includes/class-player-list.php:319
+#: includes/player-management.php:462
+#: includes/player-management.php:613
+#: includes/user-profile-players.php:143
+msgid "Edit"
+msgstr "Modifier"
+
+#: includes/class-player-list.php:333
+msgid "Close"
+msgstr ""
+
+#: includes/class-player-list.php:334
+#: includes/class-player-list.php:485
+msgid "Player Details"
+msgstr ""
+
+#: includes/class-player-list.php:336
+msgid "Loading..."
+msgstr ""
+
+#: includes/class-player-list.php:343
+#: includes/player-management.php:258
+#: includes/player-management.php:584
+#: includes/player-management.php:624
+#: includes/user-profile-players.php:97
+#: includes/user-profile-players.php:155
+msgid "First Name"
+msgstr "Prénom"
+
+#: includes/class-player-list.php:347
+#: includes/player-management.php:259
+#: includes/player-management.php:585
+#: includes/player-management.php:629
+#: includes/user-profile-players.php:98
+#: includes/user-profile-players.php:160
+msgid "Last Name"
+msgstr "Nom"
+
+#: includes/class-player-list.php:351
+#: includes/class-player-list.php:478
+#: includes/player-management.php:486
+#: includes/player-management.php:634
+#: includes/user-profile-players.php:165
+msgid "Date of Birth"
+msgstr "Date de naissance"
+
+#: includes/class-player-list.php:357
+#: includes/class-player-list.php:505
+#: includes/player-management.php:25
+#: includes/player-management.php:496
+#: includes/player-management.php:653
+#: includes/user-profile-players.php:173
+msgid "Male"
+msgstr "Garçon"
+
+#: includes/class-player-list.php:358
+#: includes/class-player-list.php:506
+#: includes/player-management.php:27
+#: includes/player-management.php:497
+#: includes/player-management.php:654
+#: includes/user-profile-players.php:174
+msgid "Female"
+msgstr "Fille"
+
+#: includes/class-player-list.php:359
+#: includes/player-management.php:29
+#: includes/player-management.php:498
+#: includes/player-management.php:655
+#: includes/user-profile-players.php:175
+msgid "Other"
+msgstr "Autre"
+
+#: includes/class-player-list.php:363
+#: includes/player-management.php:262
+#: includes/player-management.php:588
+#: includes/player-management.php:660
+#: includes/user-profile-players.php:101
+#: includes/user-profile-players.php:180
+msgid "AVS Number"
+msgstr "Numéro AVS"
+
+#: includes/class-player-list.php:367
+#: includes/class-player-list.php:482
+msgid "Medical/Dietary/Allergies"
+msgstr ""
+
+#: includes/class-player-list.php:371
+#: includes/class-player-list.php:562
+#: includes/class-player-list.php:567
+msgid "Save Changes"
+msgstr ""
+
+#: includes/class-player-list.php:372
+#: includes/player-management.php:522
+#: includes/player-management.php:523
+#: includes/player-management.php:672
+#: includes/user-profile-players.php:194
+msgid "Cancel"
+msgstr "Annuler"
+
+#: includes/class-player-list.php:481
+msgid "Location"
+msgstr ""
+
+#: includes/class-player-list.php:518
+msgid "Edit Player"
+msgstr ""
+
+#: includes/class-player-list.php:537
+msgid "Saving..."
+msgstr ""
+
+#: includes/class-player-list.php:556
+msgid "Player updated successfully!"
+msgstr ""
+
+#: includes/class-player-list.php:561
+msgid "Failed to update player."
+msgstr ""
+
+#: includes/class-player-list.php:566
+msgid "Network error. Please try again."
+msgstr ""
+
+#: includes/class-player-list.php:599
+msgid "Previous"
+msgstr ""
+
+#: includes/class-player-list.php:934
+msgid "Invalid security token"
+msgstr ""
+
+#: includes/class-player-list.php:938
+msgid "Unauthorized"
+msgstr ""
+
+#: includes/class-player-overview.php:222
+msgid "No Data"
+msgstr ""
+
+#: includes/class-player-overview.php:223
+#: includes/templates/overview-template.php:265
+msgid "Chart loading failed"
+msgstr ""
+
+#: includes/class-player-overview.php:224
+#: includes/templates/overview-template.php:164
+msgid "Participants"
+msgstr ""
+
+#: includes/data-deletion.php:15
+msgid "Please log in to request data deletion."
+msgstr "Veuillez vous connecter pour demander la suppression de vos données."
+
+#: includes/data-deletion.php:21
+msgid "Request Data Deletion"
+msgstr "Demande de suppression des données"
+
+#: includes/data-deletion.php:25
+msgid "Reason for Deletion (optional):"
+msgstr "Motif de la suppression (facultatif) :"
+
+#: includes/data-deletion.php:29
+msgid "Submit Request"
+msgstr "Envoyer la demande"
+
+#: includes/data-deletion.php:51
+msgid "New Data Deletion Request"
+msgstr ""
+
+msgid "A user (ID: %d) has requested data deletion. Reason: %s. Review in admin."
+msgstr ""
+
+#: includes/data-deletion.php:54
+msgid "Your request has been submitted."
+msgstr "Votre demande a été envoyée."
+
+#: includes/data-deletion.php:65
+#: includes/data-deletion.php:102
+msgid "Data Deletion Requests"
+msgstr ""
+
+#: includes/data-deletion.php:66
+msgid "Data Deletion"
+msgstr "Suppression des données"
+
+#: includes/data-deletion.php:90
+msgid "User data deleted."
+msgstr ""
+
+#: includes/data-deletion.php:106
+#: includes/player-management.php:366
+#: includes/player-management.php:419
+msgid "User ID"
+msgstr "ID utilisateur"
+
+#: includes/data-deletion.php:107
+msgid "Reason"
+msgstr ""
+
+#: includes/data-deletion.php:121
+msgid "Process"
+msgstr ""
+
+#: includes/player-management.php:226
+msgid "Please log in to manage your Attendees."
+msgstr "Veuillez vous connecter pour gérer vos participants."
+
+#: includes/player-management.php:234
+msgid "Error: Unable to load user data."
+msgstr "Erreur : impossible de charger les données utilisateur."
+
+#: includes/player-management.php:263
+#: includes/user-profile-players.php:103
+msgid "Events"
+msgstr "Événements"
+
+#: includes/player-management.php:265
+msgid "Manage All Players"
+msgstr ""
+
+#: includes/player-management.php:265
+#: player-management.php:315
+msgid "Manage Your Attendees"
+msgstr "Gérer vos participants"
+
+#: includes/player-management.php:338
+msgid "Attendee Management Dashboard"
+msgstr "Tableau de bord de gestion des participants"
+
+msgid "Total Players: %d"
+msgstr "Nombre total de participants : %d"
+
+#: includes/player-management.php:355
+#: includes/player-management.php:580
+#: includes/user-profile-players.php:93
+msgid "Add New Player"
+msgstr "Ajouter un participant"
+
+#: includes/player-management.php:356
+msgid "Add"
+msgstr "Ajouter"
+
+#: includes/player-management.php:361
+msgid "Attendee Table"
+msgstr "Tableau des participants"
+
+#: includes/player-management.php:362
+msgid "List of attendees"
+msgstr "Liste des participants"
+
+#: includes/player-management.php:368
+#: includes/player-management.php:425
+msgid "City"
+msgstr "Ville"
+
+#: includes/player-management.php:385
+#: includes/player-management.php:442
+msgid "Creation Date"
+msgstr "Date de création"
+
+#: includes/player-management.php:386
+#: includes/player-management.php:443
+msgid "Past Events"
+msgstr "Événements passés"
+
+#: includes/player-management.php:396
+msgid "No attendees added yet."
+msgstr "Aucun participant ajouté pour le moment."
+
+#: includes/player-management.php:398
+msgid "No participants yet. Use Add to register a participant before booking."
+msgstr "Aucun participant pour le moment. Utilisez Ajouter pour enregistrer un participant avant de réserver."
+
+#: includes/player-management.php:420
+msgid "Edit user profile"
+msgstr "Modifier le profil utilisateur"
+
+#: includes/player-management.php:456
+msgid "No past events."
+msgstr "Aucun événement passé."
+
+#: includes/player-management.php:461
+msgid "Edit player"
+msgstr "Modifier le participant"
+
+#: includes/player-management.php:495
+msgid "Select Gender"
+msgstr "Sélectionner le genre"
+
+#: includes/player-management.php:507
+#: includes/player-management.php:662
+#: includes/user-profile-players.php:182
+msgid "No AVS? Enter foreign insurance number or \"0000\" and email us the insurance details."
+msgstr "Pas de numéro AVS ? Indiquez le numéro d'assurance étranger ou « 0000 », puis envoyez-nous les détails par e-mail."
+
+#: includes/player-management.php:512
+msgid "Medical Conditions, Dietary Restrictions, and Allergies:"
+msgstr "Conditions médicales, restrictions alimentaires et allergies :"
+
+#: includes/player-management.php:514
+msgid "Optional field for medical conditions, dietary restrictions, and allergies."
+msgstr "Champ facultatif pour les conditions médicales, restrictions alimentaires et allergies."
+
+#: includes/player-management.php:518
+msgid "Save Player"
+msgstr "Enregistrer le participant"
+
+#: includes/player-management.php:519
+#: includes/player-management.php:671
+#: includes/user-profile-players.php:193
+msgid "Save"
+msgstr "Enregistrer"
+
+#: includes/player-management.php:595
+#: includes/user-profile-players.php:109
+msgid "No players added yet."
+msgstr "Aucun participant ajouté pour le moment."
+
+#: includes/player-management.php:614
+#: includes/user-profile-players.php:144
+msgid "Delete"
+msgstr "Supprimer"
+
+#: includes/player-management.php:636
+msgid "Day"
+msgstr "Jour"
+
+#: includes/player-management.php:640
+msgid "Month"
+msgstr "Mois"
+
+#: includes/player-management.php:644
+msgid "Year"
+msgstr "Année"
+
+#: includes/player-management.php:652
+#: includes/user-profile-players.php:172
+msgid "Select"
+msgstr "Sélectionner"
+
+#: includes/player-management.php:690
+msgid "Assigned Attendee"
+msgstr "Participant assigné"
+
+#: includes/privacy-admin-notice.php:91
+msgid "Medical and date-of-birth access roles are not configured yet. Staff access will follow legacy rules until you save the medical roles setting."
+msgstr ""
+
+#: includes/privacy-admin-notice.php:96
+msgid "Configure medical access"
+msgstr ""
+
+#: includes/privacy-admin-notice.php:111
+msgid "Invalid security token."
+msgstr ""
+
+#: includes/privacy-admin-notice.php:122
+#: includes/privacy-admin-notice.php:129
+#: includes/privacy-admin-notice.php:137
+msgid "Forbidden."
+msgstr ""
+
+#: includes/templates/overview-template.php:131
+msgid "Players overview"
+msgstr ""
+
+#: includes/templates/overview-template.php:134
+#: includes/templates/overview-template.php:147
+msgid "Refresh"
+msgstr ""
+
+msgid "Updated %s"
+msgstr ""
+
+#: includes/templates/overview-template.php:149
+msgid "Partial data — see notice below."
+msgstr ""
+
+#: includes/templates/overview-template.php:156
+msgid "Warning:"
+msgstr "Avertissement :"
+
+#: includes/templates/overview-template.php:157
+msgid "Overview data could not be fully generated. Showing partial or fallback figures."
+msgstr ""
+
+#: includes/templates/overview-template.php:162
+msgid "Key metrics"
+msgstr ""
+
+#: includes/templates/overview-template.php:163
+msgid "Total participant profiles on parent accounts"
+msgstr ""
+
+#: includes/templates/overview-template.php:168
+msgid "Customer accounts with no participant profiles"
+msgstr ""
+
+#: includes/templates/overview-template.php:169
+msgid "Parents with 0 kids"
+msgstr ""
+
+#: includes/templates/overview-template.php:173
+#: includes/templates/overview-template.php:183
+#: includes/templates/overview-template.php:193
+#: includes/templates/overview-template.php:219
+#: includes/templates/overview-template.php:236
+#: includes/templates/overview-template.php:253
+msgid "Review"
+msgstr ""
+
+#: includes/templates/overview-template.php:178
+msgid "Participants with no completed or processing bookings ever"
+msgstr ""
+
+#: includes/templates/overview-template.php:179
+msgid "Never booked (lifetime)"
+msgstr ""
+
+#: includes/templates/overview-template.php:188
+msgid "Participants missing date of birth or medical information"
+msgstr ""
+
+#: includes/templates/overview-template.php:189
+msgid "Incomplete profiles"
+msgstr ""
+
+#: includes/templates/overview-template.php:200
+msgid "Attention"
+msgstr ""
+
+#: includes/templates/overview-template.php:202
+msgid "No follow-ups right now."
+msgstr ""
+
+#: includes/templates/overview-template.php:261
+msgid "Participants by canton"
+msgstr ""
+
+#: includes/templates/overview-template.php:262
+msgid "Bar chart of participants by canton"
+msgstr ""
+
+#: includes/templates/overview-template.php:273
+msgid "Debug information"
+msgstr ""
+
+#: includes/templates/overview-template.php:277
+msgid "Users processed:"
+msgstr ""
+
+#: includes/templates/overview-template.php:280
+msgid "Method:"
+msgstr "Méthode :"
+
+#: includes/templates/overview-template.php:283
+msgid "Cache key:"
+msgstr ""
+
+#: includes/user-profile-players.php:136
+msgid "View orders"
+msgstr "Voir les commandes"
+
+#: player-management.php:71
+msgid "Player Management requires WooCommerce to be installed and active."
+msgstr ""
+
+#: player-management.php:207
+msgid "Player management functionality is not available."
+msgstr "La gestion des participants n'est pas disponible."
+
+#: player-management.php:326
 msgid "Coach"
 msgstr "Entraîneur"
 
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/player-management.php:139
+#: player-management.php:329
 msgid "Organizer"
 msgstr "Organisateur"
 
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/player-management.php:342
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:128
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:129
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:323
-msgid "Settings"
-msgstr "Paramètres"
+#: player-management.php:555
+msgid "Player Management:"
+msgstr "Gestion des participants :"
+
+msgid "Missing files detected: %s"
+msgstr ""
+
+#: player-management.php:564
+msgid "Player Management is already loaded from another plugin folder. Deactivate and delete the older versioned directory (e.g. player-management-plugin-2.6.3) before activating this copy."
+msgstr ""
+
+#: includes/class-player-management-admin.php:86
+#: includes/class-player-management-admin.php:87
+msgid "Dashboard"
+msgstr ""
+
+#: includes/class-player-management-admin.php:105
+#: includes/class-player-management-admin.php:106
+#: includes/class-player-management-admin.php:574
+msgid "Rosters & Export"
+msgstr ""
+
+#: includes/class-player-management-admin.php:135
+#: includes/class-player-management-admin.php:136
+msgid "Tools"
+msgstr ""
+
+#: includes/class-player-management-admin.php:209
+#: includes/frontend-i18n.php:31
+msgid "Are you sure you want to delete this player?"
+msgstr "Voulez-vous vraiment supprimer ce participant ?"
+
+#: includes/class-player-management-admin.php:210
+msgid "Are you sure you want to delete the selected players?"
+msgstr ""
+
+#: includes/class-player-management-admin.php:211
+msgid "Processing export..."
+msgstr ""
+
+#: includes/class-player-management-admin.php:212
+msgid "Export completed successfully!"
+msgstr ""
+
+#: includes/class-player-management-admin.php:213
+msgid "Export failed. Please try again."
+msgstr ""
+
+#: includes/class-player-management-admin.php:229
+msgid "InterSoccer Players Dashboard"
+msgstr ""
+
+#: includes/class-player-management-admin.php:234
+msgid "Total Players"
+msgstr ""
+
+#: includes/class-player-management-admin.php:239
+msgid "Recent Registrations"
+msgstr ""
+
+#: includes/class-player-management-admin.php:241
+msgid "Last 30 days"
+msgstr ""
+
+#: includes/class-player-management-admin.php:245
+msgid "Average Age"
+msgstr ""
+
+#: includes/class-player-management-admin.php:250
+msgid "Total Events"
+msgstr ""
+
+#: includes/class-player-management-admin.php:258
+msgid "Analytics"
+msgstr ""
+
+#: includes/class-player-management-admin.php:262
+msgid "Gender Distribution"
+msgstr ""
+
+#: includes/class-player-management-admin.php:267
+msgid "Events by Type"
+msgstr ""
+
+#: includes/class-player-management-admin.php:275
+msgid "Recent Players"
+msgstr ""
+
+#: includes/class-player-management-admin.php:278
+msgid "No recent players found."
+msgstr ""
+
+#: includes/class-player-management-admin.php:304
+msgid "Quick Actions"
+msgstr ""
+
+#: includes/class-player-management-admin.php:308
+msgid "Export Rosters"
+msgstr ""
+
+#: includes/class-player-management-admin.php:312
+msgid "View All Players"
+msgstr ""
+
+#: includes/class-player-management-admin.php:316
+msgid "Manage Events"
+msgstr ""
+
+#: includes/class-player-management-admin.php:423
+msgid "All Genders"
+msgstr ""
+
+#: includes/class-player-management-admin.php:430
+msgid "All Ages"
+msgstr ""
+
+#: includes/class-player-management-admin.php:431
+#: includes/class-elementor-widget-base.php:531
+msgid "3-5 years"
+msgstr ""
+
+#: includes/class-player-management-admin.php:432
+#: includes/class-elementor-widget-base.php:532
+msgid "6-8 years"
+msgstr ""
+
+#: includes/class-player-management-admin.php:433
+#: includes/class-elementor-widget-base.php:533
+msgid "9-12 years"
+msgstr ""
+
+#: includes/class-player-management-admin.php:434
+#: includes/class-elementor-widget-base.php:534
+msgid "13-18 years"
+msgstr ""
+
+#: includes/class-player-management-admin.php:437
+msgid "Search players..."
+msgstr ""
+
+#: includes/class-player-management-admin.php:438
+msgid "Reset"
+msgstr ""
+
+#: includes/class-player-management-admin.php:448
+#: includes/class-player-list-elementor-widget.php:110
+#: includes/class-elementor-widget-base.php:145
+msgid "Age"
+msgstr "Âge"
+
+#: includes/class-player-management-admin.php:452
+msgid "Registration Date"
+msgstr ""
+
+#: includes/class-player-management-admin.php:504
+msgid "Bulk Actions"
+msgstr ""
+
+#: includes/class-player-management-admin.php:505
+msgid "Delete Selected"
+msgstr ""
+
+#: includes/class-player-management-admin.php:506
+msgid "Export Selected"
+msgstr ""
+
+#: includes/class-player-management-admin.php:508
+msgid "Apply"
+msgstr ""
+
+#: includes/class-player-management-admin.php:548
+#: includes/class-player-list-elementor-widget.php:115
+msgid "Emergency Contact"
+msgstr "Contact d'urgence"
+
+#: includes/class-player-management-admin.php:552
+msgid "Emergency Phone"
+msgstr ""
+
+#: includes/class-player-management-admin.php:579
+msgid "Quick Export"
+msgstr ""
+
+#: includes/class-player-management-admin.php:582
+#: includes/class-player-management-admin.php:623
+msgid "Custom Export"
+msgstr ""
+
+#: includes/class-player-management-admin.php:585
+#: includes/class-player-management-admin.php:690
+msgid "Scheduled Exports"
+msgstr ""
+
+#: includes/class-player-management-admin.php:591
+msgid "Quick Export Options"
+msgstr ""
+
+#: includes/class-player-management-admin.php:592
+msgid "Export commonly requested roster formats:"
+msgstr ""
+
+#: includes/class-player-management-admin.php:596
+msgid "All Camps"
+msgstr ""
+
+#: includes/class-player-management-admin.php:597
+msgid "Export all camp rosters with player details."
+msgstr ""
+
+#: includes/class-player-management-admin.php:599
+msgid "Export Camps"
+msgstr ""
+
+#: includes/class-player-management-admin.php:604
+msgid "All Courses"
+msgstr ""
+
+#: includes/class-player-management-admin.php:605
+msgid "Export all course rosters with schedule details."
+msgstr ""
+
+#: includes/class-player-management-admin.php:607
+msgid "Export Courses"
+msgstr ""
+
+#: includes/class-player-management-admin.php:612
+msgid "Complete Roster"
+msgstr ""
+
+#: includes/class-player-management-admin.php:613
+msgid "Export all players and events in one comprehensive file."
+msgstr ""
+
+#: includes/class-player-management-admin.php:615
+msgid "Export All"
+msgstr ""
+
+#: includes/class-player-management-admin.php:628
+msgid "Activity Type"
+msgstr ""
+
+#: includes/class-player-management-admin.php:630
+#: includes/class-elementor-widget-base.php:544
+msgid "Camps"
+msgstr ""
+
+#: includes/class-player-management-admin.php:631
+#: includes/class-elementor-widget-base.php:545
+msgid "Courses"
+msgstr ""
+
+#: includes/class-player-management-admin.php:632
+#: includes/class-elementor-widget-base.php:546
+msgid "Birthday Parties"
+msgstr ""
+
+#: includes/class-player-management-admin.php:637
+msgid "Season"
+msgstr ""
+
+#: includes/class-player-management-admin.php:639
+msgid "All Seasons"
+msgstr ""
+
+#: includes/class-player-management-admin.php:640
+msgid "Spring 2025"
+msgstr ""
+
+#: includes/class-player-management-admin.php:641
+msgid "Summer 2025"
+msgstr ""
+
+#: includes/class-player-management-admin.php:642
+msgid "Autumn 2025"
+msgstr ""
+
+#: includes/class-player-management-admin.php:643
+msgid "Winter 2025"
+msgstr ""
+
+#: includes/class-player-management-admin.php:648
+msgid "Start Date"
+msgstr ""
+
+#: includes/class-player-management-admin.php:653
+msgid "End Date"
+msgstr ""
+
+#: includes/class-player-management-admin.php:658
+msgid "Venue"
+msgstr ""
+
+#: includes/class-player-management-admin.php:660
+msgid "All Venues"
+msgstr ""
+
+#: includes/class-player-management-admin.php:672
+msgid "Export Format"
+msgstr ""
+
+#: includes/class-player-management-admin.php:674
+msgid "CSV"
+msgstr ""
+
+#: includes/class-player-management-admin.php:675
+msgid "PDF"
+msgstr ""
+
+#: includes/class-player-management-admin.php:682
+msgid "Generate Custom Export"
+msgstr ""
+
+#: includes/class-player-management-admin.php:691
+msgid "Set up automatic exports that run on a schedule."
+msgstr ""
+
+#: includes/class-player-management-admin.php:692
+msgid "Coming soon..."
+msgstr ""
+
+#: includes/class-player-management-admin.php:698
+msgid "Export History"
+msgstr ""
+
+#: includes/class-player-management-admin.php:702
+msgid "Date"
+msgstr ""
+
+#: includes/class-player-management-admin.php:703
+msgid "Type"
+msgstr ""
+
+#: includes/class-player-management-admin.php:704
+msgid "Records"
+msgstr ""
+
+#: includes/class-player-management-admin.php:705
+msgid "Format"
+msgstr ""
+
+#: includes/class-player-management-admin.php:706
+msgid "User"
+msgstr ""
+
+#: includes/class-player-management-admin.php:716
+msgid "No export history found."
+msgstr ""
+
+#: includes/class-player-management-admin.php:729
+msgid "Download"
+msgstr ""
+
+#: includes/class-player-management-admin.php:732
+msgid "Expired"
+msgstr ""
+
+#: includes/class-player-management-admin.php:746
+msgid "Exporting Data"
+msgstr ""
+
+#: includes/class-player-management-admin.php:750
+msgid "Preparing export..."
+msgstr ""
+
+#: includes/class-player-management-admin.php:774
+#: includes/class-elementor-widget-base.php:619
+msgid "Not Specified"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:29
+msgid "Player List"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:47
+msgid "Content"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:55
+msgid "Title"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:57
+msgid "Our Players"
+msgstr "Nos participants"
+
+#: includes/class-player-list-elementor-widget.php:58
+msgid "Enter widget title"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:65
+msgid "Show Title"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:67
+#: includes/class-player-list-elementor-widget.php:125
+#: includes/class-player-list-elementor-widget.php:137
+#: includes/class-elementor-widget-base.php:181
+msgid "Show"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:68
+#: includes/class-player-list-elementor-widget.php:126
+#: includes/class-player-list-elementor-widget.php:138
+#: includes/class-elementor-widget-base.php:182
+msgid "Hide"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:77
+msgid "Player Source"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:82
+msgid "Current User Players"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:83
+msgid "Specific User Players"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:84
+msgid "Recently Added"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:104
+msgid "Display Fields"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:113
+#: includes/class-elementor-widget-base.php:147
+msgid "Event Count"
+msgstr "Nombre d'événements"
+
+#: includes/class-player-list-elementor-widget.php:123
+msgid "Show Avatar"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:135
+msgid "Show Action Buttons"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:153
+msgid "Age Filters"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:161
+msgid "Minimum Age"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:172
+msgid "Maximum Age"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:183
+msgid "Gender Filter"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:187
+#: includes/class-player-list-elementor-widget.php:418
+#: includes/class-elementor-widget-base.php:518
+#: includes/class-elementor-widget-base.php:530
+#: includes/class-elementor-widget-base.php:543
+msgid "All"
+msgstr "Tous"
+
+#: includes/class-player-list-elementor-widget.php:188
+msgid "Male Only"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:189
+msgid "Female Only"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:213
+msgid "No players found matching your criteria."
+msgstr "Aucun participant ne correspond à vos critères."
+
+#: includes/class-player-list-elementor-widget.php:325
+#: includes/class-player-list-elementor-widget.php:443
+msgid "Age:"
+msgstr "Âge :"
+
+#: includes/class-player-list-elementor-widget.php:332
+#: includes/class-player-list-elementor-widget.php:416
+#: includes/class-player-list-elementor-widget.php:450
+#: includes/class-elementor-widget-base.php:516
+msgid "Gender:"
+msgstr "Genre :"
+
+#: includes/class-player-list-elementor-widget.php:339
+msgid "Date of Birth:"
+msgstr "Date de naissance :"
+
+#: includes/class-player-list-elementor-widget.php:346
+#: includes/class-player-list-elementor-widget.php:457
+msgid "Events:"
+msgstr "Événements :"
+
+#: includes/class-player-list-elementor-widget.php:353
+msgid "Medical:"
+msgstr "Médical :"
+
+#: includes/class-player-list-elementor-widget.php:360
+msgid "Emergency Contact:"
+msgstr "Contact d'urgence :"
+
+#: includes/frontend-i18n.php:18
+msgid "Edit player %s"
+msgstr "Modifier le participant %s"
+
+#: includes/frontend-i18n.php:19
+msgid "Delete player %s"
+msgstr "Supprimer le participant %s"
+
+#: includes/frontend-i18n.php:21
+msgid "Cancel Edit"
+msgstr "Annuler la modification"
+
+#: includes/frontend-i18n.php:23
+msgid "First name, last name, date of birth, and gender are required."
+msgstr "Le prénom, le nom, la date de naissance et le genre sont obligatoires."
+
+#: includes/frontend-i18n.php:24
+msgid "Invalid date of birth format. Use YYYY-MM-DD."
+msgstr "Format de date de naissance non valide. Utilisez AAAA-MM-JJ."
+
+#: includes/frontend-i18n.php:25
+msgid "Player updated successfully."
+msgstr "Participant mis à jour avec succès."
+
+#: includes/frontend-i18n.php:26
+msgid "Player added successfully."
+msgstr "Participant ajouté avec succès."
+
+#: includes/frontend-i18n.php:27
+msgid "Error saving player."
+msgstr "Erreur lors de l'enregistrement du participant."
+
+#: includes/frontend-i18n.php:28
+msgid "Error saving player: %s"
+msgstr "Erreur lors de l'enregistrement du participant : %s"
+
+#: includes/frontend-i18n.php:29
+msgid "Error: Could not load player data for editing."
+msgstr "Erreur : impossible de charger les données du participant pour la modification."
+
+#: includes/frontend-i18n.php:30
+msgid "Edit canceled."
+msgstr "Modification annulée."
+
+#: includes/frontend-i18n.php:32
+msgid "Failed to delete player."
+msgstr "Échec de la suppression du participant."
+
+#: includes/frontend-i18n.php:33
+msgid "Error: Failed to refresh security token."
+msgstr "Erreur : impossible d'actualiser le jeton de sécurité."
+
+#: includes/frontend-i18n.php:34
+msgid "Error: Unable to delete player - %s"
+msgstr "Erreur : impossible de supprimer le participant – %s"
+
+#: includes/frontend-i18n.php:35
+msgid "Add player canceled."
+msgstr "Ajout de participant annulé."
+
+#: includes/frontend-i18n.php:36
+msgid "Unknown error"
+msgstr "Erreur inconnue"
+
+#: includes/class-validator.php:34
+msgid "First name is required."
+msgstr "Le prénom est obligatoire."
+
+#: includes/class-validator.php:36
+msgid "First name contains invalid characters."
+msgstr "Le prénom contient des caractères non valides."
+
+#: includes/class-validator.php:41
+msgid "Last name is required."
+msgstr "Le nom est obligatoire."
+
+#: includes/class-validator.php:43
+msgid "Last name contains invalid characters."
+msgstr "Le nom contient des caractères non valides."
+
+#: includes/class-validator.php:48
+msgid "Date of birth is required."
+msgstr "La date de naissance est obligatoire."
+
+#: includes/class-validator.php:50
+msgid "Invalid date of birth format."
+msgstr "Format de date de naissance non valide."
+
+#: includes/class-validator.php:52
+msgid "Player age is not within acceptable range."
+msgstr "L'âge du participant n'est pas dans la plage acceptée."
+
+#: includes/class-validator.php:57
+msgid "Gender is required."
+msgstr "Le genre est obligatoire."
+
+#: includes/class-validator.php:64
+msgid "City contains invalid characters."
+msgstr "La ville contient des caractères non valides."
+
+#: includes/class-validator.php:67
+msgid "Canton contains invalid characters."
+msgstr "Le canton contient des caractères non valides."
+
+#: includes/class-validator.php:72
+msgid "Invalid AVS number format."
+msgstr "Format de numéro AVS non valide."
+
+#: includes/class-validator.php:94
+msgid "Activity type is required."
+msgstr "Le type d'activité est obligatoire."
+
+#: includes/class-validator.php:96
+msgid "Invalid activity type."
+msgstr "Type d'activité non valide."
+
+#: includes/class-validator.php:101
+msgid "Invalid start date format."
+msgstr "Format de date de début non valide."
+
+#: includes/class-validator.php:105
+msgid "Invalid end date format."
+msgstr "Format de date de fin non valide."
+
+#: includes/class-validator.php:111
+msgid "End date must be after start date."
+msgstr "La date de fin doit être postérieure à la date de début."
+
+#: includes/class-validator.php:117
+msgid "Venue name is too long."
+msgstr "Le nom du lieu est trop long."
+
+#: includes/class-validator.php:134
+msgid "Email address is required."
+msgstr "L'adresse e-mail est obligatoire."
+
+#: includes/class-validator.php:136
+msgid "Invalid email address format."
+msgstr "Format d'adresse e-mail non valide."
+
+#: includes/class-validator.php:138
+msgid "Email address is already registered."
+msgstr "Cette adresse e-mail est déjà enregistrée."
+
+#: includes/class-validator.php:143
+msgid "Invalid phone number format."
+msgstr "Format de numéro de téléphone non valide."
+
+#: includes/class-elementor-widget-base.php:66
+msgid "Layout"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:74
+msgid "Columns"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:90
+msgid "Gap"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:121
+msgid "Query"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:129
+msgid "Limit"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:140
+msgid "Order By"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:146
+msgid "Created Date"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:155
+msgid "Order"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:159
+msgid "Ascending"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:160
+msgid "Descending"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:171
+msgid "Filters"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:179
+msgid "Show Filters"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:191
+msgid "Filter by Age"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:204
+msgid "Filter by Gender"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:217
+msgid "Filter by Activity Type"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:238
+msgid "Card Style"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:246
+#: includes/class-elementor-widget-base.php:385
+#: includes/class-elementor-widget-base.php:417
+msgid "Background Color"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:259
+#: includes/class-elementor-widget-base.php:443
+msgid "Border"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:267
+#: includes/class-elementor-widget-base.php:451
+msgid "Border Radius"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:280
+msgid "Box Shadow"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:288
+#: includes/class-elementor-widget-base.php:463
+msgid "Padding"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:303
+#: includes/class-elementor-widget-base.php:433
+msgid "Typography"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:312
+msgid "Title Typography"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:320
+msgid "Title Color"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:333
+msgid "Content Typography"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:341
+msgid "Content Color"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:356
+msgid "Button Style"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:366
+msgid "Normal"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:399
+msgid "Hover"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:528
+msgid "Age Group:"
+msgstr "Groupe d'âge :"
+
+#: includes/class-elementor-widget-base.php:541
+msgid "Activity:"
+msgstr "Activité :"
+
+#: includes/class-elementor-widget-base.php:553
+msgid "Reset Filters"
+msgstr "Réinitialiser les filtres"
+
+#: includes/class-elementor-widget-base.php:577
+msgid "No data found."
+msgstr "Aucune donnée trouvée."
+
+#: includes/class-elementor-widget-base.php:629
+msgid "Camp"
+msgstr "Camp"
+
+#: includes/class-elementor-widget-base.php:631
+msgid "Course"
+msgstr "Cours"
+
+#: includes/class-elementor-widget-base.php:633
+msgid "Birthday Party"
+msgstr "Fête d'anniversaire"
 
 #: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:98
 msgid "Players Overview Dashboard"
@@ -58,10 +2187,6 @@ msgstr "Généré :"
 msgid "Users Processed:"
 msgstr "Utilisateurs traités :"
 
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:110
-msgid "Method:"
-msgstr "Méthode :"
-
 #: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:112
 msgid "Error:"
 msgstr "Erreur :"
@@ -70,23 +2195,12 @@ msgstr "Erreur :"
 msgid "Data cached for 30 minutes."
 msgstr "Données mises en cache pour 30 minutes."
 
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:119
-msgid "Warning:"
-msgstr "Avertissement :"
-
 #: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:120
-msgid ""
-"The overview data could not be fully generated due to an error. Showing "
-"partial or fallback data."
+msgid "The overview data could not be fully generated due to an error. Showing partial or fallback data."
 msgstr ""
 
 #: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:121
 msgid "Please check the debug logs or try refreshing the data."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:128
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:237
-msgid "Total Players"
 msgstr ""
 
 #: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:134
@@ -129,1449 +2243,30 @@ msgstr ""
 msgid "Cache Key:"
 msgstr ""
 
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/data-deletion.php:24
-msgid "Please log in to request data deletion."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/data-deletion.php:30
-msgid "Request Data Deletion"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/data-deletion.php:34
-msgid "Reason for Deletion (optional):"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/data-deletion.php:38
-msgid "Submit Request"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/data-deletion.php:60
-msgid "New Data Deletion Request"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/data-deletion.php:61
-#, php-format
-msgid ""
-"A user (ID: %d) has requested data deletion. Reason: %s. Review in admin."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/data-deletion.php:63
-msgid "Your request has been submitted."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/data-deletion.php:74
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/data-deletion.php:109
-msgid "Data Deletion Requests"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/data-deletion.php:75
-msgid "Data Deletion"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/data-deletion.php:85
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:234
-msgid "You do not have permission to access this page."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/data-deletion.php:97
-msgid "User data deleted."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/data-deletion.php:113
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:92
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:221
-msgid "User ID"
-msgstr "ID utilisateur"
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/data-deletion.php:114
-msgid "Reason"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/data-deletion.php:115
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/player-management.php:139
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:434
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:693
-msgid "Actions"
-msgstr "Actions"
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/data-deletion.php:128
-msgid "Process"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-players.php:40
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-players.php:41
-msgid "Players"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-players.php:51
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-players.php:52
-msgid "Overview"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-players.php:60
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-players.php:61
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:81
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:98
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:99
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:394
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:159
-msgid "All Players"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-players.php:69
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-players.php:70
-msgid "Advanced"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-players.php:95
-msgid "Players per page"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:29
-msgid "Player List"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:47
-msgid "Content"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:55
-msgid "Title"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:57
-msgid "Our Players"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:58
-msgid "Enter widget title"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:65
-msgid "Show Title"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:67
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:125
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:137
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:181
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:181
-msgid "Show"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:68
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:126
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:138
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:182
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:182
-msgid "Hide"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:77
-msgid "Player Source"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:82
-msgid "Current User Players"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:83
-msgid "Specific User Players"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:84
-msgid "Recently Added"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:104
-msgid "Display Fields"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:109
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:428
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:144
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:144
-msgid "Name"
-msgstr "Nom"
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:110
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:429
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:229
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:145
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:145
-msgid "Age"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:111
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/player-management.php:136
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:430
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:513
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:227
-msgid "Gender"
-msgstr "Genre"
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:112
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:509
-msgid "Date of Birth"
-msgstr "Date de naissance"
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:113
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:147
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:147
-msgid "Event Count"
-msgstr ""
-
 #: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:114
 #: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:525
 #: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:230
-msgid "Medical Conditions, Dietary Restrictions, and Allergies"
-msgstr "Conditions médicales, restrictions alimentaires et allergies"
-
-msgid "Medical Conditions, Dietary Restrictions, and Allergies:"
-msgstr "Conditions médicales, restrictions alimentaires et allergies :"
-
-msgid "Optional field for medical conditions, dietary restrictions, and allergies."
-msgstr "Champ facultatif pour les conditions médicales, restrictions alimentaires et allergies."
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:115
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:533
-msgid "Emergency Contact"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:123
-msgid "Show Avatar"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:135
-msgid "Show Action Buttons"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:153
-msgid "Age Filters"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:161
-msgid "Minimum Age"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:172
-msgid "Maximum Age"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:183
-msgid "Gender Filter"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:187
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:418
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:505
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:517
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:530
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:505
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:517
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:530
-msgid "All"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:188
-msgid "Male Only"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:189
-msgid "Female Only"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:213
-msgid "No players found matching your criteria."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:325
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:443
-msgid "Age:"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:332
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:416
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:450
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:503
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:503
-msgid "Gender:"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:339
-msgid "Date of Birth:"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:346
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:457
-msgid "Events:"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:353
-msgid "Medical:"
-msgstr "Médical :"
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:360
-msgid "Emergency Contact:"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:380
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:466
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:296
-msgid "View"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:387
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:466
-msgid "Edit"
-msgstr "Modifier"
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:394
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:467
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/player-management.php:138
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:118
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:119
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:432
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:470
-msgid "Events"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:419
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:451
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:405
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:515
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:754
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:506
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:600
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:506
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:600
-msgid "Male"
-msgstr "Garçon"
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:420
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:451
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:406
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:516
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:756
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:507
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:602
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:507
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:602
-msgid "Female"
-msgstr "Fille"
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/player-management.php:101
-msgid "Please log in to manage your Attendees."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/player-management.php:109
-msgid "Error: Unable to load user data."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/player-management.php:133
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:501
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:224
-msgid "First Name"
-msgstr "Prénom"
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/player-management.php:134
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:505
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:225
-msgid "Last Name"
-msgstr "Nom"
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/player-management.php:135
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:226
-msgid "DOB"
-msgstr "Date de naissance"
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/player-management.php:137
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:521
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:228
-msgid "AVS Number"
-msgstr "Numéro AVS"
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/player-management.php:140
-msgid "Manage All Players"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/player-management.php:140
-msgid "Manage Your Attendees"
-msgstr "Gérer vos participants"
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/player-management.php:223
-#, php-format
-msgid "Total Players: %d"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/player-management.php:561
-msgid "Assigned Attendee"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:77
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:78
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-elementor-manager.php:87
-msgid "InterSoccer Players"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:89
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:90
-msgid "Dashboard"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:108
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:109
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:559
-msgid "Rosters & Export"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:138
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:139
-msgid "Tools"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:212
-msgid "Are you sure you want to delete this player?"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:213
-msgid "Are you sure you want to delete the selected players?"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:214
-msgid "Processing export..."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:215
-msgid "Export completed successfully!"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:216
-msgid "Export failed. Please try again."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:232
-msgid "InterSoccer Players Dashboard"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:242
-msgid "Recent Registrations"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:244
-msgid "Last 30 days"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:248
-msgid "Average Age"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:253
-msgid "Total Events"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:261
-msgid "Analytics"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:265
-msgid "Gender Distribution"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:270
-msgid "Events by Type"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:278
-msgid "Recent Players"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:281
-msgid "No recent players found."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:307
-msgid "Quick Actions"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:311
-msgid "Export Rosters"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:315
-msgid "View All Players"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:319
-msgid "Manage Events"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:396
-msgid "Add New Player"
-msgstr "Ajouter un nouveau participant"
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:404
-msgid "All Genders"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:407
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:517
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:758
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:508
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:604
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:508
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:604
-msgid "Other"
-msgstr "Autre"
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:411
-msgid "All Ages"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:412
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:518
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:518
-msgid "3-5 years"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:413
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:519
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:519
-msgid "6-8 years"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:414
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:520
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:520
-msgid "9-12 years"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:415
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:521
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:521
-msgid "13-18 years"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:418
-msgid "Search players..."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:419
-msgid "Reset"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:431
-msgid "Parent"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:433
-msgid "Registration Date"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:474
-msgid "Delete"
-msgstr "Supprimer"
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:485
-msgid "Bulk Actions"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:486
-msgid "Delete Selected"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:487
-msgid "Export Selected"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:489
-msgid "Apply"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:497
-msgid "Player Details"
-msgstr ""
+msgid "Medical Conditions"
+msgstr "Conditions médicales"
 
 #: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:529
 msgid "Dietary Requirements"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:537
-msgid "Emergency Phone"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:542
-msgid "Save Player"
-msgstr "Enregistrer le participant"
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:543
-msgid "Cancel"
-msgstr "Annuler"
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:564
-msgid "Quick Export"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:567
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:608
-msgid "Custom Export"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:570
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:676
-msgid "Scheduled Exports"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:576
-msgid "Quick Export Options"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:577
-msgid "Export commonly requested roster formats:"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:581
-msgid "All Camps"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:582
-msgid "Export all camp rosters with player details."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:584
-msgid "Export Camps"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:589
-msgid "All Courses"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:590
-msgid "Export all course rosters with schedule details."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:592
-msgid "Export Courses"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:597
-msgid "Complete Roster"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:598
-msgid "Export all players and events in one comprehensive file."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:600
-msgid "Export All"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:613
-msgid "Activity Type"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:615
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:531
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:531
-msgid "Camps"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:616
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:532
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:532
-msgid "Courses"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:617
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:533
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:533
-msgid "Birthday Parties"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:622
-msgid "Season"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:624
-msgid "All Seasons"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:625
-msgid "Spring 2025"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:626
-msgid "Summer 2025"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:627
-msgid "Autumn 2025"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:628
-msgid "Winter 2025"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:633
-msgid "Start Date"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:638
-msgid "End Date"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:643
-msgid "Venue"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:645
-msgid "All Venues"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:657
-msgid "Export Format"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:659
-msgid "CSV"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:661
-msgid "PDF"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:668
-msgid "Generate Custom Export"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:677
-msgid "Set up automatic exports that run on a schedule."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:678
-msgid "Coming soon..."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:684
-msgid "Export History"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:688
-msgid "Date"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:689
-msgid "Type"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:690
-msgid "Records"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:691
-msgid "Format"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:692
-msgid "User"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:702
-msgid "No export history found."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:715
-msgid "Download"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:718
-msgid "Expired"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:732
-msgid "Exporting Data"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:736
-msgid "Preparing export..."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:760
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:606
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:606
-msgid "Not Specified"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/user-profile-players.php:141
-msgid "View orders"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:34
-msgid "First name is required."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:36
-msgid "First name contains invalid characters."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:41
-msgid "Last name is required."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:43
-msgid "Last name contains invalid characters."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:48
-msgid "Date of birth is required."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:50
-msgid "Invalid date of birth format."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:52
-msgid "Player age is not within acceptable range."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:57
-msgid "Gender is required."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:59
-msgid "Invalid gender selection."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:64
-msgid "Invalid AVS number format."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:86
-msgid "Activity type is required."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:88
-msgid "Invalid activity type."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:93
-msgid "Invalid start date format."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:97
-msgid "Invalid end date format."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:103
-msgid "End date must be after start date."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:109
-msgid "Venue name is too long."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:126
-msgid "Email address is required."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:128
-msgid "Invalid email address format."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:130
-msgid "Email address is already registered."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-validator.php:135
-msgid "Invalid phone number format."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:30
-msgid "You do not have sufficient permissions to access this page."
 msgstr ""
 
 #: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:166
 msgid "Search by name, email, or AVS number..."
 msgstr ""
 
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:168
-msgid "Search"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:171
-msgid "Clear Search"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:179
-msgid "Showing:"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:181
-#, php-format
-msgid ""
-"Page %d of %d | %d players on this page | %d total items | %d users without "
-"players"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:189
-msgid "Search results for:"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:196
-msgid "Players on Page"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:200
-msgid "Male (Page)"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:204
-msgid "Female (Page)"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:208
-msgid "Total Pages"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:222
-msgid "Canton"
-msgstr "Canton"
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:223
-msgid "City"
-msgstr "Ville"
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:231
-msgid "Creation Date"
-msgstr "Date de création"
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:239
-msgid "No players found matching your search."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:241
-msgid "No players found on this page."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:339
-msgid "Previous"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:370
-msgid "Next"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:556
-msgid "Unauthorized"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:66
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:66
-msgid "Layout"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:74
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:74
-msgid "Columns"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:90
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:90
-msgid "Gap"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:121
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:121
-msgid "Query"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:129
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:129
-msgid "Limit"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:140
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:140
-msgid "Order By"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:146
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:146
-msgid "Created Date"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:155
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:155
-msgid "Order"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:159
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:159
-msgid "Ascending"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:160
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:160
-msgid "Descending"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:171
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:171
-msgid "Filters"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:179
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:179
-msgid "Show Filters"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:191
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:191
-msgid "Filter by Age"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:204
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:204
-msgid "Filter by Activity Type"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:225
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:225
-msgid "Card Style"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:233
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:372
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:404
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:233
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:372
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:404
-msgid "Background Color"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:246
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:430
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:246
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:430
-msgid "Border"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:254
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:438
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:254
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:438
-msgid "Border Radius"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:267
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:267
-msgid "Box Shadow"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:275
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:450
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:275
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:450
-msgid "Padding"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:290
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:420
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:290
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:420
-msgid "Typography"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:299
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:299
-msgid "Title Typography"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:307
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:307
-msgid "Title Color"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:320
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:320
-msgid "Content Typography"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:328
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:328
-msgid "Content Color"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:343
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:343
-msgid "Button Style"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:353
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:353
-msgid "Normal"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:360
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:393
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:360
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:393
-msgid "Text Color"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:386
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:386
-msgid "Hover"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:515
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:515
-msgid "Age Group:"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:528
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:528
-msgid "Activity:"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:540
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:540
-msgid "Reset Filters"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:554
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-elementor-manager.php:127
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:554
-msgid "Loading..."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:564
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-elementor-manager.php:129
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:564
-msgid "No data found."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:616
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:616
-msgid "Camp"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:618
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:618
-msgid "Course"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-elementor-widget-base.php:620
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-widget-base.php:620
-msgid "Birthday Party"
-msgstr ""
-
 #: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-elementor-manager.php:128
 msgid "An error occurred. Please try again."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:51
-msgid "Camp Terms"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:60
-msgid ""
-"Please install the wp-background-processing library for asynchronous "
-"attribute creation in Player Management."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:69
-msgid "You do not have permission to perform this action."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:267
-msgid "Attribute creation queued. Check status in Site Health > Info."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:291
-msgid "Attributes created synchronously."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:298
-msgid "Please confirm user cleanup by checking the confirmation box."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:302
-#, php-format
-msgid ""
-"User cleanup completed: %d users deleted, %d users preserved (had activity)."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:318
-#, php-format
-msgid "Preview: %d users would be affected by cleanup."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:335
-msgid "Camp terms imported successfully."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:337
-msgid "No CSV file uploaded."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:383
-msgid "Users and players imported successfully."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:385
-msgid "No CSV file uploaded for import."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:419
-msgid "Please confirm player flagging."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:438
-#, php-format
-msgid "Flagged %d players as ineligible."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:444
-msgid "Advanced Settings"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:454
-msgid "🗄️ Database Cleanup"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:455
-msgid ""
-"Remove user accounts that have no players and no activity (orders, posts, "
-"etc.)."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:459
-msgid "Age Threshold"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:462
-msgid "Only delete accounts older than this many days."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:466
-msgid "Safety Check"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:470
-msgid ""
-"I understand this will permanently delete user accounts with no players and "
-"no activity."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:478
-msgid "Preview Cleanup"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:480
-msgid "Run Cleanup"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:489
-msgid "Preview of Users to be Cleaned Up"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:510
-#, php-format
-msgid "... and %d more users."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:520
-msgid "Last Cleanup Results"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:522
-msgid "Date:"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:523
-msgid "Deleted:"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:524
-msgid "Preserved:"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:532
-msgid "⚙️ Auto-Create Attributes"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:533
-msgid "Create WooCommerce product attributes for InterSoccer events."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:534
-msgid "Create Attributes"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:539
-msgid "📁 Import/Export"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:541
-msgid "Import Camp Terms from CSV"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:543
-msgid "Import Terms"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:545
-msgid "Import Users and Players from CSV"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:547
-msgid "Import Users & Players"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:549
-msgid "Export Users and Players"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:550
-msgid "Export to CSV"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:555
-msgid "👥 Player Management"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:557
-msgid "Flag Older Players"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:558
-#, php-format
-msgid "Flag players born before %s as ineligible."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:559
-msgid "Confirm Flagging"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:560
-msgid "Flag Players"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:565
-msgid "🔧 Advanced Configuration"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:566
-msgid "Custom JSON Attributes"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:568
-msgid "Save JSON"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:573
-msgid "📊 System Information"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:595
-msgid "Total Users:"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:599
-msgid "Users with Players:"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:603
-msgid "Users without Players:"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:607
-msgid "Total Orders:"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:611
-msgid "PHP Memory Limit:"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:615
-msgid "Current Memory Usage:"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:619
-msgid "WordPress Version:"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:623
-msgid "WooCommerce Version:"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:631
-msgid "❓ Help & Documentation"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:633
-msgid "Database Cleanup Guidelines:"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:635
-msgid "Always run a preview before performing cleanup"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:636
-msgid "Users with orders, posts, or comments will be preserved"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:637
-msgid "Users with billing information will be preserved"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:638
-msgid "Recommended to backup database before major cleanups"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:641
-msgid "Performance Tips:"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:643
-msgid "Regular cleanup helps maintain database performance"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:644
-msgid "Use 30-90 day age thresholds for safety"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:645
-msgid "Monitor memory usage during large operations"
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:666
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:674
-msgid "Please check the confirmation box first."
-msgstr ""
-
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/admin-advanced.php:684
-msgid "Warning: Very short age thresholds may delete recent accounts."
-msgstr ""
+msgstr "Une erreur s'est produite. Veuillez réessayer."
 
 #: /home/jeremy-lee/projects/underdog/intersoccer/player-management/vendor/deliciousbrains/wp-background-processing/classes/wp-background-process.php:777
 msgid "Every Minute"
 msgstr ""
 
-#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/vendor/deliciousbrains/wp-background-processing/classes/wp-background-process.php:779
-#, php-format
 msgid "Every %d Minutes"
 msgstr ""
-
-#: includes/player-management.php:389
-#: includes/player-management.php:541
-msgid "Save"
-msgstr "Enregistrer"
-
-#: includes/player-management.php:377
-msgid "No AVS? Enter foreign insurance number or \"0000\" and email us the insurance details."
-msgstr "Pas d'AVS ? Entrez le numéro d'assurance étranger ou \"0000\" et envoyez-nous les détails de l'assurance par e-mail."
 
 #: includes/player-management.php
 msgid "Add Player"
@@ -1589,8 +2284,31 @@ msgstr "Aucun participant enregistré."
 msgid "No players found."
 msgstr "Aucun participant trouvé."
 
-#: includes/player-management.php
-
 #: includes/player-management.php:382
 msgid "Medical Conditions:"
 msgstr "Conditions médicales :"
+
+#: includes/player-management.php
+msgid "Player Assignment:"
+msgstr "Attribution du participant :"
+
+#: includes/player-management.php
+msgid "Guest order - no registered players available."
+msgstr "Commande invité - aucun participant enregistré disponible."
+
+#: includes/player-management.php
+msgid "Customer has no registered players."
+msgstr "Le client n'a aucun participant enregistré."
+
+#: includes/player-management.php
+msgid "Assigned Player:"
+msgstr "Participant assigné :"
+
+#: includes/player-management.php
+msgid "-- Select Player --"
+msgstr "-- Sélectionner un participant --"
+
+#: includes/player-management.php
+msgid "Current:"
+msgstr "Actuel :"
+

@@ -553,16 +553,14 @@ function intersoccer_render_user_profile_players($user) {
     }
 
     // Localize script for user profile
-    $localize_data = [
-        'ajax_url' => admin_url('admin-ajax.php'),
+    $localize_data = array_merge(intersoccer_pm_customer_script_localize_base(false), [
         'nonce' => wp_create_nonce('intersoccer_player_nonce'),
         'user_id' => $user->ID,
         'is_admin' => '1',
-        'nonce_refresh_url' => admin_url('admin-ajax.php?action=intersoccer_refresh_nonce'),
         'debug' => defined('WP_DEBUG') && WP_DEBUG ? '1' : '0',
         'preload_players' => $players,
         'server_time' => current_time('mysql'),
-    ];
+    ]);
     if (defined('WP_DEBUG') && WP_DEBUG) {
         error_log('InterSoccer: Localizing intersoccerPlayer data for user profile, user: ' . $user->ID . ', player count: ' . count($players));
     }
@@ -683,9 +681,27 @@ function intersoccer_render_user_profile_players($user) {
  * See: player-management.php lines 141-175
  */
 
+/**
+ * True when the item's formatted (customer-visible) meta already contains the Assigned Attendee row.
+ */
+function intersoccer_order_item_meta_already_lists_attendee( $item ) {
+    if ( ! is_object( $item ) || ! method_exists( $item, 'get_formatted_meta_data' ) ) {
+        return false;
+    }
+    foreach ( (array) $item->get_formatted_meta_data() as $meta ) {
+        if ( is_object( $meta ) && isset( $meta->key ) && $meta->key === 'Assigned Attendee' ) {
+            return true;
+        }
+    }
+    return false;
+}
+
 // Display assigned attendee in frontend order details (My Account > Orders)
 function intersoccer_display_order_item_attendee( $item_id, $item, $order, $plain_text = false ) {
     $attendee = $item->get_meta( 'Assigned Attendee' );
+    if ( $attendee && intersoccer_order_item_meta_already_lists_attendee( $item ) ) {
+        return; // WooCommerce already prints the visible 'Assigned Attendee' meta row.
+    }
     if ( $attendee ) {
         echo '<p><strong>' . esc_html__( 'Assigned Attendee', 'player-management' ) . ':</strong> ' . esc_html( $attendee ) . '</p>';
     }

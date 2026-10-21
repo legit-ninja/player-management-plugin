@@ -208,6 +208,20 @@ if (!function_exists('admin_url')) {
     }
 }
 
+if (!function_exists('add_query_arg')) {
+    function add_query_arg($args, $url = '') {
+        if (is_array($args)) {
+            $query = http_build_query($args, '', '&', PHP_QUERY_RFC3986);
+            if ($url === '') {
+                return '?' . $query;
+            }
+            $separator = strpos($url, '?') === false ? '?' : '&';
+            return $url . $separator . $query;
+        }
+        return $url;
+    }
+}
+
 if (!function_exists('wp_login_url')) {
     function wp_login_url($redirect = '') {
         $url = 'https://example.com/wp-login.php';
@@ -260,6 +274,26 @@ if (!function_exists('wp_delete_user')) {
 
 if (!function_exists('wp_mail')) {
     function wp_mail($to, $subject, $message, $headers = '', $attachments = []) {
+        $GLOBALS['wp_stub_last_wp_mail'] = [
+            'to' => $to,
+            'subject' => $subject,
+            'message' => $message,
+        ];
+        return true;
+    }
+}
+
+if (!function_exists('switch_to_locale')) {
+    function switch_to_locale($locale) {
+        $GLOBALS['wp_stub_locale_switch_log'][] = $locale;
+        $GLOBALS['wp_stub_locale_switch_history'][] = $locale;
+        return true;
+    }
+}
+
+if (!function_exists('restore_previous_locale')) {
+    function restore_previous_locale() {
+        array_pop($GLOBALS['wp_stub_locale_switch_log']);
         return true;
     }
 }
@@ -392,6 +426,18 @@ if (!function_exists('current_user_can')) {
 if (!function_exists('is_admin')) {
     function is_admin() {
         return !empty($GLOBALS['wp_stub_is_admin']);
+    }
+}
+
+if (!function_exists('wp_doing_ajax')) {
+    function wp_doing_ajax() {
+        return !empty($GLOBALS['wp_stub_doing_ajax']);
+    }
+}
+
+if (!function_exists('is_locale_switched')) {
+    function is_locale_switched() {
+        return !empty($GLOBALS['wp_stub_locale_switched']);
     }
 }
 

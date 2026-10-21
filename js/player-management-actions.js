@@ -5,6 +5,17 @@ jQuery(document).ready(function($) {
     const isAdmin = intersoccerPlayer.is_admin === '1';
     const debugEnabled = intersoccerPlayer.debug === '1';
 
+    function pmAjaxData(data) {
+        if (typeof window.intersoccerPmAjaxData === 'function') {
+            return window.intersoccerPmAjaxData(data);
+        }
+        const payload = Object.assign({}, data || {});
+        if (intersoccerPlayer && intersoccerPlayer.lang) {
+            payload.lang = intersoccerPlayer.lang;
+        }
+        return payload;
+    }
+
     /**
      * Translate gender value for display
      * Converts database value (english) to translated display value
@@ -95,12 +106,12 @@ jQuery(document).ready(function($) {
         $.ajax({
             url: intersoccerPlayer.ajax_url,
             type: 'POST',
-            data: {
+            data: pmAjaxData({
                 action: 'intersoccer_delete_player',
                 nonce: intersoccerPlayer.nonce,
                 user_id: userId,
                 player_index: index
-            },
+            }),
             success: function(response) {
                 if (response.success) {
                     showMessage(response.data.message || 'Player removed successfully.', 'success');
@@ -200,7 +211,7 @@ jQuery(document).ready(function($) {
         $.ajax({
             url: intersoccerPlayer.ajax_url,
             type: 'POST',
-            data: data,
+            data: pmAjaxData(data),
             ontentType: "application/x-www-form-urlencoded; charset=UTF-8",
             dataType: 'json',
             success: function(response) {

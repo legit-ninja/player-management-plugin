@@ -59,17 +59,25 @@ function intersoccer_add_user_profile_players($user) {
         wp_enqueue_style('intersoccer-player-management-css', plugin_dir_url(dirname(__FILE__)) . 'css/player-management.css', [], '1.0.13');
     }
 
-    $localize_data = [
-        'ajax_url' => admin_url('admin-ajax.php'),
+    $localize_data = array_merge(intersoccer_pm_customer_script_localize_base(!$is_admin), [
         'nonce' => wp_create_nonce('intersoccer_player_nonce'),
         'user_id' => $user->ID,
         'is_admin' => $is_admin ? '1' : '0',
         'context' => 'user_profile',
-        'nonce_refresh_url' => admin_url('admin-ajax.php?action=intersoccer_refresh_nonce'),
         'debug' => defined('WP_DEBUG') && WP_DEBUG ? '1' : '0',
         'preload_players' => $players ?: [],
         'server_time' => current_time('mysql'),
-    ];
+        'i18n' => $is_admin ? [] : array_merge(
+            intersoccer_pm_frontend_js_i18n(),
+            [
+                'gender' => [
+                    'male' => __('Male', INTERSOCCER_PLAYER_TEXT_DOMAIN),
+                    'female' => __('Female', INTERSOCCER_PLAYER_TEXT_DOMAIN),
+                    'other' => __('Other', INTERSOCCER_PLAYER_TEXT_DOMAIN),
+                ],
+            ]
+        ),
+    ]);
     wp_localize_script('intersoccer-player-management-js', 'intersoccerPlayer', $localize_data);
     if (defined('WP_DEBUG') && WP_DEBUG) {
         error_log('InterSoccer: Localized intersoccerPlayer data for user profile, user: ' . $user->ID . ', player count: ' . count($players));

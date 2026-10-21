@@ -37,28 +37,6 @@ define('PLAYER_MANAGEMENT_URL', plugin_dir_url(__FILE__));
 if (!defined('INTERSOCCER_PLAYER_TEXT_DOMAIN')) {
     define('INTERSOCCER_PLAYER_TEXT_DOMAIN', 'player-management');
 }
-// Load translation
-add_action('init', function () {
-    $locale = determine_locale();
-    $mofile = sprintf('%s-%s.mo', 'player-management', $locale);
-    
-    // Try to load from plugin directory first
-    $plugin_mofile = PLAYER_MANAGEMENT_PATH . 'languages/' . $mofile;
-    
-    if (file_exists($plugin_mofile)) {
-        load_textdomain('player-management', $plugin_mofile);
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('InterSoccer: Loaded translation from plugin directory | Locale: ' . $locale . ' | File: ' . $plugin_mofile);
-        }
-    } else {
-        // Fallback to standard loading (checks global dir)
-        load_plugin_textdomain('player-management', false, dirname(plugin_basename(__FILE__)) . '/languages/');
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('InterSoccer: Translation file NOT found in plugin directory | Locale: ' . $locale . ' | Checked: ' . $plugin_mofile);
-        }
-    }
-});
-
 // Check if WooCommerce is active (required)
 if (!function_exists('is_plugin_active')) {
     include_once ABSPATH . 'wp-admin/includes/plugin.php';
@@ -77,6 +55,9 @@ if (!is_plugin_active('woocommerce/woocommerce.php')) {
 
 // Include core files (check if they exist first)
 $core_files = [
+    'includes/admin-locale.php',
+    'includes/pm-i18n-locale.php',
+    'includes/frontend-i18n.php',
     'includes/player-data.php',
     'includes/privacy-settings.php',
     'includes/player-management.php',
@@ -470,25 +451,25 @@ add_action('wp_enqueue_scripts', function () {
         }
 
         // Localize script
-        $localize_data = [
-            'ajax_url' => admin_url('admin-ajax.php'),
+        $localize_data = array_merge(intersoccer_pm_customer_script_localize_base(true), [
             'nonce' => wp_create_nonce('intersoccer_player_nonce'),
             'user_id' => $user_id,
             'is_admin' => current_user_can('manage_options') ? '1' : '0',
-            'nonce_refresh_url' => admin_url('admin-ajax.php?action=intersoccer_refresh_nonce'),
             'debug' => defined('WP_DEBUG') && WP_DEBUG ? '1' : '0',
             'preload_players' => $preload_players,
             'server_time' => current_time('mysql'),
             'version' => PLAYER_MANAGEMENT_VERSION,
-            // Gender translations for JavaScript
-            'i18n' => [
-                'gender' => [
-                    'male' => __('Male', 'player-management'),
-                    'female' => __('Female', 'player-management'),
-                    'other' => __('Other', 'player-management'),
-                ],
-            ],
-        ];
+            'i18n' => array_merge(
+                intersoccer_pm_frontend_js_i18n(),
+                [
+                    'gender' => [
+                        'male' => __('Male', INTERSOCCER_PLAYER_TEXT_DOMAIN),
+                        'female' => __('Female', INTERSOCCER_PLAYER_TEXT_DOMAIN),
+                        'other' => __('Other', INTERSOCCER_PLAYER_TEXT_DOMAIN),
+                    ],
+                ]
+            ),
+        ]);
 
         if (defined('WP_DEBUG') && WP_DEBUG) {
             error_log('InterSoccer: Localizing intersoccerPlayer data for user ' . $user_id . ', player count: ' . count($preload_players));
