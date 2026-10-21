@@ -193,7 +193,8 @@ function intersoccer_pm_bootstrap_customer_ajax_language() {
     if (isset($_REQUEST['lang'])) {
         $lang = sanitize_text_field(wp_unslash((string) $_REQUEST['lang']));
     }
-    if ($lang === '') {
+    // Only plain language codes (e.g. fr, de, fr_CH); never a path fragment.
+    if ($lang === '' || !preg_match('/^[a-z]{2,3}(?:[_-][A-Za-z]{2,4})?$/', $lang)) {
         return;
     }
 

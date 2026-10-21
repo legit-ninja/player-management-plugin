@@ -116,4 +116,17 @@ class PmWpmlAjaxTest extends InterSoccer_Test_Case
 
         $this->assertNull($GLOBALS['intersoccer_pm_wpml_switched']);
     }
+
+    public function test_bootstrap_ignores_non_language_lang_value()
+    {
+        $_REQUEST['lang'] = '../../evil';
+        $GLOBALS['wp_stub_is_admin'] = true;
+        $GLOBALS['wp_stub_doing_ajax'] = true;
+        $_SERVER['HTTP_REFERER'] = 'https://example.com/fr/mon-compte/';
+        unset($GLOBALS['intersoccer_pm_textdomain_locale']);
+
+        intersoccer_pm_bootstrap_customer_ajax_language();
+
+        $this->assertArrayNotHasKey('intersoccer_pm_textdomain_locale', $GLOBALS);
+    }
 }
