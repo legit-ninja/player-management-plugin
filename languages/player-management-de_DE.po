@@ -1,395 +1,171 @@
 msgid ""
 msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-10-21T11:32:30+00:00\n"
+"PO-Revision-Date: 2026-10-21T11:32:30+00:00\n"
+"Language: \n"
+
+
+#: player-management.php
+msgid "Player Management"
+msgstr ""
+
+#: player-management.php
+msgid "https://github.com/legit-ninja/player-management-plugin"
+msgstr ""
+
+#: player-management.php
+msgid "Manages players for InterSoccer events, integrating with WooCommerce My Account page and providing an admin dashboard."
+msgstr ""
+
+#: player-management.php
+msgid "Jeremy Lee"
+msgstr ""
+
+#: player-management.php
+msgid "https://underdogunlimited.com"
+msgstr ""
+
+#: elementoridgets/player-management-link-widget.php:21
+msgid "Player Management Link"
+msgstr "Link zur Teilnehmerverwaltung"
+
+#: elementoridgets/player-management-link-widget.php:49
+msgid "Content Settings"
+msgstr ""
+
+#: elementoridgets/player-management-link-widget.php:57
+msgid "Display Type"
+msgstr ""
+
+#: elementoridgets/player-management-link-widget.php:60
+msgid "Icon + Text"
+msgstr "Symbol + Text"
+
+#: elementoridgets/player-management-link-widget.php:61
+msgid "Icon Only"
+msgstr "Nur Symbol"
+
+#: elementoridgets/player-management-link-widget.php:62
+msgid "Text Only"
+msgstr "Nur Text"
+
+#: elementoridgets/player-management-link-widget.php:71
+msgid "Icon"
+msgstr ""
+
+#: elementoridgets/player-management-link-widget.php:86
+msgid "Link Text"
+msgstr "Linktext"
 
 #: elementoridgets/player-management-link-widget.php:88
 msgid "Manage Players"
 msgstr "Teilnehmer verwalten"
 
-#: player-management.php:326
-msgid "Coach"
+#: elementoridgets/player-management-link-widget.php:98
+msgid "Enable Shepherd.js Tour"
 msgstr ""
 
-#: player-management.php:329
-msgid "Organizer"
+#: elementoridgets/player-management-link-widget.php:100
+#: elementoridgets/player-management-link-widget.php:113
+msgid "Yes"
+msgstr "Ja"
+
+#: elementoridgets/player-management-link-widget.php:101
+#: elementoridgets/player-management-link-widget.php:114
+msgid "No"
+msgstr "Nein"
+
+#: elementoridgets/player-management-link-widget.php:104
+msgid "Show guided tour for users without registered players"
 msgstr ""
 
-#: includes/admin-players.php:81
-#: includes/admin-players.php:82
-#: player-management.php:530
-msgid "Settings"
+#: elementoridgets/player-management-link-widget.php:111
+msgid "Auto-start Tour"
+msgstr "Tour automatisch starten"
+
+#: elementoridgets/player-management-link-widget.php:126
+msgid "Tour Delay (seconds)"
 msgstr ""
 
-#: includes/templates/overview-template.php:280
-msgid "Method:"
+#: elementoridgets/player-management-link-widget.php:145
+msgid "Style"
 msgstr ""
 
-#: includes/templates/overview-template.php:156
-msgid "Warning:"
+#: elementoridgets/player-management-link-widget.php:153
+msgid "Icon Size"
 msgstr ""
 
-#: includes/data-deletion.php:15
-msgid "Please log in to request data deletion."
-msgstr "Bitte melden Sie sich an, um die Löschung Ihrer Daten zu beantragen."
-
-#: includes/data-deletion.php:21
-msgid "Request Data Deletion"
-msgstr "Datenlöschung beantragen"
-
-#: includes/data-deletion.php:25
-msgid "Reason for Deletion (optional):"
-msgstr "Grund für die Löschung (optional):"
-
-#: includes/data-deletion.php:29
-msgid "Submit Request"
-msgstr "Anfrage senden"
-
-#: includes/data-deletion.php:51
-msgid "New Data Deletion Request"
-msgstr ""
-
-#: includes/data-deletion.php:52
-#, php-format
-msgid "A user (ID: %d) has requested data deletion. Reason: %s. Review in admin."
-msgstr ""
-
-#: includes/data-deletion.php:54
-msgid "Your request has been submitted."
-msgstr "Ihre Anfrage wurde gesendet."
-
-#: includes/data-deletion.php:65
-#: includes/data-deletion.php:102
-msgid "Data Deletion Requests"
-msgstr ""
-
-#: includes/data-deletion.php:66
-msgid "Data Deletion"
-msgstr "Datenlöschung"
-
-#: includes/admin-advanced.php:242
-#: includes/admin-settings.php:209
-#: includes/data-deletion.php:76
-msgid "You do not have permission to access this page."
-msgstr ""
-
-#: includes/data-deletion.php:90
-msgid "User data deleted."
-msgstr ""
-
-#: includes/data-deletion.php:106
-#: includes/player-management.php:366
-#: includes/player-management.php:419
-msgid "User ID"
-msgstr "Benutzer-ID"
-
-#: includes/data-deletion.php:107
-msgid "Reason"
-msgstr ""
-
-#: includes/class-player-list.php:253
-#: includes/class-player-list.php:308
-#: includes/data-deletion.php:108
-#: includes/player-management.php:264
-#: includes/player-management.php:590
-#: includes/user-profile-players.php:104
-msgid "Actions"
-msgstr "Aktionen"
-
-#: includes/data-deletion.php:121
-msgid "Process"
-msgstr ""
-
-#: includes/admin-players.php:43
-#: includes/admin-players.php:44
-msgid "Players"
-msgstr ""
-
-#: includes/admin-players.php:54
-#: includes/admin-players.php:55
-msgid "Overview"
-msgstr ""
-
-#: includes/admin-players.php:63
-#: includes/admin-players.php:64
-#: includes/class-player-list.php:148
-msgid "All Players"
-msgstr ""
-
-#: includes/admin-players.php:72
-#: includes/admin-players.php:73
-msgid "Advanced"
-msgstr ""
-
-#: includes/admin-players.php:107
-msgid "Players per page"
-msgstr ""
-
-#: includes/class-player-list.php:247
-#: includes/class-player-list.php:272
-#: includes/class-player-list.php:477
-#: includes/player-management.php:370
-#: includes/player-management.php:427
-msgid "Name"
-msgstr "Name"
-
-#: includes/class-player-list.php:250
-#: includes/class-player-list.php:287
-#: includes/class-player-list.php:355
-#: includes/class-player-list.php:479
-#: includes/player-management.php:261
-#: includes/player-management.php:587
-#: includes/player-management.php:650
-#: includes/user-profile-players.php:100
-#: includes/user-profile-players.php:170
-msgid "Gender"
-msgstr "Geschlecht"
-
-#: includes/class-player-list.php:351
-#: includes/class-player-list.php:478
-#: includes/player-management.php:486
-#: includes/player-management.php:634
-#: includes/user-profile-players.php:165
-msgid "Date of Birth"
-msgstr "Geburtsdatum"
-
-#: includes/class-player-list.php:313
-msgid "View"
-msgstr ""
-
-#: includes/class-player-list.php:319
-#: includes/player-management.php:462
-#: includes/player-management.php:613
-#: includes/user-profile-players.php:143
-msgid "Edit"
-msgstr "Bearbeiten"
-
-#: includes/player-management.php:263
-#: includes/user-profile-players.php:103
-msgid "Events"
-msgstr "Events"
-
-#: includes/class-player-list.php:357
-#: includes/class-player-list.php:505
-#: includes/player-management.php:25
-#: includes/player-management.php:496
-#: includes/player-management.php:653
-#: includes/user-profile-players.php:173
-msgid "Male"
-msgstr "Junge"
-
-#: includes/class-player-list.php:358
-#: includes/class-player-list.php:506
-#: includes/player-management.php:27
-#: includes/player-management.php:497
-#: includes/player-management.php:654
-#: includes/user-profile-players.php:174
-msgid "Female"
-msgstr "Mädchen"
-
-#: includes/player-management.php:226
-msgid "Please log in to manage your Attendees."
-msgstr "Bitte melden Sie sich an, um Ihre Teilnehmer zu verwalten."
-
-#: includes/player-management.php:234
-msgid "Error: Unable to load user data."
-msgstr "Fehler: Benutzerdaten konnten nicht geladen werden."
-
-#: includes/class-player-list.php:343
-#: includes/player-management.php:258
-#: includes/player-management.php:584
-#: includes/player-management.php:624
-#: includes/user-profile-players.php:97
-#: includes/user-profile-players.php:155
-msgid "First Name"
-msgstr "Vorname"
-
-#: includes/class-player-list.php:347
-#: includes/player-management.php:259
-#: includes/player-management.php:585
-#: includes/player-management.php:629
-#: includes/user-profile-players.php:98
-#: includes/user-profile-players.php:160
-msgid "Last Name"
-msgstr "Nachname"
-
-#: includes/class-player-list.php:248
-#: includes/class-player-list.php:275
-#: includes/player-management.php:260
-#: includes/player-management.php:586
-#: includes/user-profile-players.php:99
-msgid "DOB"
-msgstr "Geburtsdatum"
-
-#: includes/class-player-list.php:363
-#: includes/player-management.php:262
-#: includes/player-management.php:588
-#: includes/player-management.php:660
-#: includes/user-profile-players.php:101
-#: includes/user-profile-players.php:180
-msgid "AVS Number"
-msgstr "AHV-Nummer"
-
-#: includes/player-management.php:265
-msgid "Manage All Players"
-msgstr ""
-
-#: includes/player-management.php:265
-#: player-management.php:315
-msgid "Manage Your Attendees"
-msgstr "Verwalten Sie Ihre Teilnehmer"
-
-#: includes/player-management.php:349
-#, php-format
-msgid "Total Players: %d"
-msgstr "Teilnehmer gesamt: %d"
-
-#: includes/player-management.php:690
-msgid "Assigned Attendee"
-msgstr "Zugewiesener Teilnehmer"
-
-#: includes/class-elementor-integration.php:85
-#: includes/player-management.php:578
-#: includes/user-profile-players.php:91
-msgid "InterSoccer Players"
-msgstr "InterSoccer-Teilnehmer"
-
-#: includes/player-management.php:355
-#: includes/player-management.php:580
-#: includes/user-profile-players.php:93
-msgid "Add New Player"
-msgstr "Neuen Teilnehmer hinzufügen"
-
-#: includes/class-player-list.php:359
-#: includes/player-management.php:29
-#: includes/player-management.php:498
-#: includes/player-management.php:655
-#: includes/user-profile-players.php:175
-msgid "Other"
-msgstr "Andere"
-
-#: includes/class-player-list.php:249
-#: includes/class-player-list.php:281
-#: includes/class-player-list.php:480
-msgid "Parent"
-msgstr ""
-
-#: includes/player-management.php:614
-#: includes/user-profile-players.php:144
-msgid "Delete"
-msgstr "Löschen"
-
-#: includes/class-player-list.php:334
-#: includes/class-player-list.php:485
-msgid "Player Details"
-msgstr ""
-
-#: includes/player-management.php:518
-msgid "Save Player"
-msgstr "Teilnehmer speichern"
-
-#: includes/class-player-list.php:372
-#: includes/player-management.php:522
-#: includes/player-management.php:523
-#: includes/player-management.php:672
-#: includes/user-profile-players.php:194
-msgid "Cancel"
-msgstr "Abbrechen"
-
-#: includes/user-profile-players.php:136
-msgid "View orders"
-msgstr "Bestellungen anzeigen"
-
-#: includes/ajax-handlers.php:75
-#: includes/ajax-handlers.php:178
-msgid "Invalid gender selection."
-msgstr "Ungültige Geschlechtsauswahl."
-
-#: includes/admin-players.php:135
-#: includes/class-player-list.php:30
-msgid "You do not have sufficient permissions to access this page."
-msgstr ""
-
-#: includes/class-player-list.php:191
-msgid "Search"
-msgstr ""
-
-#: includes/class-player-list.php:197
-msgid "Clear Search"
-msgstr ""
-
-#: includes/class-player-list.php:205
-msgid "Showing:"
-msgstr ""
-
-#: includes/class-player-list.php:207
-#, php-format
-msgid "Page %d of %d | %d players on this page | %d total items | %d users without players"
-msgstr ""
-
-#: includes/class-player-list.php:215
-msgid "Search results for:"
-msgstr ""
-
-#: includes/class-player-list.php:222
-msgid "Players on Page"
-msgstr ""
-
-#: includes/class-player-list.php:226
-msgid "Male (Page)"
-msgstr ""
-
-#: includes/class-player-list.php:230
-msgid "Female (Page)"
-msgstr ""
-
-#: includes/class-player-list.php:234
-msgid "Total Pages"
-msgstr ""
-
-#: includes/class-player-list.php:251
-#: includes/class-player-list.php:290
-#: includes/player-management.php:367
-#: includes/player-management.php:424
-msgid "Canton"
-msgstr "Kanton"
-
-#: includes/player-management.php:368
-#: includes/player-management.php:425
-msgid "City"
-msgstr "Ort"
-
-#: includes/player-management.php:385
-#: includes/player-management.php:442
-msgid "Creation Date"
-msgstr "Erstellungsdatum"
-
-#: includes/class-player-list.php:261
-msgid "No players found matching your search."
-msgstr ""
-
-#: includes/class-player-list.php:263
-msgid "No players found on this page."
-msgstr ""
-
-#: includes/class-player-list.php:599
-msgid "Previous"
-msgstr ""
-
-#: elementoridgets/player-management-link-widget.php:478
-#: includes/class-player-list.php:630
-msgid "Next"
-msgstr ""
-
-#: includes/class-player-list.php:938
-msgid "Unauthorized"
+#: elementoridgets/player-management-link-widget.php:184
+msgid "Icon Color"
 msgstr ""
 
 #: elementoridgets/player-management-link-widget.php:202
 msgid "Text Color"
 msgstr ""
 
-#: includes/class-player-list.php:336
-msgid "Loading..."
+#: elementoridgets/player-management-link-widget.php:227
+msgid "Alignment"
 msgstr ""
+
+#: elementoridgets/player-management-link-widget.php:231
+msgid "Left"
+msgstr "Links"
+
+#: elementoridgets/player-management-link-widget.php:235
+msgid "Center"
+msgstr "Mitte"
+
+#: elementoridgets/player-management-link-widget.php:239
+msgid "Right"
+msgstr "Rechts"
+
+#: elementoridgets/player-management-link-widget.php:253
+msgid "Icon-Text Spacing"
+msgstr ""
+
+#: elementoridgets/player-management-link-widget.php:473
+msgid "Register Your Players"
+msgstr "Teilnehmer registrieren"
+
+#: elementoridgets/player-management-link-widget.php:474
+msgid "Before you can register for camps and courses, you need to add at least one player (attendee) to your account."
+msgstr "Bevor Sie Camps oder Kurse buchen können, müssen Sie mindestens einen Teilnehmer zu Ihrem Konto hinzufügen."
+
+#: elementoridgets/player-management-link-widget.php:475
+msgid "Click here to manage your players and add your first attendee."
+msgstr "Klicken Sie hier, um Ihre Teilnehmer zu verwalten und den ersten Teilnehmer hinzuzufügen."
+
+#: elementoridgets/player-management-link-widget.php:476
+msgid "Click this link to get started!"
+msgstr "Klicken Sie auf diesen Link, um zu starten!"
+
+#: elementoridgets/player-management-link-widget.php:477
+msgid "Don't show again"
+msgstr "Nicht mehr anzeigen"
+
+#: elementoridgets/player-management-link-widget.php:478
+#: includes/class-player-list.php:630
+msgid "Next"
+msgstr "Weiter"
+
+#: elementoridgets/player-management-link-widget.php:479
+msgid "Back"
+msgstr "Zurück"
+
+#: elementoridgets/player-management-link-widget.php:480
+msgid "Got it!"
+msgstr "Verstanden!"
+
+#: includes/account-dashboard.php:159
+msgid "Add your participants below, then book a camp or course."
+msgstr "Fügen Sie unten Ihre Teilnehmer hinzu und buchen Sie anschliessend ein Camp oder einen Kurs."
 
 #: includes/admin-advanced.php:53
 msgid "Camp Terms"
@@ -401,6 +177,12 @@ msgstr ""
 
 #: includes/admin-advanced.php:71
 msgid "You do not have permission to perform this action."
+msgstr ""
+
+#: includes/admin-advanced.php:242
+#: includes/admin-settings.php:209
+#: includes/data-deletion.php:76
+msgid "You do not have permission to access this page."
 msgstr ""
 
 #: includes/admin-advanced.php:275
@@ -415,14 +197,25 @@ msgstr ""
 msgid "Please confirm user cleanup by checking the confirmation box."
 msgstr ""
 
-#: includes/admin-advanced.php:310
-#, php-format
 msgid "User cleanup completed: %d users deleted, %d users preserved (had activity)."
 msgstr ""
 
-#: includes/admin-advanced.php:326
-#, php-format
 msgid "Preview: %d users would be affected by cleanup."
+msgstr ""
+
+#: includes/admin-advanced.php:331
+msgid "Player ID backfill is unavailable. Update Player Management plugin."
+msgstr ""
+
+msgid "Player ID backfill batch complete: %1$d users processed, %2$d users updated, %3$d players assigned UUIDs."
+msgstr ""
+
+msgid "More users remain — run again with offset %d or submit another batch."
+msgstr ""
+
+#: includes/admin-advanced.php:362
+#: includes/admin-advanced.php:390
+msgid "Invalid file type. Only CSV files are allowed."
 msgstr ""
 
 #: includes/admin-advanced.php:376
@@ -445,8 +238,6 @@ msgstr ""
 msgid "Please confirm player flagging."
 msgstr ""
 
-#: includes/admin-advanced.php:504
-#, php-format
 msgid "Flagged %d players as ineligible."
 msgstr ""
 
@@ -490,8 +281,6 @@ msgstr ""
 msgid "Preview of Users to be Cleaned Up"
 msgstr ""
 
-#: includes/admin-advanced.php:576
-#, php-format
 msgid "... and %d more users."
 msgstr ""
 
@@ -509,6 +298,33 @@ msgstr ""
 
 #: includes/admin-advanced.php:590
 msgid "Preserved:"
+msgstr ""
+
+#: includes/admin-advanced.php:598
+msgid "🆔 Backfill Player IDs"
+msgstr ""
+
+#: includes/admin-advanced.php:599
+msgid "Assign stable UUID player_id values to existing player rows missing them. Run before order meta backfill in Product Variations."
+msgstr ""
+
+#: includes/admin-advanced.php:605
+msgid "Last run:"
+msgstr ""
+
+msgid "Processed %1$d users, updated %2$d users, %3$d players."
+msgstr ""
+
+#: includes/admin-advanced.php:616
+msgid "Batch size"
+msgstr ""
+
+#: includes/admin-advanced.php:618
+msgid "Offset"
+msgstr ""
+
+#: includes/admin-advanced.php:621
+msgid "Backfill Player IDs"
 msgstr ""
 
 #: includes/admin-advanced.php:626
@@ -560,8 +376,6 @@ msgstr ""
 msgid "Flag Older Players"
 msgstr ""
 
-#: includes/admin-advanced.php:652
-#, php-format
 msgid "Flag players born before %s as ineligible."
 msgstr ""
 
@@ -670,211 +484,40 @@ msgstr ""
 msgid "Warning: Very short age thresholds may delete recent accounts."
 msgstr ""
 
-#: includes/player-management.php:519
-#: includes/player-management.php:671
-#: includes/user-profile-players.php:193
-msgid "Save"
-msgstr "Speichern"
-
-#: includes/player-management.php:507
-#: includes/player-management.php:662
-#: includes/user-profile-players.php:182
-msgid "No AVS? Enter foreign insurance number or \"0000\" and email us the insurance details."
-msgstr "Keine AHV? Geben Sie die ausländische Versicherungsnummer oder «0000» ein und senden Sie uns die Angaben per E-Mail."
-
-#. Plugin Name of the plugin
-#: player-management.php
-msgid "Player Management"
+#: includes/admin-players.php:43
+#: includes/admin-players.php:44
+msgid "Players"
 msgstr ""
 
-#. Plugin URI of the plugin
-#: player-management.php
-msgid "https://github.com/legit-ninja/player-management-plugin"
+#: includes/admin-players.php:54
+#: includes/admin-players.php:55
+msgid "Overview"
 msgstr ""
 
-#. Description of the plugin
-#: player-management.php
-msgid "Manages players for InterSoccer events, integrating with WooCommerce My Account page and providing an admin dashboard."
+#: includes/admin-players.php:63
+#: includes/admin-players.php:64
+#: includes/class-player-list.php:148
+msgid "All Players"
 msgstr ""
 
-#. Author of the plugin
-#: player-management.php
-msgid "Jeremy Lee"
+#: includes/admin-players.php:72
+#: includes/admin-players.php:73
+msgid "Advanced"
 msgstr ""
 
-#. Author URI of the plugin
-#: player-management.php
-msgid "https://underdogunlimited.com"
+#: includes/admin-players.php:81
+#: includes/admin-players.php:82
+#: player-management.php:530
+msgid "Settings"
 msgstr ""
 
-#: elementoridgets/player-management-link-widget.php:21
-msgid "Player Management Link"
-msgstr "Link zur Teilnehmerverwaltung"
-
-#: elementoridgets/player-management-link-widget.php:49
-msgid "Content Settings"
+#: includes/admin-players.php:107
+msgid "Players per page"
 msgstr ""
 
-#: elementoridgets/player-management-link-widget.php:57
-msgid "Display Type"
-msgstr ""
-
-#: elementoridgets/player-management-link-widget.php:60
-msgid "Icon + Text"
-msgstr "Symbol + Text"
-
-#: elementoridgets/player-management-link-widget.php:61
-msgid "Icon Only"
-msgstr "Nur Symbol"
-
-#: elementoridgets/player-management-link-widget.php:62
-msgid "Text Only"
-msgstr "Nur Text"
-
-#: elementoridgets/player-management-link-widget.php:71
-msgid "Icon"
-msgstr ""
-
-#: elementoridgets/player-management-link-widget.php:86
-msgid "Link Text"
-msgstr "Linktext"
-
-#: elementoridgets/player-management-link-widget.php:98
-msgid "Enable Shepherd.js Tour"
-msgstr ""
-
-#: elementoridgets/player-management-link-widget.php:100
-#: elementoridgets/player-management-link-widget.php:113
-msgid "Yes"
-msgstr "Ja"
-
-#: elementoridgets/player-management-link-widget.php:101
-#: elementoridgets/player-management-link-widget.php:114
-msgid "No"
-msgstr "Nein"
-
-#: elementoridgets/player-management-link-widget.php:104
-msgid "Show guided tour for users without registered players"
-msgstr ""
-
-#: elementoridgets/player-management-link-widget.php:111
-msgid "Auto-start Tour"
-msgstr "Tour automatisch starten"
-
-#: elementoridgets/player-management-link-widget.php:126
-msgid "Tour Delay (seconds)"
-msgstr ""
-
-#: elementoridgets/player-management-link-widget.php:145
-msgid "Style"
-msgstr ""
-
-#: elementoridgets/player-management-link-widget.php:153
-msgid "Icon Size"
-msgstr ""
-
-#: elementoridgets/player-management-link-widget.php:184
-msgid "Icon Color"
-msgstr ""
-
-#: elementoridgets/player-management-link-widget.php:227
-msgid "Alignment"
-msgstr ""
-
-#: elementoridgets/player-management-link-widget.php:231
-msgid "Left"
-msgstr "Links"
-
-#: elementoridgets/player-management-link-widget.php:235
-msgid "Center"
-msgstr "Mitte"
-
-#: elementoridgets/player-management-link-widget.php:239
-msgid "Right"
-msgstr "Rechts"
-
-#: elementoridgets/player-management-link-widget.php:253
-msgid "Icon-Text Spacing"
-msgstr ""
-
-#: elementoridgets/player-management-link-widget.php:473
-msgid "Register Your Players"
-msgstr "Teilnehmer registrieren"
-
-#: elementoridgets/player-management-link-widget.php:474
-msgid "Before you can register for camps and courses, you need to add at least one player (attendee) to your account."
-msgstr "Bevor Sie Camps oder Kurse buchen können, müssen Sie mindestens einen Teilnehmer zu Ihrem Konto hinzufügen."
-
-#: elementoridgets/player-management-link-widget.php:475
-msgid "Click here to manage your players and add your first attendee."
-msgstr "Klicken Sie hier, um Ihre Teilnehmer zu verwalten und den ersten Teilnehmer hinzuzufügen."
-
-#: elementoridgets/player-management-link-widget.php:476
-msgid "Click this link to get started!"
-msgstr "Klicken Sie auf diesen Link, um zu starten!"
-
-#: elementoridgets/player-management-link-widget.php:477
-msgid "Don't show again"
-msgstr "Nicht mehr anzeigen"
-
-#: elementoridgets/player-management-link-widget.php:479
-msgid "Back"
-msgstr "Zurück"
-
-#: elementoridgets/player-management-link-widget.php:480
-msgid "Got it!"
-msgstr "Verstanden!"
-
-#: includes/account-dashboard.php:159
-msgid "Add your participants below, then book a camp or course."
-msgstr "Fügen Sie unten Ihre Teilnehmer hinzu und buchen Sie anschliessend ein Camp oder einen Kurs."
-
-#: includes/admin-advanced.php:331
-msgid "Player ID backfill is unavailable. Update Player Management plugin."
-msgstr ""
-
-#: includes/admin-advanced.php:341
-#, php-format
-msgid "Player ID backfill batch complete: %1$d users processed, %2$d users updated, %3$d players assigned UUIDs."
-msgstr ""
-
-#: includes/admin-advanced.php:348
-#, php-format
-msgid "More users remain — run again with offset %d or submit another batch."
-msgstr ""
-
-#: includes/admin-advanced.php:362
-#: includes/admin-advanced.php:390
-msgid "Invalid file type. Only CSV files are allowed."
-msgstr ""
-
-#: includes/admin-advanced.php:598
-msgid "🆔 Backfill Player IDs"
-msgstr ""
-
-#: includes/admin-advanced.php:599
-msgid "Assign stable UUID player_id values to existing player rows missing them. Run before order meta backfill in Product Variations."
-msgstr ""
-
-#: includes/admin-advanced.php:605
-msgid "Last run:"
-msgstr ""
-
-#: includes/admin-advanced.php:607
-#, php-format
-msgid "Processed %1$d users, updated %2$d users, %3$d players."
-msgstr ""
-
-#: includes/admin-advanced.php:616
-msgid "Batch size"
-msgstr ""
-
-#: includes/admin-advanced.php:618
-msgid "Offset"
-msgstr ""
-
-#: includes/admin-advanced.php:621
-msgid "Backfill Player IDs"
+#: includes/admin-players.php:135
+#: includes/class-player-list.php:30
+msgid "You do not have sufficient permissions to access this page."
 msgstr ""
 
 #: includes/admin-players.php:161
@@ -1043,6 +686,11 @@ msgstr "Alle Pflichtfelder müssen ausgefüllt sein"
 msgid "Player name contains invalid characters."
 msgstr "Der Teilnehmername enthält ungültige Zeichen."
 
+#: includes/ajax-handlers.php:75
+#: includes/ajax-handlers.php:178
+msgid "Invalid gender selection."
+msgstr "Ungültige Geschlechtsauswahl."
+
 #: includes/ajax-handlers.php:79
 #: includes/ajax-handlers.php:182
 msgid "Invalid date of birth format"
@@ -1099,6 +747,12 @@ msgstr "Teilnehmer erfolgreich gelöscht"
 msgid "Failed to delete player"
 msgstr "Teilnehmer konnte nicht gelöscht werden"
 
+#: includes/class-elementor-integration.php:85
+#: includes/player-management.php:578
+#: includes/user-profile-players.php:91
+msgid "InterSoccer Players"
+msgstr "InterSoccer-Teilnehmer"
+
 #: includes/class-player-list.php:159
 #: includes/class-player-management-admin.php:407
 msgid "Nurture queue: Overview filter “Never booked (lifetime)”. Prioritize parents of players with 0 events — use Events column = 0 and export for outreach."
@@ -1123,18 +777,192 @@ msgstr ""
 msgid "Search by player name, parent name/email, AVS..."
 msgstr ""
 
+#: includes/class-player-list.php:191
+msgid "Search"
+msgstr ""
+
+#: includes/class-player-list.php:197
+msgid "Clear Search"
+msgstr ""
+
+#: includes/class-player-list.php:205
+msgid "Showing:"
+msgstr ""
+
+msgid "Page %d of %d | %d players on this page | %d total items | %d users without players"
+msgstr ""
+
+#: includes/class-player-list.php:215
+msgid "Search results for:"
+msgstr ""
+
+#: includes/class-player-list.php:222
+msgid "Players on Page"
+msgstr ""
+
+#: includes/class-player-list.php:226
+msgid "Male (Page)"
+msgstr ""
+
+#: includes/class-player-list.php:230
+msgid "Female (Page)"
+msgstr ""
+
+#: includes/class-player-list.php:234
+msgid "Total Pages"
+msgstr ""
+
+#: includes/class-player-list.php:247
+#: includes/class-player-list.php:272
+#: includes/class-player-list.php:477
+#: includes/player-management.php:370
+#: includes/player-management.php:427
+msgid "Name"
+msgstr "Name"
+
+#: includes/class-player-list.php:248
+#: includes/class-player-list.php:275
+#: includes/player-management.php:260
+#: includes/player-management.php:586
+#: includes/user-profile-players.php:99
+msgid "DOB"
+msgstr "Geburtsdatum"
+
+#: includes/class-player-list.php:249
+#: includes/class-player-list.php:281
+#: includes/class-player-list.php:480
+msgid "Parent"
+msgstr ""
+
+#: includes/class-player-list.php:250
+#: includes/class-player-list.php:287
+#: includes/class-player-list.php:355
+#: includes/class-player-list.php:479
+#: includes/player-management.php:261
+#: includes/player-management.php:587
+#: includes/player-management.php:650
+#: includes/user-profile-players.php:100
+#: includes/user-profile-players.php:170
+msgid "Gender"
+msgstr "Geschlecht"
+
+#: includes/class-player-list.php:251
+#: includes/class-player-list.php:290
+#: includes/player-management.php:367
+#: includes/player-management.php:424
+msgid "Canton"
+msgstr "Kanton"
+
 #: includes/class-player-list.php:252
 #: includes/class-player-list.php:296
 msgid "Medical/Dietary"
+msgstr ""
+
+#: includes/class-player-list.php:253
+#: includes/class-player-list.php:308
+#: includes/data-deletion.php:108
+#: includes/player-management.php:264
+#: includes/player-management.php:590
+#: includes/user-profile-players.php:104
+msgid "Actions"
+msgstr "Aktionen"
+
+#: includes/class-player-list.php:261
+msgid "No players found matching your search."
+msgstr ""
+
+#: includes/class-player-list.php:263
+msgid "No players found on this page."
 msgstr ""
 
 #: includes/class-player-list.php:278
 msgid "years"
 msgstr ""
 
+#: includes/class-player-list.php:313
+msgid "View"
+msgstr ""
+
+#: includes/class-player-list.php:319
+#: includes/player-management.php:462
+#: includes/player-management.php:613
+#: includes/user-profile-players.php:143
+msgid "Edit"
+msgstr "Bearbeiten"
+
 #: includes/class-player-list.php:333
 msgid "Close"
 msgstr ""
+
+#: includes/class-player-list.php:334
+#: includes/class-player-list.php:485
+msgid "Player Details"
+msgstr ""
+
+#: includes/class-player-list.php:336
+msgid "Loading..."
+msgstr ""
+
+#: includes/class-player-list.php:343
+#: includes/player-management.php:258
+#: includes/player-management.php:584
+#: includes/player-management.php:624
+#: includes/user-profile-players.php:97
+#: includes/user-profile-players.php:155
+msgid "First Name"
+msgstr "Vorname"
+
+#: includes/class-player-list.php:347
+#: includes/player-management.php:259
+#: includes/player-management.php:585
+#: includes/player-management.php:629
+#: includes/user-profile-players.php:98
+#: includes/user-profile-players.php:160
+msgid "Last Name"
+msgstr "Nachname"
+
+#: includes/class-player-list.php:351
+#: includes/class-player-list.php:478
+#: includes/player-management.php:486
+#: includes/player-management.php:634
+#: includes/user-profile-players.php:165
+msgid "Date of Birth"
+msgstr "Geburtsdatum"
+
+#: includes/class-player-list.php:357
+#: includes/class-player-list.php:505
+#: includes/player-management.php:25
+#: includes/player-management.php:496
+#: includes/player-management.php:653
+#: includes/user-profile-players.php:173
+msgid "Male"
+msgstr "Junge"
+
+#: includes/class-player-list.php:358
+#: includes/class-player-list.php:506
+#: includes/player-management.php:27
+#: includes/player-management.php:497
+#: includes/player-management.php:654
+#: includes/user-profile-players.php:174
+msgid "Female"
+msgstr "Mädchen"
+
+#: includes/class-player-list.php:359
+#: includes/player-management.php:29
+#: includes/player-management.php:498
+#: includes/player-management.php:655
+#: includes/user-profile-players.php:175
+msgid "Other"
+msgstr "Andere"
+
+#: includes/class-player-list.php:363
+#: includes/player-management.php:262
+#: includes/player-management.php:588
+#: includes/player-management.php:660
+#: includes/user-profile-players.php:101
+#: includes/user-profile-players.php:180
+msgid "AVS Number"
+msgstr "AHV-Nummer"
 
 #: includes/class-player-list.php:367
 #: includes/class-player-list.php:482
@@ -1146,6 +974,14 @@ msgstr ""
 #: includes/class-player-list.php:567
 msgid "Save Changes"
 msgstr ""
+
+#: includes/class-player-list.php:372
+#: includes/player-management.php:522
+#: includes/player-management.php:523
+#: includes/player-management.php:672
+#: includes/user-profile-players.php:194
+msgid "Cancel"
+msgstr "Abbrechen"
 
 #: includes/class-player-list.php:481
 msgid "Location"
@@ -1171,8 +1007,16 @@ msgstr ""
 msgid "Network error. Please try again."
 msgstr ""
 
+#: includes/class-player-list.php:599
+msgid "Previous"
+msgstr ""
+
 #: includes/class-player-list.php:934
 msgid "Invalid security token"
+msgstr ""
+
+#: includes/class-player-list.php:938
+msgid "Unauthorized"
 msgstr ""
 
 #: includes/class-player-overview.php:222
@@ -1189,9 +1033,94 @@ msgstr ""
 msgid "Participants"
 msgstr ""
 
+#: includes/data-deletion.php:15
+msgid "Please log in to request data deletion."
+msgstr "Bitte melden Sie sich an, um die Löschung Ihrer Daten zu beantragen."
+
+#: includes/data-deletion.php:21
+msgid "Request Data Deletion"
+msgstr "Datenlöschung beantragen"
+
+#: includes/data-deletion.php:25
+msgid "Reason for Deletion (optional):"
+msgstr "Grund für die Löschung (optional):"
+
+#: includes/data-deletion.php:29
+msgid "Submit Request"
+msgstr "Anfrage senden"
+
+#: includes/data-deletion.php:51
+msgid "New Data Deletion Request"
+msgstr ""
+
+msgid "A user (ID: %d) has requested data deletion. Reason: %s. Review in admin."
+msgstr ""
+
+#: includes/data-deletion.php:54
+msgid "Your request has been submitted."
+msgstr "Ihre Anfrage wurde gesendet."
+
+#: includes/data-deletion.php:65
+#: includes/data-deletion.php:102
+msgid "Data Deletion Requests"
+msgstr ""
+
+#: includes/data-deletion.php:66
+msgid "Data Deletion"
+msgstr "Datenlöschung"
+
+#: includes/data-deletion.php:90
+msgid "User data deleted."
+msgstr ""
+
+#: includes/data-deletion.php:106
+#: includes/player-management.php:366
+#: includes/player-management.php:419
+msgid "User ID"
+msgstr "Benutzer-ID"
+
+#: includes/data-deletion.php:107
+msgid "Reason"
+msgstr ""
+
+#: includes/data-deletion.php:121
+msgid "Process"
+msgstr ""
+
+#: includes/player-management.php:226
+msgid "Please log in to manage your Attendees."
+msgstr "Bitte melden Sie sich an, um Ihre Teilnehmer zu verwalten."
+
+#: includes/player-management.php:234
+msgid "Error: Unable to load user data."
+msgstr "Fehler: Benutzerdaten konnten nicht geladen werden."
+
+#: includes/player-management.php:263
+#: includes/user-profile-players.php:103
+msgid "Events"
+msgstr "Events"
+
+#: includes/player-management.php:265
+msgid "Manage All Players"
+msgstr ""
+
+#: includes/player-management.php:265
+#: player-management.php:315
+msgid "Manage Your Attendees"
+msgstr "Verwalten Sie Ihre Teilnehmer"
+
 #: includes/player-management.php:338
 msgid "Attendee Management Dashboard"
 msgstr "Teilnehmer-Verwaltung"
+
+msgid "Total Players: %d"
+msgstr "Teilnehmer gesamt: %d"
+
+#: includes/player-management.php:355
+#: includes/player-management.php:580
+#: includes/user-profile-players.php:93
+msgid "Add New Player"
+msgstr "Neuen Teilnehmer hinzufügen"
 
 #: includes/player-management.php:356
 msgid "Add"
@@ -1204,6 +1133,16 @@ msgstr "Teilnehmerliste"
 #: includes/player-management.php:362
 msgid "List of attendees"
 msgstr "Liste der Teilnehmer"
+
+#: includes/player-management.php:368
+#: includes/player-management.php:425
+msgid "City"
+msgstr "Ort"
+
+#: includes/player-management.php:385
+#: includes/player-management.php:442
+msgid "Creation Date"
+msgstr "Erstellungsdatum"
 
 #: includes/player-management.php:386
 #: includes/player-management.php:443
@@ -1234,6 +1173,12 @@ msgstr "Teilnehmer bearbeiten"
 msgid "Select Gender"
 msgstr "Geschlecht wählen"
 
+#: includes/player-management.php:507
+#: includes/player-management.php:662
+#: includes/user-profile-players.php:182
+msgid "No AVS? Enter foreign insurance number or \"0000\" and email us the insurance details."
+msgstr "Keine AHV? Geben Sie die ausländische Versicherungsnummer oder «0000» ein und senden Sie uns die Angaben per E-Mail."
+
 #: includes/player-management.php:512
 msgid "Medical Conditions, Dietary Restrictions, and Allergies:"
 msgstr "Medizinische Angaben, Ernährungsbeschränkungen und Allergien:"
@@ -1242,10 +1187,25 @@ msgstr "Medizinische Angaben, Ernährungsbeschränkungen und Allergien:"
 msgid "Optional field for medical conditions, dietary restrictions, and allergies."
 msgstr "Optionales Feld für medizinische Angaben, Ernährungsbeschränkungen und Allergien."
 
+#: includes/player-management.php:518
+msgid "Save Player"
+msgstr "Teilnehmer speichern"
+
+#: includes/player-management.php:519
+#: includes/player-management.php:671
+#: includes/user-profile-players.php:193
+msgid "Save"
+msgstr "Speichern"
+
 #: includes/player-management.php:595
 #: includes/user-profile-players.php:109
 msgid "No players added yet."
 msgstr "Noch keine Teilnehmer hinzugefügt."
+
+#: includes/player-management.php:614
+#: includes/user-profile-players.php:144
+msgid "Delete"
+msgstr "Löschen"
 
 #: includes/player-management.php:636
 msgid "Day"
@@ -1263,6 +1223,10 @@ msgstr "Jahr"
 #: includes/user-profile-players.php:172
 msgid "Select"
 msgstr "Auswählen"
+
+#: includes/player-management.php:690
+msgid "Assigned Attendee"
+msgstr "Zugewiesener Teilnehmer"
 
 #: includes/privacy-admin-notice.php:91
 msgid "Medical and date-of-birth access roles are not configured yet. Staff access will follow legacy rules until you save the medical roles setting."
@@ -1291,14 +1255,15 @@ msgstr ""
 msgid "Refresh"
 msgstr ""
 
-#. translators: %s: generation datetime
-#: includes/templates/overview-template.php:142
-#, php-format
 msgid "Updated %s"
 msgstr ""
 
 #: includes/templates/overview-template.php:149
 msgid "Partial data — see notice below."
+msgstr ""
+
+#: includes/templates/overview-template.php:156
+msgid "Warning:"
 msgstr ""
 
 #: includes/templates/overview-template.php:157
@@ -1354,30 +1319,6 @@ msgstr ""
 msgid "No follow-ups right now."
 msgstr ""
 
-#. translators: %s: number of accounts
-#: includes/templates/overview-template.php:210
-#, php-format
-msgid "%s account with no participants."
-msgid_plural "%s accounts with no participants."
-msgstr[0] ""
-msgstr[1] ""
-
-#. translators: %s: number of participants
-#: includes/templates/overview-template.php:227
-#, php-format
-msgid "%s participant has never booked (lifetime)."
-msgid_plural "%s participants have never booked (lifetime)."
-msgstr[0] ""
-msgstr[1] ""
-
-#. translators: %s: number of participants
-#: includes/templates/overview-template.php:244
-#, php-format
-msgid "%s incomplete participant profile."
-msgid_plural "%s incomplete participant profiles."
-msgstr[0] ""
-msgstr[1] ""
-
 #: includes/templates/overview-template.php:261
 msgid "Participants by canton"
 msgstr ""
@@ -1394,9 +1335,17 @@ msgstr ""
 msgid "Users processed:"
 msgstr ""
 
+#: includes/templates/overview-template.php:280
+msgid "Method:"
+msgstr ""
+
 #: includes/templates/overview-template.php:283
 msgid "Cache key:"
 msgstr ""
+
+#: includes/user-profile-players.php:136
+msgid "View orders"
+msgstr "Bestellungen anzeigen"
 
 #: player-management.php:71
 msgid "Player Management requires WooCommerce to be installed and active."
@@ -1404,17 +1353,938 @@ msgstr ""
 
 #: player-management.php:207
 msgid "Player management functionality is not available."
+msgstr "Die Teilnehmerverwaltung ist nicht verfügbar."
+
+#: player-management.php:326
+msgid "Coach"
+msgstr ""
+
+#: player-management.php:329
+msgid "Organizer"
 msgstr ""
 
 #: player-management.php:555
 msgid "Player Management:"
-msgstr ""
+msgstr "Teilnehmerverwaltung:"
 
-#: player-management.php:555
-#, php-format
 msgid "Missing files detected: %s"
 msgstr ""
 
 #: player-management.php:564
 msgid "Player Management is already loaded from another plugin folder. Deactivate and delete the older versioned directory (e.g. player-management-plugin-2.6.3) before activating this copy."
 msgstr ""
+
+#: includes/class-player-management-admin.php:86
+#: includes/class-player-management-admin.php:87
+msgid "Dashboard"
+msgstr ""
+
+#: includes/class-player-management-admin.php:105
+#: includes/class-player-management-admin.php:106
+#: includes/class-player-management-admin.php:574
+msgid "Rosters & Export"
+msgstr ""
+
+#: includes/class-player-management-admin.php:135
+#: includes/class-player-management-admin.php:136
+msgid "Tools"
+msgstr ""
+
+#: includes/class-player-management-admin.php:209
+#: includes/frontend-i18n.php:31
+msgid "Are you sure you want to delete this player?"
+msgstr "Möchten Sie diesen Teilnehmer wirklich löschen?"
+
+#: includes/class-player-management-admin.php:210
+msgid "Are you sure you want to delete the selected players?"
+msgstr ""
+
+#: includes/class-player-management-admin.php:211
+msgid "Processing export..."
+msgstr ""
+
+#: includes/class-player-management-admin.php:212
+msgid "Export completed successfully!"
+msgstr ""
+
+#: includes/class-player-management-admin.php:213
+msgid "Export failed. Please try again."
+msgstr ""
+
+#: includes/class-player-management-admin.php:229
+msgid "InterSoccer Players Dashboard"
+msgstr ""
+
+#: includes/class-player-management-admin.php:234
+msgid "Total Players"
+msgstr ""
+
+#: includes/class-player-management-admin.php:239
+msgid "Recent Registrations"
+msgstr ""
+
+#: includes/class-player-management-admin.php:241
+msgid "Last 30 days"
+msgstr ""
+
+#: includes/class-player-management-admin.php:245
+msgid "Average Age"
+msgstr ""
+
+#: includes/class-player-management-admin.php:250
+msgid "Total Events"
+msgstr ""
+
+#: includes/class-player-management-admin.php:258
+msgid "Analytics"
+msgstr ""
+
+#: includes/class-player-management-admin.php:262
+msgid "Gender Distribution"
+msgstr ""
+
+#: includes/class-player-management-admin.php:267
+msgid "Events by Type"
+msgstr ""
+
+#: includes/class-player-management-admin.php:275
+msgid "Recent Players"
+msgstr ""
+
+#: includes/class-player-management-admin.php:278
+msgid "No recent players found."
+msgstr ""
+
+#: includes/class-player-management-admin.php:304
+msgid "Quick Actions"
+msgstr ""
+
+#: includes/class-player-management-admin.php:308
+msgid "Export Rosters"
+msgstr ""
+
+#: includes/class-player-management-admin.php:312
+msgid "View All Players"
+msgstr ""
+
+#: includes/class-player-management-admin.php:316
+msgid "Manage Events"
+msgstr ""
+
+#: includes/class-player-management-admin.php:423
+msgid "All Genders"
+msgstr ""
+
+#: includes/class-player-management-admin.php:430
+msgid "All Ages"
+msgstr ""
+
+#: includes/class-player-management-admin.php:431
+#: includes/class-elementor-widget-base.php:531
+msgid "3-5 years"
+msgstr ""
+
+#: includes/class-player-management-admin.php:432
+#: includes/class-elementor-widget-base.php:532
+msgid "6-8 years"
+msgstr ""
+
+#: includes/class-player-management-admin.php:433
+#: includes/class-elementor-widget-base.php:533
+msgid "9-12 years"
+msgstr ""
+
+#: includes/class-player-management-admin.php:434
+#: includes/class-elementor-widget-base.php:534
+msgid "13-18 years"
+msgstr ""
+
+#: includes/class-player-management-admin.php:437
+msgid "Search players..."
+msgstr ""
+
+#: includes/class-player-management-admin.php:438
+msgid "Reset"
+msgstr ""
+
+#: includes/class-player-management-admin.php:448
+#: includes/class-player-list-elementor-widget.php:110
+#: includes/class-elementor-widget-base.php:145
+msgid "Age"
+msgstr "Alter"
+
+#: includes/class-player-management-admin.php:452
+msgid "Registration Date"
+msgstr ""
+
+#: includes/class-player-management-admin.php:504
+msgid "Bulk Actions"
+msgstr ""
+
+#: includes/class-player-management-admin.php:505
+msgid "Delete Selected"
+msgstr ""
+
+#: includes/class-player-management-admin.php:506
+msgid "Export Selected"
+msgstr ""
+
+#: includes/class-player-management-admin.php:508
+msgid "Apply"
+msgstr ""
+
+#: includes/class-player-management-admin.php:548
+#: includes/class-player-list-elementor-widget.php:115
+msgid "Emergency Contact"
+msgstr "Notfallkontakt"
+
+#: includes/class-player-management-admin.php:552
+msgid "Emergency Phone"
+msgstr ""
+
+#: includes/class-player-management-admin.php:579
+msgid "Quick Export"
+msgstr ""
+
+#: includes/class-player-management-admin.php:582
+#: includes/class-player-management-admin.php:623
+msgid "Custom Export"
+msgstr ""
+
+#: includes/class-player-management-admin.php:585
+#: includes/class-player-management-admin.php:690
+msgid "Scheduled Exports"
+msgstr ""
+
+#: includes/class-player-management-admin.php:591
+msgid "Quick Export Options"
+msgstr ""
+
+#: includes/class-player-management-admin.php:592
+msgid "Export commonly requested roster formats:"
+msgstr ""
+
+#: includes/class-player-management-admin.php:596
+msgid "All Camps"
+msgstr ""
+
+#: includes/class-player-management-admin.php:597
+msgid "Export all camp rosters with player details."
+msgstr ""
+
+#: includes/class-player-management-admin.php:599
+msgid "Export Camps"
+msgstr ""
+
+#: includes/class-player-management-admin.php:604
+msgid "All Courses"
+msgstr ""
+
+#: includes/class-player-management-admin.php:605
+msgid "Export all course rosters with schedule details."
+msgstr ""
+
+#: includes/class-player-management-admin.php:607
+msgid "Export Courses"
+msgstr ""
+
+#: includes/class-player-management-admin.php:612
+msgid "Complete Roster"
+msgstr ""
+
+#: includes/class-player-management-admin.php:613
+msgid "Export all players and events in one comprehensive file."
+msgstr ""
+
+#: includes/class-player-management-admin.php:615
+msgid "Export All"
+msgstr ""
+
+#: includes/class-player-management-admin.php:628
+msgid "Activity Type"
+msgstr ""
+
+#: includes/class-player-management-admin.php:630
+#: includes/class-elementor-widget-base.php:544
+msgid "Camps"
+msgstr ""
+
+#: includes/class-player-management-admin.php:631
+#: includes/class-elementor-widget-base.php:545
+msgid "Courses"
+msgstr ""
+
+#: includes/class-player-management-admin.php:632
+#: includes/class-elementor-widget-base.php:546
+msgid "Birthday Parties"
+msgstr ""
+
+#: includes/class-player-management-admin.php:637
+msgid "Season"
+msgstr ""
+
+#: includes/class-player-management-admin.php:639
+msgid "All Seasons"
+msgstr ""
+
+#: includes/class-player-management-admin.php:640
+msgid "Spring 2025"
+msgstr ""
+
+#: includes/class-player-management-admin.php:641
+msgid "Summer 2025"
+msgstr ""
+
+#: includes/class-player-management-admin.php:642
+msgid "Autumn 2025"
+msgstr ""
+
+#: includes/class-player-management-admin.php:643
+msgid "Winter 2025"
+msgstr ""
+
+#: includes/class-player-management-admin.php:648
+msgid "Start Date"
+msgstr ""
+
+#: includes/class-player-management-admin.php:653
+msgid "End Date"
+msgstr ""
+
+#: includes/class-player-management-admin.php:658
+msgid "Venue"
+msgstr ""
+
+#: includes/class-player-management-admin.php:660
+msgid "All Venues"
+msgstr ""
+
+#: includes/class-player-management-admin.php:672
+msgid "Export Format"
+msgstr ""
+
+#: includes/class-player-management-admin.php:674
+msgid "CSV"
+msgstr ""
+
+#: includes/class-player-management-admin.php:675
+msgid "PDF"
+msgstr ""
+
+#: includes/class-player-management-admin.php:682
+msgid "Generate Custom Export"
+msgstr ""
+
+#: includes/class-player-management-admin.php:691
+msgid "Set up automatic exports that run on a schedule."
+msgstr ""
+
+#: includes/class-player-management-admin.php:692
+msgid "Coming soon..."
+msgstr ""
+
+#: includes/class-player-management-admin.php:698
+msgid "Export History"
+msgstr ""
+
+#: includes/class-player-management-admin.php:702
+msgid "Date"
+msgstr ""
+
+#: includes/class-player-management-admin.php:703
+msgid "Type"
+msgstr ""
+
+#: includes/class-player-management-admin.php:704
+msgid "Records"
+msgstr ""
+
+#: includes/class-player-management-admin.php:705
+msgid "Format"
+msgstr ""
+
+#: includes/class-player-management-admin.php:706
+msgid "User"
+msgstr ""
+
+#: includes/class-player-management-admin.php:716
+msgid "No export history found."
+msgstr ""
+
+#: includes/class-player-management-admin.php:729
+msgid "Download"
+msgstr ""
+
+#: includes/class-player-management-admin.php:732
+msgid "Expired"
+msgstr ""
+
+#: includes/class-player-management-admin.php:746
+msgid "Exporting Data"
+msgstr ""
+
+#: includes/class-player-management-admin.php:750
+msgid "Preparing export..."
+msgstr ""
+
+#: includes/class-player-management-admin.php:774
+#: includes/class-elementor-widget-base.php:619
+msgid "Not Specified"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:29
+msgid "Player List"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:47
+msgid "Content"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:55
+msgid "Title"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:57
+msgid "Our Players"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:58
+msgid "Enter widget title"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:65
+msgid "Show Title"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:67
+#: includes/class-player-list-elementor-widget.php:125
+#: includes/class-player-list-elementor-widget.php:137
+#: includes/class-elementor-widget-base.php:181
+msgid "Show"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:68
+#: includes/class-player-list-elementor-widget.php:126
+#: includes/class-player-list-elementor-widget.php:138
+#: includes/class-elementor-widget-base.php:182
+msgid "Hide"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:77
+msgid "Player Source"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:82
+msgid "Current User Players"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:83
+msgid "Specific User Players"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:84
+msgid "Recently Added"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:104
+msgid "Display Fields"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:113
+#: includes/class-elementor-widget-base.php:147
+msgid "Event Count"
+msgstr "Anzahl Events"
+
+#: includes/class-player-list-elementor-widget.php:123
+msgid "Show Avatar"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:135
+msgid "Show Action Buttons"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:153
+msgid "Age Filters"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:161
+msgid "Minimum Age"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:172
+msgid "Maximum Age"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:183
+msgid "Gender Filter"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:187
+#: includes/class-player-list-elementor-widget.php:418
+#: includes/class-elementor-widget-base.php:518
+#: includes/class-elementor-widget-base.php:530
+#: includes/class-elementor-widget-base.php:543
+msgid "All"
+msgstr "Alle"
+
+#: includes/class-player-list-elementor-widget.php:188
+msgid "Male Only"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:189
+msgid "Female Only"
+msgstr ""
+
+#: includes/class-player-list-elementor-widget.php:213
+msgid "No players found matching your criteria."
+msgstr "Keine Teilnehmer entsprechen Ihren Kriterien."
+
+#: includes/class-player-list-elementor-widget.php:325
+#: includes/class-player-list-elementor-widget.php:443
+msgid "Age:"
+msgstr "Alter:"
+
+#: includes/class-player-list-elementor-widget.php:332
+#: includes/class-player-list-elementor-widget.php:416
+#: includes/class-player-list-elementor-widget.php:450
+#: includes/class-elementor-widget-base.php:516
+msgid "Gender:"
+msgstr "Geschlecht:"
+
+#: includes/class-player-list-elementor-widget.php:339
+msgid "Date of Birth:"
+msgstr "Geburtsdatum:"
+
+#: includes/class-player-list-elementor-widget.php:346
+#: includes/class-player-list-elementor-widget.php:457
+msgid "Events:"
+msgstr "Events:"
+
+#: includes/class-player-list-elementor-widget.php:353
+msgid "Medical:"
+msgstr "Medizinisch:"
+
+#: includes/class-player-list-elementor-widget.php:360
+msgid "Emergency Contact:"
+msgstr "Notfallkontakt:"
+
+#: includes/frontend-i18n.php:18
+msgid "Edit player %s"
+msgstr "Teilnehmer %s bearbeiten"
+
+#: includes/frontend-i18n.php:19
+msgid "Delete player %s"
+msgstr "Teilnehmer %s löschen"
+
+#: includes/frontend-i18n.php:21
+msgid "Cancel Edit"
+msgstr "Bearbeitung abbrechen"
+
+#: includes/frontend-i18n.php:23
+msgid "First name, last name, date of birth, and gender are required."
+msgstr "Vorname, Nachname, Geburtsdatum und Geschlecht sind Pflichtfelder."
+
+#: includes/frontend-i18n.php:24
+msgid "Invalid date of birth format. Use YYYY-MM-DD."
+msgstr "Ungültiges Geburtsdatumsformat. Verwenden Sie JJJJ-MM-TT."
+
+#: includes/frontend-i18n.php:25
+msgid "Player updated successfully."
+msgstr "Teilnehmer erfolgreich aktualisiert."
+
+#: includes/frontend-i18n.php:26
+msgid "Player added successfully."
+msgstr "Teilnehmer erfolgreich hinzugefügt."
+
+#: includes/frontend-i18n.php:27
+msgid "Error saving player."
+msgstr "Fehler beim Speichern des Teilnehmers."
+
+#: includes/frontend-i18n.php:28
+msgid "Error saving player: %s"
+msgstr "Fehler beim Speichern des Teilnehmers: %s"
+
+#: includes/frontend-i18n.php:29
+msgid "Error: Could not load player data for editing."
+msgstr "Fehler: Teilnehmerdaten konnten nicht zum Bearbeiten geladen werden."
+
+#: includes/frontend-i18n.php:30
+msgid "Edit canceled."
+msgstr "Bearbeitung abgebrochen."
+
+#: includes/frontend-i18n.php:32
+msgid "Failed to delete player."
+msgstr "Teilnehmer konnte nicht gelöscht werden."
+
+#: includes/frontend-i18n.php:33
+msgid "Error: Failed to refresh security token."
+msgstr "Fehler: Sicherheitstoken konnte nicht aktualisiert werden."
+
+#: includes/frontend-i18n.php:34
+msgid "Error: Unable to delete player - %s"
+msgstr "Fehler: Teilnehmer konnte nicht gelöscht werden – %s"
+
+#: includes/frontend-i18n.php:35
+msgid "Add player canceled."
+msgstr "Hinzufügen des Teilnehmers abgebrochen."
+
+#: includes/frontend-i18n.php:36
+msgid "Unknown error"
+msgstr "Unbekannter Fehler"
+
+#: includes/class-validator.php:34
+msgid "First name is required."
+msgstr ""
+
+#: includes/class-validator.php:36
+msgid "First name contains invalid characters."
+msgstr ""
+
+#: includes/class-validator.php:41
+msgid "Last name is required."
+msgstr ""
+
+#: includes/class-validator.php:43
+msgid "Last name contains invalid characters."
+msgstr ""
+
+#: includes/class-validator.php:48
+msgid "Date of birth is required."
+msgstr ""
+
+#: includes/class-validator.php:50
+msgid "Invalid date of birth format."
+msgstr ""
+
+#: includes/class-validator.php:52
+msgid "Player age is not within acceptable range."
+msgstr ""
+
+#: includes/class-validator.php:57
+msgid "Gender is required."
+msgstr ""
+
+#: includes/class-validator.php:64
+msgid "City contains invalid characters."
+msgstr ""
+
+#: includes/class-validator.php:67
+msgid "Canton contains invalid characters."
+msgstr ""
+
+#: includes/class-validator.php:72
+msgid "Invalid AVS number format."
+msgstr ""
+
+#: includes/class-validator.php:94
+msgid "Activity type is required."
+msgstr ""
+
+#: includes/class-validator.php:96
+msgid "Invalid activity type."
+msgstr ""
+
+#: includes/class-validator.php:101
+msgid "Invalid start date format."
+msgstr ""
+
+#: includes/class-validator.php:105
+msgid "Invalid end date format."
+msgstr ""
+
+#: includes/class-validator.php:111
+msgid "End date must be after start date."
+msgstr ""
+
+#: includes/class-validator.php:117
+msgid "Venue name is too long."
+msgstr ""
+
+#: includes/class-validator.php:134
+msgid "Email address is required."
+msgstr ""
+
+#: includes/class-validator.php:136
+msgid "Invalid email address format."
+msgstr ""
+
+#: includes/class-validator.php:138
+msgid "Email address is already registered."
+msgstr ""
+
+#: includes/class-validator.php:143
+msgid "Invalid phone number format."
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:66
+msgid "Layout"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:74
+msgid "Columns"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:90
+msgid "Gap"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:121
+msgid "Query"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:129
+msgid "Limit"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:140
+msgid "Order By"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:146
+msgid "Created Date"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:155
+msgid "Order"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:159
+msgid "Ascending"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:160
+msgid "Descending"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:171
+msgid "Filters"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:179
+msgid "Show Filters"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:191
+msgid "Filter by Age"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:204
+msgid "Filter by Gender"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:217
+msgid "Filter by Activity Type"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:238
+msgid "Card Style"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:246
+#: includes/class-elementor-widget-base.php:385
+#: includes/class-elementor-widget-base.php:417
+msgid "Background Color"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:259
+#: includes/class-elementor-widget-base.php:443
+msgid "Border"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:267
+#: includes/class-elementor-widget-base.php:451
+msgid "Border Radius"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:280
+msgid "Box Shadow"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:288
+#: includes/class-elementor-widget-base.php:463
+msgid "Padding"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:303
+#: includes/class-elementor-widget-base.php:433
+msgid "Typography"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:312
+msgid "Title Typography"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:320
+msgid "Title Color"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:333
+msgid "Content Typography"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:341
+msgid "Content Color"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:356
+msgid "Button Style"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:366
+msgid "Normal"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:399
+msgid "Hover"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:528
+msgid "Age Group:"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:541
+msgid "Activity:"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:553
+msgid "Reset Filters"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:577
+msgid "No data found."
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:629
+msgid "Camp"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:631
+msgid "Course"
+msgstr ""
+
+#: includes/class-elementor-widget-base.php:633
+msgid "Birthday Party"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:98
+msgid "Players Overview Dashboard"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:101
+msgid "Refresh Data"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:107
+msgid "Data Status:"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:108
+msgid "Generated:"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:109
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:185
+msgid "Users Processed:"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:112
+msgid "Error:"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:114
+msgid "Data cached for 30 minutes."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:120
+msgid "The overview data could not be fully generated due to an error. Showing partial or fallback data."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:121
+msgid "Please check the debug logs or try refreshing the data."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:134
+msgid "Users Without Players"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:140
+msgid "Assigned vs Unassigned"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:149
+msgid "Gender Breakdown"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:158
+msgid "Players by Canton"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:167
+msgid "Top 5 Cantons"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:179
+msgid "Debug Information"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:183
+msgid "Memory Peak:"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:184
+msgid "Total Players:"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:186
+msgid "Processing Method:"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/templates/overview-template.php:187
+msgid "Cache Key:"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list-elementor-widget.php:114
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:525
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:230
+msgid "Medical Conditions"
+msgstr "Medizinische Angaben"
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-management-admin.php:529
+msgid "Dietary Requirements"
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-list.php:166
+msgid "Search by name, email, or AVS number..."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/includes/class-player-elementor-manager.php:128
+msgid "An error occurred. Please try again."
+msgstr ""
+
+#: /home/jeremy-lee/projects/underdog/intersoccer/player-management/vendor/deliciousbrains/wp-background-processing/classes/wp-background-process.php:777
+msgid "Every Minute"
+msgstr ""
+
+msgid "Every %d Minutes"
+msgstr ""
+
+#: includes/player-management.php
+msgid "Add Player"
+msgstr "Teilnehmer hinzufügen"
+
+#: includes/player-management.php
+msgid "Add Attendee"
+msgstr "Teilnehmer hinzufügen"
+
+#: includes/player-management.php
+msgid "No players registered."
+msgstr "Keine Teilnehmer registriert."
+
+#: includes/player-management.php
+msgid "No players found."
+msgstr "Keine Teilnehmer gefunden."
+
+#: includes/player-management.php:382
+msgid "Medical Conditions:"
+msgstr "Medizinische Angaben:"
+
