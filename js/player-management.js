@@ -24,6 +24,13 @@
         return template.replace("%s", value);
     }
 
+    function pmAjaxData(data) {
+        if (typeof window.intersoccerPmAjaxData === "function") {
+            return window.intersoccerPmAjaxData(data);
+        }
+        return data;
+    }
+
     function playerActionLinks(index, userId, firstName) {
         const editLabel = pmFmt("edit_player_aria", "Edit player %s", firstName);
         const deleteLabel = pmFmt("delete_player_aria", "Delete player %s", firstName);
@@ -97,7 +104,7 @@
             $.ajax({
                 url: intersoccerPlayer.nonce_refresh_url,
                 type: "POST",
-                data: { action: "intersoccer_refresh_nonce" },
+                data: pmAjaxData({ action: "intersoccer_refresh_nonce" }),
                 success: (response) => {
                     if (debugEnabled) console.log("InterSoccer: Nonce refresh response:", JSON.stringify(response));
                     if (response.success && response.data.nonce) {
@@ -272,7 +279,7 @@
             $.ajax({
                 url: intersoccerPlayer.ajax_url,
                 type: "POST",
-                data: ajaxData,
+                data: pmAjaxData(ajaxData),
                 contentType: "application/x-www-form-urlencoded; charset=UTF-8",
                 success: function (response) {
                     if (debugEnabled) console.log("InterSoccer: Save player response:", JSON.stringify(response));
@@ -498,12 +505,12 @@
         $.ajax({
             url: intersoccerPlayer.ajax_url,
             type: "POST",
-            data: {
+            data: pmAjaxData({
                 action: "intersoccer_delete_player",
                 nonce: intersoccerPlayer.nonce,
                 user_id: userId,
                 player_index: index
-            },
+            }),
             success: (response) => {
                 if (response.success) {
                     $row.remove();

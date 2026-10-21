@@ -32,6 +32,14 @@
     return;
   }
 
+  window.intersoccerPmAjaxData = function (data) {
+    const payload = Object.assign({}, data || {});
+    if (intersoccerPlayer && intersoccerPlayer.lang) {
+      payload.lang = intersoccerPlayer.lang;
+    }
+    return payload;
+  };
+
   // Validation moved to player-management.js for consolidation
   // Use window.intersoccerValidateRow from there
 
@@ -81,7 +89,7 @@
       $.ajax({
         url: intersoccerPlayer.nonce_refresh_url,
         type: "POST",
-        data: { action: "intersoccer_refresh_nonce" },
+        data: window.intersoccerPmAjaxData({ action: "intersoccer_refresh_nonce" }),
         success: (response) => {
           if (response.success && response.data.nonce) {
             intersoccerPlayer.nonce = response.data.nonce;

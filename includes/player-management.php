@@ -553,16 +553,14 @@ function intersoccer_render_user_profile_players($user) {
     }
 
     // Localize script for user profile
-    $localize_data = [
-        'ajax_url' => admin_url('admin-ajax.php'),
+    $localize_data = array_merge(intersoccer_pm_customer_script_localize_base(false), [
         'nonce' => wp_create_nonce('intersoccer_player_nonce'),
         'user_id' => $user->ID,
         'is_admin' => '1',
-        'nonce_refresh_url' => admin_url('admin-ajax.php?action=intersoccer_refresh_nonce'),
         'debug' => defined('WP_DEBUG') && WP_DEBUG ? '1' : '0',
         'preload_players' => $players,
         'server_time' => current_time('mysql'),
-    ];
+    ]);
     if (defined('WP_DEBUG') && WP_DEBUG) {
         error_log('InterSoccer: Localizing intersoccerPlayer data for user profile, user: ' . $user->ID . ', player count: ' . count($players));
     }

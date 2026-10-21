@@ -208,6 +208,20 @@ if (!function_exists('admin_url')) {
     }
 }
 
+if (!function_exists('add_query_arg')) {
+    function add_query_arg($args, $url = '') {
+        if (is_array($args)) {
+            $query = http_build_query($args, '', '&', PHP_QUERY_RFC3986);
+            if ($url === '') {
+                return '?' . $query;
+            }
+            $separator = strpos($url, '?') === false ? '?' : '&';
+            return $url . $separator . $query;
+        }
+        return $url;
+    }
+}
+
 if (!function_exists('wp_login_url')) {
     function wp_login_url($redirect = '') {
         $url = 'https://example.com/wp-login.php';
