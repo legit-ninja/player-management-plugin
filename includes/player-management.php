@@ -683,9 +683,27 @@ function intersoccer_render_user_profile_players($user) {
  * See: player-management.php lines 141-175
  */
 
+/**
+ * True when the item's formatted (customer-visible) meta already contains the Assigned Attendee row.
+ */
+function intersoccer_order_item_meta_already_lists_attendee( $item ) {
+    if ( ! is_object( $item ) || ! method_exists( $item, 'get_formatted_meta_data' ) ) {
+        return false;
+    }
+    foreach ( (array) $item->get_formatted_meta_data() as $meta ) {
+        if ( is_object( $meta ) && isset( $meta->key ) && $meta->key === 'Assigned Attendee' ) {
+            return true;
+        }
+    }
+    return false;
+}
+
 // Display assigned attendee in frontend order details (My Account > Orders)
 function intersoccer_display_order_item_attendee( $item_id, $item, $order, $plain_text = false ) {
     $attendee = $item->get_meta( 'Assigned Attendee' );
+    if ( $attendee && intersoccer_order_item_meta_already_lists_attendee( $item ) ) {
+        return; // WooCommerce already prints the visible 'Assigned Attendee' meta row.
+    }
     if ( $attendee ) {
         echo '<p><strong>' . esc_html__( 'Assigned Attendee', 'player-management' ) . ':</strong> ' . esc_html( $attendee ) . '</p>';
     }
