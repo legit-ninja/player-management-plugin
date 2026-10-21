@@ -395,6 +395,18 @@ if (!function_exists('is_admin')) {
     }
 }
 
+if (!function_exists('wp_doing_ajax')) {
+    function wp_doing_ajax() {
+        return !empty($GLOBALS['wp_stub_doing_ajax']);
+    }
+}
+
+if (!function_exists('is_locale_switched')) {
+    function is_locale_switched() {
+        return !empty($GLOBALS['wp_stub_locale_switched']);
+    }
+}
+
 if (!class_exists('WPSendJsonExit', false)) {
     class WPSendJsonExit extends Exception {
     }
