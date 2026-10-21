@@ -1746,7 +1746,7 @@ msgstr ""
 
 #: includes/class-player-list-elementor-widget.php:57
 msgid "Our Players"
-msgstr ""
+msgstr "Nos participants"
 
 #: includes/class-player-list-elementor-widget.php:58
 msgid "Enter widget title"
@@ -1934,87 +1934,87 @@ msgstr "Erreur inconnue"
 
 #: includes/class-validator.php:34
 msgid "First name is required."
-msgstr ""
+msgstr "Le prénom est obligatoire."
 
 #: includes/class-validator.php:36
 msgid "First name contains invalid characters."
-msgstr ""
+msgstr "Le prénom contient des caractères non valides."
 
 #: includes/class-validator.php:41
 msgid "Last name is required."
-msgstr ""
+msgstr "Le nom est obligatoire."
 
 #: includes/class-validator.php:43
 msgid "Last name contains invalid characters."
-msgstr ""
+msgstr "Le nom contient des caractères non valides."
 
 #: includes/class-validator.php:48
 msgid "Date of birth is required."
-msgstr ""
+msgstr "La date de naissance est obligatoire."
 
 #: includes/class-validator.php:50
 msgid "Invalid date of birth format."
-msgstr ""
+msgstr "Format de date de naissance non valide."
 
 #: includes/class-validator.php:52
 msgid "Player age is not within acceptable range."
-msgstr ""
+msgstr "L'âge du participant n'est pas dans la plage acceptée."
 
 #: includes/class-validator.php:57
 msgid "Gender is required."
-msgstr ""
+msgstr "Le genre est obligatoire."
 
 #: includes/class-validator.php:64
 msgid "City contains invalid characters."
-msgstr ""
+msgstr "La ville contient des caractères non valides."
 
 #: includes/class-validator.php:67
 msgid "Canton contains invalid characters."
-msgstr ""
+msgstr "Le canton contient des caractères non valides."
 
 #: includes/class-validator.php:72
 msgid "Invalid AVS number format."
-msgstr ""
+msgstr "Format de numéro AVS non valide."
 
 #: includes/class-validator.php:94
 msgid "Activity type is required."
-msgstr ""
+msgstr "Le type d'activité est obligatoire."
 
 #: includes/class-validator.php:96
 msgid "Invalid activity type."
-msgstr ""
+msgstr "Type d'activité non valide."
 
 #: includes/class-validator.php:101
 msgid "Invalid start date format."
-msgstr ""
+msgstr "Format de date de début non valide."
 
 #: includes/class-validator.php:105
 msgid "Invalid end date format."
-msgstr ""
+msgstr "Format de date de fin non valide."
 
 #: includes/class-validator.php:111
 msgid "End date must be after start date."
-msgstr ""
+msgstr "La date de fin doit être postérieure à la date de début."
 
 #: includes/class-validator.php:117
 msgid "Venue name is too long."
-msgstr ""
+msgstr "Le nom du lieu est trop long."
 
 #: includes/class-validator.php:134
 msgid "Email address is required."
-msgstr ""
+msgstr "L'adresse e-mail est obligatoire."
 
 #: includes/class-validator.php:136
 msgid "Invalid email address format."
-msgstr ""
+msgstr "Format d'adresse e-mail non valide."
 
 #: includes/class-validator.php:138
 msgid "Email address is already registered."
-msgstr ""
+msgstr "Cette adresse e-mail est déjà enregistrée."
 
 #: includes/class-validator.php:143
 msgid "Invalid phone number format."
-msgstr ""
+msgstr "Format de numéro de téléphone non valide."
 
 #: includes/class-elementor-widget-base.php:66
 msgid "Layout"

@@ -7,6 +7,19 @@ if (!defined('ABSPATH')) {
 }
 
 /**
+ * Safe wrapper: WordPress fatals if is_locale_switched() runs before $wp_locale_switcher exists.
+ *
+ * @return bool
+ */
+function intersoccer_pm_is_locale_switched() {
+    if (!isset($GLOBALS['wp_locale_switcher']) || !is_object($GLOBALS['wp_locale_switcher'])) {
+        return false;
+    }
+
+    return function_exists('is_locale_switched') && is_locale_switched();
+}
+
+/**
  * Whether PM admin UI should bypass translations and show English msgids.
  *
  * @return bool
@@ -14,7 +27,7 @@ if (!defined('ABSPATH')) {
 function intersoccer_pm_is_admin_english_context() {
     $force = is_admin()
         && (!function_exists('wp_doing_ajax') || !wp_doing_ajax() || intersoccer_pm_is_admin_ajax_request())
-        && (!function_exists('is_locale_switched') || !is_locale_switched());
+        && !intersoccer_pm_is_locale_switched();
 
     /**
      * Filter whether PM admin screens should force English for this text domain.

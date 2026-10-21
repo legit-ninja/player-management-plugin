@@ -11,8 +11,28 @@ class AdminLocaleTest extends InterSoccer_Test_Case
     protected function tearDown(): void
     {
         unset($GLOBALS['wp_stub_is_admin'], $GLOBALS['wp_stub_doing_ajax'], $GLOBALS['wp_stub_locale_switched']);
+        unset($GLOBALS['wp_locale_switcher']);
         unset($_SERVER['HTTP_REFERER']);
         parent::tearDown();
+    }
+
+    private function stub_locale_switcher(bool $switched): void
+    {
+        $GLOBALS['wp_locale_switcher'] = new class($switched) {
+            /** @var bool */
+            private $switched;
+
+            public function __construct(bool $switched)
+            {
+                $this->switched = $switched;
+            }
+
+            public function is_switched(): bool
+            {
+                return $this->switched;
+            }
+        };
+        $GLOBALS['wp_stub_locale_switched'] = $switched;
     }
 
     public function test_admin_screen_forces_english_gettext()
@@ -48,7 +68,7 @@ class AdminLocaleTest extends InterSoccer_Test_Case
     {
         $GLOBALS['wp_stub_is_admin'] = true;
         $GLOBALS['wp_stub_doing_ajax'] = false;
-        $GLOBALS['wp_stub_locale_switched'] = true;
+        $this->stub_locale_switcher(true);
 
         $this->assertFalse(intersoccer_pm_is_admin_english_context());
         $this->assertSame(
@@ -67,6 +87,26 @@ class AdminLocaleTest extends InterSoccer_Test_Case
         WP_Mock::userFunction('admin_url')->andReturn('https://example.com/wp-admin/');
 
         $this->assertTrue(intersoccer_pm_is_admin_english_context());
+    }
+
+    public function test_admin_context_without_locale_switcher_does_not_fatal()
+    {
+        unset($GLOBALS['wp_locale_switcher']);
+        $GLOBALS['wp_stub_is_admin'] = true;
+        $GLOBALS['wp_stub_doing_ajax'] = false;
+        $GLOBALS['wp_stub_locale_switched'] = false;
+
+        $this->assertTrue(intersoccer_pm_is_admin_english_context());
+        $this->assertSame(
+            'Manage Players',
+            intersoccer_pm_filter_admin_english_gettext('Gérer les participants', 'Manage Players', INTERSOCCER_PLAYER_TEXT_DOMAIN)
+        );
+    }
+
+    public function test_locale_switcher_helper_false_when_switcher_missing()
+    {
+        unset($GLOBALS['wp_locale_switcher']);
+        $this->assertFalse(intersoccer_pm_is_locale_switched());
     }
 
 }
