@@ -113,7 +113,7 @@ function intersoccer_add_player() {
 
     $players[] = $new_player;
     $new_index = array_key_last($players);
-    $updated = intersoccer_persist_user_players($user_id, $players);
+    $updated = intersoccer_persist_user_players($user_id, $players, ['intent' => 'add']);
 
     if ($updated) {
         if (defined('WP_DEBUG') && WP_DEBUG) {
@@ -235,7 +235,10 @@ function intersoccer_edit_player() {
     }
 
     $players[$player_index] = $updated_player;
-    $updated = intersoccer_persist_user_players($user_id, $players);
+    $updated = intersoccer_persist_user_players($user_id, $players, [
+        'intent' => 'edit',
+        'overwrite_name_player_ids' => [$updated_player['player_id']],
+    ]);
 
     if ($updated) {
         if (defined('WP_DEBUG') && WP_DEBUG) {
@@ -300,7 +303,7 @@ function intersoccer_delete_player() {
     }
 
     unset($players[$player_index]);
-    $updated = intersoccer_persist_user_players($user_id, $players);
+    $updated = intersoccer_persist_user_players($user_id, $players, ['intent' => 'delete']);
 
     if ($updated) {
         if (defined('WP_DEBUG') && WP_DEBUG) {
