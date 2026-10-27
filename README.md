@@ -5,7 +5,7 @@ The InterSoccer Player Management plugin provides comprehensive player registrat
 
 ## Version
 - **Current Version:** 2.10.23
-- **Release Date:** September 28, 2026
+- **Release Date:** October 23, 2026
 
 ## Core Features
 
