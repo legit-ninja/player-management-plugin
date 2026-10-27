@@ -15,6 +15,7 @@
         }
     },
     "scripts": {
+        "install-hooks": "bash bin/install-hooks.sh",
         "test": "phpunit",
         "test:unit": "phpunit --testsuite=unit",
         "test:integration": "phpunit --testsuite=integration",

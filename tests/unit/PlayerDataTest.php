@@ -161,4 +161,122 @@ class PlayerDataTest extends InterSoccer_Test_Case
         $this->assertSame('Alice', $alice['first_name']);
         $this->assertSame('2015-01-01', $alice['dob']);
     }
+
+    // Regression: #56 — stale snapshot persist must not clobber PM-registered names (cart/AJAX race via backfill).
+    public function test_persist_backfill_preserves_registered_names_from_database()
+    {
+        $user_id = 55;
+        $player_id = 'uuid-francois';
+        $this->setUserMeta($user_id, [
+            'intersoccer_players' => [
+                0 => [
+                    'player_id' => $player_id,
+                    'first_name' => 'François',
+                    'last_name' => 'Dupont',
+                    'dob' => '2015-06-01',
+                    'gender' => 'male',
+                ],
+            ],
+        ]);
+
+        $stale_snapshot = [
+            0 => [
+                'player_id' => $player_id,
+                'first_name' => 'Unknown',
+                'last_name' => 'Player',
+                'dob' => '2015-06-01',
+                'gender' => 'male',
+            ],
+        ];
+
+        intersoccer_persist_user_players($user_id, $stale_snapshot, ['intent' => 'backfill']);
+
+        $stored = get_user_meta($user_id, 'intersoccer_players', true);
+        $this->assertSame('François', $stored[0]['first_name']);
+        $this->assertSame('Dupont', $stored[0]['last_name']);
+    }
+
+    public function test_persist_add_merges_concurrent_player_without_dropping_names()
+    {
+        $user_id = 56;
+        $existing_id = 'uuid-existing';
+        $this->setUserMeta($user_id, [
+            'intersoccer_players' => [
+                0 => [
+                    'player_id' => $existing_id,
+                    'first_name' => 'Registered',
+                    'last_name' => 'Child',
+                    'dob' => '2014-01-01',
+                    'gender' => 'female',
+                ],
+                1 => [
+                    'player_id' => 'uuid-sibling',
+                    'first_name' => 'Sibling',
+                    'last_name' => 'Child',
+                    'dob' => '2016-02-02',
+                    'gender' => 'male',
+                ],
+            ],
+        ]);
+
+        $stale_add_snapshot = [
+            0 => [
+                'player_id' => $existing_id,
+                'first_name' => '',
+                'last_name' => 'Child',
+                'dob' => '2014-01-01',
+                'gender' => 'female',
+            ],
+            2 => [
+                'player_id' => 'uuid-new',
+                'first_name' => 'New',
+                'last_name' => 'Player',
+                'dob' => '2017-03-03',
+                'gender' => 'male',
+            ],
+        ];
+
+        intersoccer_persist_user_players($user_id, $stale_add_snapshot, ['intent' => 'add']);
+
+        $stored = get_user_meta($user_id, 'intersoccer_players', true);
+        $this->assertSame('Registered', $stored[0]['first_name']);
+        $this->assertSame('Sibling', $stored[1]['first_name']);
+        $this->assertSame('New', $stored[2]['first_name']);
+    }
+
+    public function test_persist_edit_allows_intentional_name_change()
+    {
+        $user_id = 57;
+        $player_id = 'uuid-edit-me';
+        $this->setUserMeta($user_id, [
+            'intersoccer_players' => [
+                0 => [
+                    'player_id' => $player_id,
+                    'first_name' => 'Old',
+                    'last_name' => 'Name',
+                    'dob' => '2015-01-01',
+                    'gender' => 'male',
+                ],
+            ],
+        ]);
+
+        $edited = [
+            0 => [
+                'player_id' => $player_id,
+                'first_name' => 'New',
+                'last_name' => 'Legal',
+                'dob' => '2015-01-01',
+                'gender' => 'male',
+            ],
+        ];
+
+        intersoccer_persist_user_players($user_id, $edited, [
+            'intent' => 'edit',
+            'overwrite_name_player_ids' => [$player_id],
+        ]);
+
+        $stored = get_user_meta($user_id, 'intersoccer_players', true);
+        $this->assertSame('New', $stored[0]['first_name']);
+        $this->assertSame('Legal', $stored[0]['last_name']);
+    }
 }

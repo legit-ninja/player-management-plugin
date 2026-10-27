@@ -87,8 +87,7 @@ function intersoccer_backfill_player_ids($user_id, $persist = true) {
     }
 
     if ($updated > 0 && $persist) {
-        update_user_meta($user_id, 'intersoccer_players', $players);
-        intersoccer_invalidate_user_players_cache($user_id);
+        intersoccer_persist_user_players($user_id, $players, ['intent' => 'backfill']);
     }
 
     return ['players' => $players, 'updated' => $updated];
@@ -169,15 +168,152 @@ function intersoccer_invalidate_user_players_cache($user_id) {
 }
 
 /**
+ * Read intersoccer_players from user meta (bypasses request/object cache).
+ *
+ * @param int $user_id WordPress user ID.
+ * @return array<int|string, array>
+ */
+if (!function_exists('intersoccer_read_user_players_from_meta')) {
+function intersoccer_read_user_players_from_meta($user_id) {
+    $user_id = (int) $user_id;
+    if ($user_id <= 0) {
+        return [];
+    }
+
+    $players = get_user_meta($user_id, 'intersoccer_players', true);
+    if (is_string($players)) {
+        $players = maybe_unserialize($players);
+    }
+
+    return is_array($players) ? $players : [];
+}
+}
+
+/**
+ * Whether a player row has non-empty registered first and last names.
+ *
+ * @param array $row Player row.
+ * @return bool
+ */
+if (!function_exists('intersoccer_pm_player_row_has_registered_names')) {
+function intersoccer_pm_player_row_has_registered_names(array $row) {
+    $first = trim((string) ($row['first_name'] ?? ''));
+    $last = trim((string) ($row['last_name'] ?? ''));
+
+    return $first !== '' && $last !== '';
+}
+}
+
+/**
+ * Index player rows by stable player_id UUID.
+ *
+ * @param array<int|string, mixed> $players Player rows.
+ * @return array<string, array{key: int|string, player: array}>
+ */
+if (!function_exists('intersoccer_index_players_by_player_id')) {
+function intersoccer_index_players_by_player_id(array $players) {
+    $indexed = [];
+    foreach ($players as $key => $player) {
+        if (!is_array($player)) {
+            continue;
+        }
+        $player_id = sanitize_text_field((string) ($player['player_id'] ?? ''));
+        if ($player_id === '') {
+            continue;
+        }
+        $indexed[$player_id] = ['key' => $key, 'player' => $player];
+    }
+
+    return $indexed;
+}
+}
+
+/**
+ * Merge an in-flight snapshot with the latest DB rows before persisting.
+ *
+ * Prevents concurrent cart/AJAX reads + UUID backfill from clobbering names
+ * that PM add/edit already stored. Intentional rename passes overwrite_name_player_ids.
+ *
+ * @param int                  $user_id  WordPress user ID.
+ * @param array<int|string, mixed> $incoming Candidate rows to persist.
+ * @param array<string, mixed> $options  intent: add|edit|delete|backfill; overwrite_name_player_ids: string[].
+ * @return array<int|string, array>
+ */
+if (!function_exists('intersoccer_prepare_players_for_persist')) {
+function intersoccer_prepare_players_for_persist($user_id, array $incoming, array $options = []) {
+    $intent = isset($options['intent']) ? (string) $options['intent'] : 'mutation';
+    $allow_name_overwrite = [];
+    if (!empty($options['overwrite_name_player_ids']) && is_array($options['overwrite_name_player_ids'])) {
+        foreach ($options['overwrite_name_player_ids'] as $player_id) {
+            $player_id = sanitize_text_field((string) $player_id);
+            if ($player_id !== '') {
+                $allow_name_overwrite[$player_id] = true;
+            }
+        }
+    }
+
+    $db_players = intersoccer_read_user_players_from_meta($user_id);
+    $db_by_id = intersoccer_index_players_by_player_id($db_players);
+
+    foreach ($incoming as $key => $player) {
+        if (!is_array($player)) {
+            continue;
+        }
+        $player_id = sanitize_text_field((string) ($player['player_id'] ?? ''));
+        if ($player_id === '' || !isset($db_by_id[$player_id])) {
+            continue;
+        }
+        if (isset($allow_name_overwrite[$player_id])) {
+            continue;
+        }
+
+        $db_row = $db_by_id[$player_id]['player'];
+        if (intersoccer_pm_player_row_has_registered_names($db_row)) {
+            $incoming[$key]['first_name'] = $db_row['first_name'];
+            $incoming[$key]['last_name'] = $db_row['last_name'];
+            if (array_key_exists('name', $db_row)) {
+                $incoming[$key]['name'] = $db_row['name'];
+            }
+        }
+    }
+
+    if ($intent === 'delete') {
+        return $incoming;
+    }
+
+    $incoming_by_id = intersoccer_index_players_by_player_id($incoming);
+    foreach ($db_players as $db_key => $db_row) {
+        if (!is_array($db_row)) {
+            continue;
+        }
+        $player_id = sanitize_text_field((string) ($db_row['player_id'] ?? ''));
+        if ($player_id !== '') {
+            if (isset($incoming_by_id[$player_id])) {
+                continue;
+            }
+        } elseif (array_key_exists($db_key, $incoming)) {
+            continue;
+        }
+
+        $incoming[$db_key] = $db_row;
+    }
+
+    return $incoming;
+}
+}
+
+/**
  * Persist player rows and refresh caches.
  *
- * @param int   $user_id WordPress user ID.
- * @param array $players Player rows.
+ * @param int                  $user_id WordPress user ID.
+ * @param array<int|string, mixed> $players Player rows.
+ * @param array<string, mixed> $options   See intersoccer_prepare_players_for_persist().
  * @return bool Whether user meta was updated.
  */
 if (!function_exists('intersoccer_persist_user_players')) {
-function intersoccer_persist_user_players($user_id, array $players) {
+function intersoccer_persist_user_players($user_id, array $players, array $options = []) {
     $user_id = (int) $user_id;
+    $players = intersoccer_prepare_players_for_persist($user_id, $players, $options);
     $updated = update_user_meta($user_id, 'intersoccer_players', $players);
     intersoccer_invalidate_user_players_cache($user_id);
 

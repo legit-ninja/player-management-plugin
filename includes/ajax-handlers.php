@@ -1,17 +1,7 @@
 <?php
 /**
- * Plugin Name: InterSoccer Player Management
- * Plugin URI: https://github.com/legit-ninja/player-management-plugin
- * Description: Manages players for InterSoccer events, including registration, metadata storage (e.g., DOB, gender, medical/dietary), and integration with WooCommerce orders for rosters.
- * Version: 1.3.96
- * Author: Jeremy Lee
- * Author URI: https://underdogunlimited.com
- * License: GPL-2.0-or-later
- * License URI: https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain: player-management
- * Domain Path: /languages
+ * AJAX handlers for player management.
  */
-
 
 /**
  * Shared defence-in-depth checks for player fields that can break HTML attributes.
@@ -123,7 +113,7 @@ function intersoccer_add_player() {
 
     $players[] = $new_player;
     $new_index = array_key_last($players);
-    $updated = intersoccer_persist_user_players($user_id, $players);
+    $updated = intersoccer_persist_user_players($user_id, $players, ['intent' => 'add']);
 
     if ($updated) {
         if (defined('WP_DEBUG') && WP_DEBUG) {
@@ -245,7 +235,10 @@ function intersoccer_edit_player() {
     }
 
     $players[$player_index] = $updated_player;
-    $updated = intersoccer_persist_user_players($user_id, $players);
+    $updated = intersoccer_persist_user_players($user_id, $players, [
+        'intent' => 'edit',
+        'overwrite_name_player_ids' => [$updated_player['player_id']],
+    ]);
 
     if ($updated) {
         if (defined('WP_DEBUG') && WP_DEBUG) {
@@ -310,7 +303,7 @@ function intersoccer_delete_player() {
     }
 
     unset($players[$player_index]);
-    $updated = intersoccer_persist_user_players($user_id, $players);
+    $updated = intersoccer_persist_user_players($user_id, $players, ['intent' => 'delete']);
 
     if ($updated) {
         if (defined('WP_DEBUG') && WP_DEBUG) {
