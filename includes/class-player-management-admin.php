@@ -667,14 +667,6 @@ class InterSoccer_Player_Admin {
                                     <?php endforeach; ?>
                                 </select>
                             </div>
-
-                            <div class="intersoccer-form-field">
-                                <label for="export-format"><?php _e('Export Format', INTERSOCCER_PLAYER_TEXT_DOMAIN); ?></label>
-                                <select id="export-format" name="format">
-                                    <option value="csv"><?php _e('CSV', INTERSOCCER_PLAYER_TEXT_DOMAIN); ?></option>
-                                    <option value="pdf"><?php _e('PDF', INTERSOCCER_PLAYER_TEXT_DOMAIN); ?></option>
-                                </select>
-                            </div>
                         </div>
 
                         <div class="intersoccer-form-actions">
