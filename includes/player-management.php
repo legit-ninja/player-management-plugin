@@ -682,13 +682,3 @@ function intersoccer_render_user_profile_players($user) {
  * This duplicate hook has been removed to prevent double rendering.
  * See: player-management.php lines 141-175
  */
-
-// Display assigned attendee in frontend order details (My Account > Orders)
-function intersoccer_display_order_item_attendee( $item_id, $item, $order, $plain_text = false ) {
-    $attendee = $item->get_meta( 'Assigned Attendee' );
-    if ( $attendee ) {
-        echo '<p><strong>' . esc_html__( 'Assigned Attendee', 'player-management' ) . ':</strong> ' . esc_html( $attendee ) . '</p>';
-    }
-}
-add_action( 'woocommerce_order_item_meta_end', 'intersoccer_display_order_item_attendee', 10, 3 );
-?>
