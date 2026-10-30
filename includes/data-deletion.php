@@ -46,16 +46,43 @@ function intersoccer_data_deletion_shortcode()
         ]);
 
         if ($request_id) {
-            wp_mail(
-                get_option('admin_email'),
-                __('New Data Deletion Request', 'player-management'),
-                sprintf(__('A user (ID: %d) has requested data deletion. Reason: %s. Review in admin.', 'player-management'), $user_id, $reason)
-            );
+            intersoccer_pm_send_data_deletion_admin_email($user_id, $reason);
             echo '<div class="notice notice-success"><p>' . esc_html__('Your request has been submitted.', 'player-management') . '</p></div>';
         }
     }
 
     return ob_get_clean();
+}
+
+/**
+ * Notify the office inbox in English (customer may submit the form in FR/DE).
+ *
+ * @param int    $user_id
+ * @param string $reason
+ * @return bool
+ */
+function intersoccer_pm_send_data_deletion_admin_email($user_id, $reason)
+{
+    $switched = false;
+    if (function_exists('switch_to_locale')) {
+        switch_to_locale('en_US');
+        $switched = true;
+    }
+
+    $subject = __('New Data Deletion Request', 'player-management');
+    $message = sprintf(
+        __('A user (ID: %d) has requested data deletion. Reason: %s. Review in admin.', 'player-management'),
+        $user_id,
+        $reason
+    );
+
+    $sent = wp_mail(get_option('admin_email'), $subject, $message);
+
+    if ($switched && function_exists('restore_previous_locale')) {
+        restore_previous_locale();
+    }
+
+    return $sent;
 }
 
 function intersoccer_data_deletion_admin_menu()
