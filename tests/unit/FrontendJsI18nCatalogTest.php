@@ -86,6 +86,34 @@ class FrontendJsI18nCatalogTest extends InterSoccer_Test_Case
         }
     }
 
+    public function test_pm54_msgids_present_in_all_four_customer_po_files()
+    {
+        $msgids = [
+            'No AVS? Enter foreign insurance number or "0000" and email us the insurance details.',
+            'No participants yet. Use Add to register a participant before booking.',
+            '<a href="%1$s">Log in</a> or <a href="%2$s">register</a>.',
+        ];
+
+        foreach (['fr_CH', 'fr_FR', 'de_CH', 'de_DE'] as $locale) {
+            $map = $this->load_po_translations($locale);
+            foreach ($msgids as $msgid) {
+                $this->assertArrayHasKey($msgid, $map, $locale . ' missing msgid: ' . $msgid);
+                $this->assertNotSame('', $map[$msgid], $locale . ' empty msgstr: ' . $msgid);
+            }
+        }
+    }
+
+    public function test_frontend_js_i18n_includes_empty_participants_string()
+    {
+        $strings = intersoccer_pm_frontend_js_i18n();
+
+        $this->assertArrayHasKey('no_participants_empty', $strings);
+        $this->assertSame(
+            'No participants yet. Use Add to register a participant before booking.',
+            $strings['no_participants_empty']
+        );
+    }
+
     /**
      * @return list<string>
      */
@@ -117,6 +145,8 @@ class FrontendJsI18nCatalogTest extends InterSoccer_Test_Case
 
         $pm_lines = file($root . 'includes/player-management.php');
         $this->assertNotFalse($pm_lines);
+        $login_chunk = implode('', array_slice($pm_lines, 215, 25));
+        $strings = array_merge($strings, $this->extract_php_strings($login_chunk));
         $manage_chunk = implode('', array_slice($pm_lines, 400, 400));
         $strings = array_merge($strings, $this->extract_php_strings($manage_chunk));
 

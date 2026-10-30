@@ -1144,6 +1144,11 @@ msgstr ""
 msgid "Please log in to manage your Attendees."
 msgstr ""
 
+#. translators: %1$s: login URL, %2$s: registration URL
+#: includes/player-management.php:228
+msgid "<a href=\"%1$s\">Log in</a> or <a href=\"%2$s\">register</a>."
+msgstr ""
+
 #: includes/player-management.php:234
 msgid "Error: Unable to load user data."
 msgstr ""
@@ -1215,6 +1220,7 @@ msgid "No attendees added yet."
 msgstr ""
 
 #: includes/player-management.php:398
+#: includes/frontend-i18n.php:23
 msgid "No participants yet. Use Add to register a participant before booking."
 msgstr ""
 

@@ -20,6 +20,7 @@ function intersoccer_pm_frontend_js_i18n() {
         'save_player_aria' => __('Save Player', INTERSOCCER_PLAYER_TEXT_DOMAIN),
         'cancel_edit_aria' => __('Cancel Edit', INTERSOCCER_PLAYER_TEXT_DOMAIN),
         'no_attendees' => __('No attendees added yet.', INTERSOCCER_PLAYER_TEXT_DOMAIN),
+        'no_participants_empty' => __('No participants yet. Use Add to register a participant before booking.', INTERSOCCER_PLAYER_TEXT_DOMAIN),
         'required_fields' => __('First name, last name, date of birth, and gender are required.', INTERSOCCER_PLAYER_TEXT_DOMAIN),
         'invalid_dob' => __('Invalid date of birth format. Use YYYY-MM-DD.', INTERSOCCER_PLAYER_TEXT_DOMAIN),
         'player_updated' => __('Player updated successfully.', INTERSOCCER_PLAYER_TEXT_DOMAIN),

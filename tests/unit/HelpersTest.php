@@ -316,6 +316,10 @@ class HelpersTest extends InterSoccer_Test_Case
         WP_Mock::userFunction('esc_html__', [
             'return_arg' => 0,
         ]);
+
+        WP_Mock::userFunction('wp_kses')->andReturnUsing(function ($content) {
+            return $content;
+        });
         
         WP_Mock::userFunction('esc_url')->andReturnUsing(function($url) {
             return $url;
@@ -337,6 +341,50 @@ class HelpersTest extends InterSoccer_Test_Case
         
         $this->assertStringContainsString('log in', $result);
         $this->assertStringContainsString('register', $result);
+    }
+
+    /**
+     * Login prompt link sentence uses the player-management text domain.
+     */
+    public function test_render_players_form_login_links_use_gettext()
+    {
+        $link_msgid = '<a href="%1$s">Log in</a> or <a href="%2$s">register</a>.';
+
+        WP_Mock::userFunction('is_user_logged_in', [
+            'return' => false,
+        ]);
+
+        WP_Mock::userFunction('esc_html__', [
+            'return_arg' => 0,
+        ]);
+
+        WP_Mock::onFilter('gettext')
+            ->with($link_msgid, $link_msgid, 'player-management')
+            ->reply('LOGIN_LINKS_MARKER');
+
+        WP_Mock::userFunction('wp_kses')->andReturnUsing(function ($content) {
+            return $content;
+        });
+
+        WP_Mock::userFunction('esc_url')->andReturnUsing(function ($url) {
+            return $url;
+        });
+
+        WP_Mock::userFunction('wp_login_url', [
+            'return' => 'http://example.com/login',
+        ]);
+
+        WP_Mock::userFunction('wp_registration_url', [
+            'return' => 'http://example.com/register',
+        ]);
+
+        WP_Mock::userFunction('get_permalink', [
+            'return' => 'http://example.com/current-page',
+        ]);
+
+        $result = intersoccer_render_players_form();
+
+        $this->assertStringContainsString('LOGIN_LINKS_MARKER', $result);
     }
 
     /**

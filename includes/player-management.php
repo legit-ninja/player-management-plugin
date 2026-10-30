@@ -223,7 +223,21 @@ function intersoccer_render_players_form($is_admin = false, $settings = []) {
         if (defined('WP_DEBUG') && WP_DEBUG) {
             error_log('InterSoccer: User not logged in for player management');
         }
-        return '<p>' . esc_html__('Please log in to manage your Attendees.', 'player-management') . ' <a href="' . esc_url(wp_login_url(get_permalink())) . '">Log in</a> or <a href="' . esc_url(wp_registration_url()) . '">register</a>.</p>';
+        $login_links = sprintf(
+            /* translators: %1$s: login URL, %2$s: registration URL */
+            __('<a href="%1$s">Log in</a> or <a href="%2$s">register</a>.', 'player-management'),
+            esc_url(wp_login_url(get_permalink())),
+            esc_url(wp_registration_url())
+        );
+
+        return '<p>' . esc_html__('Please log in to manage your Attendees.', 'player-management') . ' ' . wp_kses(
+            $login_links,
+            [
+                'a' => [
+                    'href' => true,
+                ],
+            ]
+        ) . '</p>';
     }
 
     $user_id = $is_admin ? null : get_current_user_id();

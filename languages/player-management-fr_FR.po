@@ -1091,6 +1091,11 @@ msgstr ""
 msgid "Please log in to manage your Attendees."
 msgstr "Veuillez vous connecter pour gérer vos participants."
 
+#. translators: %1$s: login URL, %2$s: registration URL
+#: includes/player-management.php:228
+msgid "<a href=\"%1$s\">Log in</a> or <a href=\"%2$s\">register</a>."
+msgstr "<a href=\"%1$s\">Connectez-vous</a> ou <a href=\"%2$s\">créez un compte</a>."
+
 #: includes/player-management.php:234
 msgid "Error: Unable to load user data."
 msgstr "Erreur : impossible de charger les données utilisateur."
@@ -1177,7 +1182,7 @@ msgstr "Sélectionner le genre"
 #: includes/player-management.php:662
 #: includes/user-profile-players.php:182
 msgid "No AVS? Enter foreign insurance number or \"0000\" and email us the insurance details."
-msgstr "Pas de numéro AVS ? Indiquez le numéro d'assurance étranger ou « 0000 », puis envoyez-nous les détails par e-mail."
+msgstr "Pas de numéro AVS ? Saisissez le numéro de votre assurance étrangère ou « 0000 », puis envoyez-nous les détails de l'assurance par e-mail."
 
 #: includes/player-management.php:512
 msgid "Medical Conditions, Dietary Restrictions, and Allergies:"

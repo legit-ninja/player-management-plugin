@@ -119,9 +119,17 @@ jQuery(document).ready(function($) {
                         $(this).remove();
                         // Show empty state if no players left
                         if ($table.find('tbody tr[data-player-index]').length === 0) {
+                            var emptyStateText = (intersoccerPlayer.i18n && intersoccerPlayer.i18n.no_participants_empty)
+                                ? intersoccerPlayer.i18n.no_participants_empty
+                                : 'No participants yet. Use Add to register a participant before booking.';
+                            emptyStateText = String(emptyStateText)
+                                .replace(/&/g, '&amp;')
+                                .replace(/</g, '&lt;')
+                                .replace(/>/g, '&gt;')
+                                .replace(/"/g, '&quot;');
                             $table.find('tbody').html(
                                 '<tr class="no-players"><td colspan="6" data-field="empty-state">' +
-                                'No participants yet. Use Add to register a participant before booking.' +
+                                emptyStateText +
                                 '</td></tr>'
                             );
                         }

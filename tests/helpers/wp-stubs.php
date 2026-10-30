@@ -478,6 +478,6 @@ if (!function_exists('add_filter')) {
 
 if (!function_exists('__')) {
     function __($text, $domain = 'default') {
-        return $text;
+        return apply_filters('gettext', $text, $text, $domain);
     }
 }
