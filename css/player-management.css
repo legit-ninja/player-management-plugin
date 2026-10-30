@@ -602,17 +602,16 @@
   font-size: 14px;
 }
 
-/* Add player CTA. Body text clears the dark page; the border stays the theme link green.
-   25.5px is the parent theme button radius. */
+/* Add player CTA. Filled with the theme blend; 25.5px is the parent button radius. */
 .intersoccer-player-management .toggle-add-player {
   min-height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 12px 24px;
-  background: transparent;
-  color: var(--theme-color-text, #bbb);
-  border: 1px solid var(--theme-color-text_link, #708840);
+  background-color: var(--theme-color-text_link_blend, #7a944d);
+  color: var(--theme-color-bg_color, #1f1f1f);
+  border: 1px solid var(--theme-color-text_link_blend, #7a944d);
   border-radius: 25.5px;
   font-size: 16px;
   font-weight: 600;
@@ -620,7 +619,7 @@
 }
 
 .intersoccer-player-management .toggle-add-player:hover {
-  background: transparent;
+  background-color: var(--theme-color-text_hover, #55692e);
   color: var(--theme-color-text_dark, #fffefe);
-  border-color: var(--theme-color-text_dark, #fffefe);
+  border-color: var(--theme-color-text_hover, #55692e);
 }
