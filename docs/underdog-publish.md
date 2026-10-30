@@ -14,7 +14,7 @@ Publish Player Management ZIPs to the Underdog Unlimited plugin host. WordPress 
 - Production tags only from `main` as **non-prerelease** GitHub Releases.
 - Staging uses **prerelease** releases (or Actions → Publish plugin → Run workflow).
 - Do **not** republish the same version string to the same host; bump `-rcN` / `-dev.N` instead.
-- Both environments currently publish to `https://plugins.underdogunlimited.com`. The host marks each successful publish as **latest** for slug `player-management` — publish RC, smoke on staging WP, then publish stable promptly. Do not leave an RC as latest while customer sites poll this host.
+- Both environments currently publish to `https://<uu-host>`. The host marks each successful publish as **latest** for slug `player-management` — publish RC, smoke on staging WP, then publish stable promptly. Do not leave an RC as latest while customer sites poll this host.
 
 ## GitHub secrets & variables
 
@@ -24,7 +24,7 @@ Create Environments **`production`** and **`staging`**.
 |------|------|-------|---------|
 | `UU_PUBLISH_TOKEN` | secret | each environment | Same as server `PLUGIN_PUBLISH_TOKEN` (write-only). Never use a site token (`udpl_…`) for publish. |
 | `UU_PLUGIN_SLUG` | variable | repository | Must be `player-management` |
-| `UU_PUBLISH_URL` | variable | each environment | `https://plugins.underdogunlimited.com` |
+| `UU_PUBLISH_URL` | secret | each environment | `https://<uu-host>` |
 
 Workflow: [`.github/workflows/publish-plugin.yml`](../.github/workflows/publish-plugin.yml) — thin caller of the shared reusable workflow at [`legit-ninja/intersoccer-ci/.github/workflows/publish-plugin.yml`](https://github.com/legit-ninja/intersoccer-ci/blob/main/.github/workflows/publish-plugin.yml). The reusable handles ZIP build and curl upload; the caller only selects the environment (for env-scoped secrets) and passes inputs.
 
@@ -40,7 +40,7 @@ Hosting CI reference: Underdog Unlimited `docs/ci-plugin-publish.md`.
 ## WordPress updater (shared client)
 
 - Activate **InterSoccer Updates** (`intersoccer-updates`) on the site.
-- **Update URI** (this plugin header): `https://plugins.underdogunlimited.com`
+- **Update URI** (this plugin header): `https://<uu-host>`
 - **Settings:** Players → **Settings**
   - **General**
     - **Enable beta updates** — checkbox to receive beta/RC versions of this plugin only; uses `intersoccer_uu_beta_slugs` option via InterSoccer Updates helpers
@@ -62,14 +62,14 @@ Hosting CI reference: Underdog Unlimited `docs/ci-plugin-publish.md`.
 
 ```bash
 # Publish (CI token — write)
-curl -X POST "https://plugins.underdogunlimited.com/api/plugins/v1/player-management/publish" \
+curl -X POST "https://<uu-host>/api/plugins/v1/player-management/publish" \
   -H "Authorization: Bearer $PLUGIN_PUBLISH_TOKEN" \
   -F "version=2.7.26.0-rc1" \
   -F "changelog=RC smoke" \
   -F "file=@player-management-2.7.26.0-rc1.zip;type=application/zip"
 
 # Metadata (site token — read; channel=prerelease for Beta stream)
-curl -sS "https://plugins.underdogunlimited.com/api/plugins/v1/player-management?channel=prerelease" \
+curl -sS "https://<uu-host>/api/plugins/v1/player-management?channel=prerelease" \
   -H "Authorization: Bearer $SITE_TOKEN" | jq .
 ```
 
