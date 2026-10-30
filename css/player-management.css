@@ -1,6 +1,14 @@
-.intersoccer-table-wrapper {
-  overflow-x: auto;
+.intersoccer-player-management {
   max-width: 100%;
+  min-width: 0;
+}
+
+.intersoccer-table-wrapper {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -51,6 +59,18 @@
   width: 100%;
   border-collapse: collapse;
   position: relative;
+}
+
+/* Long headings (German) make the table wider than the account column.
+   The wrapper scrolls so Edit stays reachable; the table itself is not clipped. */
+.intersoccer-player-management .intersoccer-table-wrapper > table {
+  width: max-content;
+  min-width: 100%;
+  max-width: none;
+}
+
+.intersoccer-player-management th {
+  white-space: normal;
 }
 
 .intersoccer-player-management th,
@@ -582,27 +602,28 @@
 .intersoccer-player-management .no-players td {
   text-align: center;
   padding: 32px 16px;
-  color: #50575e;
+  color: var(--theme-color-text_light, #8f8e8e);
   font-size: 14px;
 }
 
-/* Add player CTA prominent on empty state */
+/* Add player CTA. Theme link colour on the dark page, not white on a light green. */
 .intersoccer-player-management .toggle-add-player {
   min-height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 12px 24px;
-  background: #7ab55c;
-  color: #fff;
+  background: transparent;
+  color: var(--theme-color-text_link, #708840);
+  border: 1px solid var(--theme-color-text_link, #708840);
   border-radius: 8px;
   font-size: 16px;
   font-weight: 600;
   text-decoration: none;
-  transition: background-color 0.2s;
 }
 
 .intersoccer-player-management .toggle-add-player:hover {
-  background: #689c4b;
-  color: #fff;
+  background: transparent;
+  color: var(--theme-color-text_hover, #55692e);
+  border-color: var(--theme-color-text_hover, #55692e);
 }

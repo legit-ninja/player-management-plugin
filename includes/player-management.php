@@ -359,7 +359,7 @@ function intersoccer_render_players_form($is_admin = false, $settings = []) {
             <?php endif; ?>
 
             <div class="intersoccer-table-wrapper" role="region" aria-label="<?php esc_attr_e('Attendee Table', 'player-management'); ?>">
-                <table class="wp-list-table widefat fixed striped" role="grid" aria-label="<?php esc_attr_e('List of attendees', 'player-management'); ?>" style="width: 100%; max-width: 100%;">
+                <table class="wp-list-table widefat fixed striped" role="grid" aria-label="<?php esc_attr_e('List of attendees', 'player-management'); ?>">
                     <thead>
                         <tr>
                             <?php if ($is_admin) : ?>
