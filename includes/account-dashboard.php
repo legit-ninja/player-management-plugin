@@ -106,6 +106,10 @@ function intersoccer_pm_is_manage_players_request() {
  * @return bool
  */
 function intersoccer_pm_should_enqueue_player_assets() {
+	if (!function_exists('is_user_logged_in') || !is_user_logged_in()) {
+		return false;
+	}
+
 	return intersoccer_pm_is_account_dashboard() || intersoccer_pm_is_manage_players_request();
 }
 

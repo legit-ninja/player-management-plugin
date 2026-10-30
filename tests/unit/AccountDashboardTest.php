@@ -77,10 +77,20 @@ class AccountDashboardTest extends InterSoccer_Test_Case
 
     public function test_should_enqueue_on_dashboard()
     {
+        $GLOBALS['wp_stub_logged_in'] = true;
         WP_Mock::userFunction('is_account_page', ['return' => true]);
         WP_Mock::userFunction('is_wc_endpoint_url', ['return' => false]);
 
         $this->assertTrue(intersoccer_pm_should_enqueue_player_assets());
+    }
+
+    public function test_should_not_enqueue_on_logged_out_account_page()
+    {
+        $GLOBALS['wp_stub_logged_in'] = false;
+        WP_Mock::userFunction('is_account_page', ['return' => true]);
+        WP_Mock::userFunction('is_wc_endpoint_url', ['return' => false]);
+
+        $this->assertFalse(intersoccer_pm_should_enqueue_player_assets());
     }
 
     public function test_should_not_enqueue_off_account()
