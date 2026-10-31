@@ -14,12 +14,12 @@
 
 # SSH credentials
 SERVER_USER="your-ssh-username"
-SERVER_HOST="intersoccer.legit.ninja"
+SERVER_HOST="YOUR_SSH_HOST"
 SSH_PORT="22"
 SSH_KEY="~/.ssh/id_rsa"
 
 # Plugin path on server (absolute path)
-SERVER_PATH="/var/www/html/wp-content/plugins/player-management"
+SERVER_PATH="/path/to/wp-content/plugins/player-management"
 
 # Cypress test directory (relative to this plugin directory)
 # Default points to ../intersoccer-player-management-tests
