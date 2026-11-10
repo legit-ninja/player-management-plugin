@@ -623,3 +623,21 @@
   color: var(--theme-color-text_dark, #fffefe);
   border-color: var(--theme-color-text_hover, #55692e);
 }
+
+/* Edit sits on the theme link green, which is short of 4.5:1 on the dark
+   table stripe. Save and Cancel were white on the light header green.
+   Put the label on the same blend as Add, and use the darker green with
+   light text for hover and focus. */
+.intersoccer-player-management td.actions a.edit-player,
+.intersoccer-player-management .form-actions a {
+  background-color: var(--theme-color-text_link_blend, #7a944d);
+  color: var(--theme-color-bg_color, #1f1f1f);
+}
+
+.intersoccer-player-management td.actions a.edit-player:hover,
+.intersoccer-player-management td.actions a.edit-player:focus,
+.intersoccer-player-management .form-actions a:hover,
+.intersoccer-player-management .form-actions a:focus {
+  background-color: var(--theme-color-text_hover, #55692e);
+  color: var(--theme-color-text_dark, #fffefe);
+}
