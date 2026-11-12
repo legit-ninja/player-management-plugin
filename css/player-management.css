@@ -1,6 +1,14 @@
-.intersoccer-table-wrapper {
-  overflow-x: auto;
+.intersoccer-player-management {
   max-width: 100%;
+  min-width: 0;
+}
+
+.intersoccer-table-wrapper {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -51,6 +59,14 @@
   width: 100%;
   border-collapse: collapse;
   position: relative;
+}
+
+/* Long headings (German) make the table wider than the account column.
+   The wrapper scrolls so Edit stays reachable; the table itself is not clipped. */
+.intersoccer-player-management .intersoccer-table-wrapper > table {
+  width: max-content;
+  min-width: 100%;
+  max-width: none;
 }
 
 .intersoccer-player-management th,
@@ -284,7 +300,7 @@
   100% { transform: translate(-50%, -50%) rotate(360deg); }
 }
 .loading td { position: relative; }
-.avs-instruction { font-size: 0.9em; color: #666; margin-top: 5px; display: block; }
+.avs-instruction { font-size: 0.9em; margin-top: 5px; display: block; }
 .profile-players { margin-top: 20px; }
 .profile-players table { width: 100%; border-collapse: collapse; }
 .profile-players th, .profile-players td { border: 1px solid #ddd; padding: 8px; }
@@ -310,7 +326,7 @@
     display: block;
   }
   .intersoccer-player-management thead tr { position: absolute; top: -9999px; left: -9999px; }
-  .intersoccer-player-management tr { margin-bottom: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); padding: 10px; background: #fff; } /* Card style */
+  .intersoccer-player-management tr { margin-bottom: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); padding: 10px; } /* Card style */
   .intersoccer-player-management td { border: none; position: relative; padding: 10px 0 10px 50%; font-size: 16px; min-height: 40px; } /* Larger text and touch areas */
   .intersoccer-player-management td:before {
     content: attr(data-label);
@@ -320,11 +336,10 @@
     padding-right: 10px;
     white-space: nowrap;
     font-weight: bold;
-    color: #333;
     font-size: 14px;
   }
   .intersoccer-player-management .actions { text-align: center; padding: 10px 0; border-top: 1px solid #eee; }
-  .intersoccer-player-management .actions a { display: inline-block; margin: 0 10px; padding: 8px 16px; background: #7ab55c; color: #fff; border-radius: 4px; font-size: 16px; min-width: 80px; text-align: center; } /* Larger buttons */
+  .intersoccer-player-management .actions a { display: inline-block; margin: 0 10px; font-size: 16px; min-width: 80px; text-align: center; } /* Larger buttons */
   .intersoccer-player-management input, .intersoccer-player-management select, .intersoccer-player-management textarea { font-size: 16px; padding: 10px; width: 100%; box-sizing: border-box; } /* Larger inputs */
   .intersoccer-player-management .form-row { margin-bottom: 20px; } /* Increased spacing for form on mobile */
   .intersoccer-player-management .avs-instruction { font-size: 14px; }
@@ -341,18 +356,8 @@
 
 .form-actions a {
   margin-right: 10px; /* Space between buttons */
-  padding: 8px 16px; /* Match Book Now padding for consistency */
-  background-color: #7ab55c; /* Green from header, or theme's primary */
-  color: #fff;
-  border-radius: 20px; /* Rounded like Book Now */
   text-decoration: none;
-  font-size: 14px;
   display: inline-block;
-  transition: background-color 0.3s ease; /* Smooth hover */
-}
-
-.form-actions a:hover {
-  background-color: #689c4b; /* Darker green on hover */
 }
 
 .form-actions a:last-child {
@@ -362,8 +367,6 @@
 @media (max-width: 600px) {
   .form-actions a {
     margin-right: 15px; /* Slightly more space for touch */
-    padding: 10px 20px; /* Larger tap area */
-    font-size: 16px;
   }
 }
 
@@ -388,16 +391,6 @@
     min-height: 44px;
     padding: 12px;
     font-size: 16px;
-    border-radius: 8px;
-    border: 2px solid #ddd;
-  }
-
-  .intersoccer-player-management .form-row input:focus,
-  .intersoccer-player-management .form-row select:focus,
-  .intersoccer-player-management .form-row textarea:focus {
-    border-color: #7ab55c;
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(122, 181, 92, 0.2);
   }
 
   .intersoccer-player-management .form-row label {
@@ -409,7 +402,6 @@
   .intersoccer-player-management .form-actions {
     position: sticky;
     bottom: 0;
-    background: #fff;
     padding: 16px 0;
     margin: 0 -16px -16px;
     padding-left: 16px;
@@ -429,7 +421,6 @@
     font-size: 16px;
     width: 100%;
     margin: 0;
-    padding: 12px 20px;
   }
 
   /* Player cards on mobile */
@@ -578,31 +569,46 @@
   border: 1px solid #f5c6cb;
 }
 
-/* Empty state */
+/* Empty state uses the surrounding text colour. */
 .intersoccer-player-management .no-players td {
   text-align: center;
   padding: 32px 16px;
-  color: #50575e;
   font-size: 14px;
 }
 
-/* Add player CTA prominent on empty state */
-.intersoccer-player-management .toggle-add-player {
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 12px 24px;
-  background: #7ab55c;
-  color: #fff;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
-  text-decoration: none;
-  transition: background-color 0.2s;
+/* Gender placeholder and other fields use the theme input text, including
+   the empty option browsers otherwise paint grey. Option rows use the
+   theme background so the open list stays readable with that text. */
+.intersoccer-player-management select,
+.intersoccer-player-management select:invalid,
+.intersoccer-player-management select option,
+.intersoccer-player-management select option[value=""] {
+  color: var(--theme-color-input_text);
 }
 
-.intersoccer-player-management .toggle-add-player:hover {
-  background: #689c4b;
-  color: #fff;
+.intersoccer-player-management select option {
+  background-color: var(--theme-color-bg_color);
+}
+
+/* Closed gender face. The theme wraps the select and the form script adds
+   fill_inited; that pair was beating the broader select colour. */
+.intersoccer-player-management form select#player_gender,
+.intersoccer-player-management form select#player_gender.fill_inited,
+.intersoccer-player-management form select#player_gender:invalid,
+.intersoccer-player-management form select#player_gender.fill_inited:invalid,
+.intersoccer-player-management form select#player_gender option[value=""],
+.intersoccer-player-management form select#player_gender.fill_inited option[value=""] {
+  color: var(--theme-color-input_text);
+}
+
+.intersoccer-player-management input::placeholder,
+.intersoccer-player-management textarea::placeholder {
+  color: var(--theme-color-input_text);
+  opacity: 1;
+}
+
+.intersoccer-player-management th.actions,
+.intersoccer-player-management td.actions {
+  width: auto;
+  min-width: 0;
 }
