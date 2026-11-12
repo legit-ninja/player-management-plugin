@@ -168,13 +168,7 @@ class InterSoccer_Player_Admin {
 
         // Chart.js for dashboard
         if ($hook === 'toplevel_page_intersoccer-players') {
-            wp_enqueue_script(
-                'chart-js',
-                'https://cdn.jsdelivr.net/npm/chart.js',
-                array(),
-                '3.9.1',
-                true
-            );
+            intersoccer_pm_enqueue_chart_js_vendor_asset();
         }
 
         // DataTables for player lists

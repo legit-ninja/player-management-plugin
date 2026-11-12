@@ -75,6 +75,8 @@ if (!is_plugin_active('woocommerce/woocommerce.php')) {
     return;
 }
 
+require_once PLAYER_MANAGEMENT_PATH . 'includes/chart-js-assets.php';
+
 // Include core files (check if they exist first)
 $core_files = [
     'includes/player-data.php',
