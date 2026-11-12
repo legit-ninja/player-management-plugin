@@ -590,6 +590,17 @@
   background-color: var(--theme-color-bg_color);
 }
 
+/* Closed gender face. The theme wraps the select and the form script adds
+   fill_inited; that pair was beating the broader select colour. */
+.intersoccer-player-management form select#player_gender,
+.intersoccer-player-management form select#player_gender.fill_inited,
+.intersoccer-player-management form select#player_gender:invalid,
+.intersoccer-player-management form select#player_gender.fill_inited:invalid,
+.intersoccer-player-management form select#player_gender option[value=""],
+.intersoccer-player-management form select#player_gender.fill_inited option[value=""] {
+  color: var(--theme-color-input_text);
+}
+
 .intersoccer-player-management input::placeholder,
 .intersoccer-player-management textarea::placeholder {
   color: var(--theme-color-input_text);

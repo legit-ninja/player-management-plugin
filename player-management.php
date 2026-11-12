@@ -415,7 +415,7 @@ add_action('wp_enqueue_scripts', function () {
             'intersoccer-player-management',
             PLAYER_MANAGEMENT_URL . 'css/player-management.css',
             [],
-            PLAYER_MANAGEMENT_VERSION
+            '2.10.30-1'
         );
     }
     if (file_exists(PLAYER_MANAGEMENT_PATH . 'css/loading.css')) {
