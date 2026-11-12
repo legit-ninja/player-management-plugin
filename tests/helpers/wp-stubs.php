@@ -397,18 +397,42 @@ if (!function_exists('is_admin')) {
 
 if (!class_exists('WPSendJsonExit', false)) {
     class WPSendJsonExit extends Exception {
+        /** @var mixed */
+        public $payload;
+
+        /** @var int|null */
+        public $status_code;
+
+        /**
+         * @param mixed $payload
+         */
+        public function __construct(string $status, $payload = null, $status_code = null) {
+            parent::__construct($status);
+            $this->payload = $payload;
+            $this->status_code = $status_code;
+        }
     }
 }
 
 if (!function_exists('wp_send_json_error')) {
     function wp_send_json_error($data = null, $status_code = null) {
-        throw new WPSendJsonExit('error');
+        $GLOBALS['wp_stub_last_json_response'] = [
+            'success' => false,
+            'data' => $data,
+            'status_code' => $status_code,
+        ];
+        throw new WPSendJsonExit('error', $data, $status_code);
     }
 }
 
 if (!function_exists('wp_send_json_success')) {
     function wp_send_json_success($data = null, $status_code = null) {
-        throw new WPSendJsonExit('success');
+        $GLOBALS['wp_stub_last_json_response'] = [
+            'success' => true,
+            'data' => $data,
+            'status_code' => $status_code,
+        ];
+        throw new WPSendJsonExit('success', $data, $status_code);
     }
 }
 
@@ -430,8 +454,42 @@ if (!function_exists('add_filter')) {
     }
 }
 
+if (!function_exists('intersoccer_test_set_user_caps')) {
+    /**
+     * @param array<string,bool> $caps
+     */
+    function intersoccer_test_set_user_caps(array $caps, int $user_id = 42): void {
+        $GLOBALS['wp_stub_user_caps'] = $caps;
+        $GLOBALS['wp_stub_current_user_id'] = $user_id;
+    }
+}
+
 if (!function_exists('__')) {
     function __($text, $domain = 'default') {
         return $text;
+    }
+}
+
+if (!function_exists('esc_html')) {
+    function esc_html($text) {
+        return htmlspecialchars((string) $text, ENT_QUOTES, 'UTF-8');
+    }
+}
+
+if (!function_exists('esc_attr')) {
+    function esc_attr($text) {
+        return htmlspecialchars((string) $text, ENT_QUOTES, 'UTF-8');
+    }
+}
+
+if (!function_exists('esc_html__')) {
+    function esc_html__($text, $domain = 'default') {
+        return esc_html(__($text, $domain));
+    }
+}
+
+if (!function_exists('esc_html_e')) {
+    function esc_html_e($text, $domain = 'default') {
+        echo esc_html__($text, $domain);
     }
 }

@@ -265,16 +265,27 @@ class Player_Management_List {
                                 </td>
                             </tr>
                         <?php else: ?>
-                            <?php foreach ($all_players as $player): ?>
+                            <?php foreach ($all_players as $player):
+                                $owner_user_id = (int) ($player['user_id'] ?? 0);
+                                ?>
                                 <tr data-player-index="<?php echo esc_attr($player['index']); ?>" 
                                     data-user-id="<?php echo esc_attr($player['user_id']); ?>"
+                                    data-first-name="<?php echo esc_attr($player['first_name'] ?? ''); ?>"
+                                    data-last-name="<?php echo esc_attr($player['last_name'] ?? ''); ?>"
+                                    data-gender="<?php echo esc_attr(strtolower($player['gender'] ?? '')); ?>"
+                                    data-avs-number="<?php echo esc_attr($player['avs_number'] ?? ''); ?>"
+                                    data-dob="<?php echo esc_attr(intersoccer_pm_sensitive_value_for_data_attribute($player['dob'] ?? '', $owner_user_id)); ?>"
+                                    data-can-view-dob="<?php echo intersoccer_pm_can_view_player_dob($owner_user_id) ? '1' : '0'; ?>"
+                                    data-can-view-medical="<?php echo intersoccer_pm_can_view_player_medical($owner_user_id) ? '1' : '0'; ?>"
                                     data-field="player-row">
                                     <td class="display-name" data-label="<?php esc_attr_e('Name', 'player-management'); ?>" data-field="player-name">
                                         <strong><?php echo esc_html(($player['first_name'] ?? '') . ' ' . ($player['last_name'] ?? '')); ?></strong>
                                     </td>
                                     <td class="display-dob" data-label="<?php esc_attr_e('DOB', 'player-management'); ?>" data-field="player-dob">
-                                        <?php echo esc_html($player['dob'] ?? 'N/A'); ?>
-                                        <?php if (!empty($player['age'])): ?>
+                                        <?php
+                                        echo esc_html(intersoccer_pm_format_dob_display_value($player['dob'] ?? '', $owner_user_id));
+                                        ?>
+                                        <?php if (intersoccer_pm_can_view_player_dob($owner_user_id) && !empty($player['age'])): ?>
                                             <br><small>(<?php echo esc_html($player['age']); ?> <?php _e('years', 'player-management'); ?>)</small>
                                         <?php endif; ?>
                                     </td>
@@ -294,9 +305,11 @@ class Player_Management_List {
                                         <?php endif; ?>
                                     </td>
                                     <td class="display-medical" data-label="<?php esc_attr_e('Medical/Dietary', 'player-management'); ?>" data-field="player-medical">
-                                        <?php 
-                                        $medical = $player['medical_conditions'] ?? '';
-                                        if ($medical !== '') {
+                                        <?php
+                                        $medical = intersoccer_pm_format_medical_display_value($player['medical_conditions'] ?? '', $owner_user_id);
+                                        if (!intersoccer_pm_can_view_player_medical($owner_user_id)) {
+                                            echo esc_html($medical);
+                                        } elseif ($medical !== '') {
                                             echo '<span class="has-medical" title="' . esc_attr($medical) . '">⚕️ ';
                                             echo esc_html(strlen($medical) > 30 ? substr($medical, 0, 30) . '...' : $medical);
                                             echo '</span>';
@@ -363,10 +376,13 @@ class Player_Management_List {
                                 <label for="edit-avs"><?php _e('AVS Number', 'player-management'); ?></label>
                                 <input type="text" id="edit-avs" name="avs_number" data-field="edit-avs">
                             </div>
-                            <div class="form-row">
+                            <div class="form-row" id="edit-medical-field-row" data-field="edit-medical-field-row">
                                 <label for="edit-medical"><?php _e('Medical/Dietary/Allergies', 'player-management'); ?></label>
                                 <textarea id="edit-medical" name="medical_conditions" rows="3" data-field="edit-medical"></textarea>
                             </div>
+                            <p class="pm-medical-field-denied-note" id="edit-medical-denied-note" style="display: none;" data-field="edit-medical-denied-note">
+                                <?php echo intersoccer_pm_medical_field_denied_notice(); ?>
+                            </p>
                             <div class="form-actions">
                                 <button type="submit" class="button button-primary" data-field="save-player-btn"><?php _e('Save Changes', 'player-management'); ?></button>
                                 <button type="button" class="button cancel-edit-btn"><?php _e('Cancel', 'player-management'); ?></button>
@@ -496,10 +512,13 @@ class Player_Management_List {
 
                 var firstName = $row.data('first-name') || $row.find('.display-name strong').text().trim().split(' ')[0];
                 var lastName = $row.data('last-name') || $row.find('.display-name strong').text().trim().split(' ').slice(1).join(' ');
-                var dob = $row.find('.display-dob').text().trim().split('\n')[0];
+                var dobRaw = $row.data('dob') || '';
+                var canViewDob = String($row.data('can-view-dob')) === '1';
                 var gender = $row.data('gender') || $row.find('.display-gender').text().trim().toLowerCase();
                 var avs = $row.data('avs-number') || '';
-                var medical = $row.find('.display-medical').attr('title') || '';
+                var $medicalEl = $row.find('.display-medical .has-medical');
+                var medical = ($medicalEl.length ? $medicalEl.attr('title') : '') || '';
+                var canViewMedical = String($row.data('can-view-medical')) === '1';
 
                 // Map gender display text back to value
                 if (gender === '<?php echo esc_js(__('Male', 'player-management')); ?>'.toLowerCase()) gender = 'male';
@@ -510,10 +529,22 @@ class Player_Management_List {
                 $('#edit-user-id').val(userId);
                 $('#edit-first-name').val(firstName);
                 $('#edit-last-name').val(lastName);
-                $('#edit-dob').val(dob);
+                if (!canViewDob) {
+                    $('#edit-dob').val('').prop('disabled', true).prop('required', false);
+                } else {
+                    $('#edit-dob').val(dobRaw).prop('disabled', false).prop('required', true);
+                }
                 $('#edit-gender').val(gender);
                 $('#edit-avs').val(avs);
-                $('#edit-medical').val(medical);
+                if (canViewMedical) {
+                    $('#edit-medical-field-row').show();
+                    $('#edit-medical-denied-note').hide();
+                    $('#edit-medical').val(medical).prop('disabled', false);
+                } else {
+                    $('#edit-medical-field-row').hide();
+                    $('#edit-medical-denied-note').show();
+                    $('#edit-medical').val('').prop('disabled', true);
+                }
 
                 $('#modal-title').text('<?php echo esc_js(__('Edit Player', 'player-management')); ?>');
                 $modalBody.hide();
@@ -546,10 +577,10 @@ class Player_Management_List {
                         player_index: $('#edit-player-index').val(),
                         player_first_name: $('#edit-first-name').val(),
                         player_last_name: $('#edit-last-name').val(),
-                        player_dob: $('#edit-dob').val(),
+                        player_dob: $('#edit-dob').prop('disabled') ? '' : $('#edit-dob').val(),
                         player_gender: $('#edit-gender').val(),
                         player_avs_number: $('#edit-avs').val(),
-                        player_medical: $('#edit-medical').val()
+                        player_medical: $('#edit-medical').prop('disabled') ? '' : $('#edit-medical').val()
                     },
                     success: function(response) {
                         if (response.success) {
@@ -965,9 +996,17 @@ class Player_Management_List {
         
         $users = get_users($user_query_args);
         $all_players = $this->utils->process_player_batch($users, $search, $per_page);
-        
+        $players_for_response = array_map(
+            static function ($player) {
+                $owner_user_id = (int) ($player['user_id'] ?? 0);
+
+                return intersoccer_pm_redact_player_for_response($player, $owner_user_id);
+            },
+            $all_players
+        );
+
         wp_send_json_success([
-            'players' => $all_players,
+            'players' => $players_for_response,
             'has_more' => count($users) === $per_page,
             'player_count' => count($all_players)
         ]);

@@ -335,8 +335,10 @@ jQuery(document).ready(function($) {
 
     const firstName = player.first_name || "N/A";
     const lastName = player.last_name || "N/A";
-    const dob = player.dob || "N/A";
-    const dobParts = dob && dob !== "N/A" ? dob.split("-") : ["", "", ""];
+    const canViewDob = String($row.data("can-view-dob")) === "1";
+    const canViewMedical = String($row.data("can-view-medical")) === "1";
+    const dob = canViewDob && player.dob && player.dob !== "N/A" ? player.dob : "";
+    const dobParts = dob ? dob.split("-") : ["", "", ""];
     const dobYear = dobParts[0] || "";
     const dobMonth = dobParts[1] || "";
     const dobDay = dobParts[2] || "";
@@ -345,7 +347,7 @@ jQuery(document).ready(function($) {
     const eventCount = player.event_count || 0;
     const canton = player.canton || "";
     const city = player.city || "";
-    const medical = player.medical_conditions ? decodeURIComponent(player.medical_conditions) : "";
+    const medical = canViewMedical && player.medical_conditions ? decodeURIComponent(player.medical_conditions) : "";
     const creationTimestamp = player.creation_timestamp || "";
     const pastEvents = player.past_events && player.past_events.length ? player.past_events : [];
 
@@ -368,8 +370,10 @@ jQuery(document).ready(function($) {
       <input type="text" name="player_last_name" value="${escapeHtml(lastName)}" required aria-required="true" maxlength="50">
       <span class="error-message" style="display: none;"></span>
     `);
+    const dobRequiredAttr = canViewDob ? ' required aria-required="true"' : "";
+    const dobDisabledAttr = canViewDob ? "" : ' disabled aria-disabled="true"';
     $row.find(".display-dob").html(`
-      <input type="text" name="player_dob" class="date-picker" value="${escapeHtml(dob)}" required aria-required="true" maxlength="10">
+      <input type="text" name="player_dob" class="date-picker" value="${escapeHtml(dob)}"${dobRequiredAttr}${dobDisabledAttr} maxlength="10">
       <span class="error-message" style="display: none;"></span>
     `);
     $row.find(".display-gender").html(`
@@ -400,13 +404,17 @@ jQuery(document).ready(function($) {
 
     // Insert medical row for the edited player
     if (intersoccerState.editingIndex === index) {
+      const deniedNotice = (window.intersoccerPlayer && intersoccerPlayer.medical_field_denied_notice) || "";
+      const medicalRowHtml = canViewMedical
+        ? `<label for="player_medical_${escapeHtml(index)}">Medical Conditions, Dietary Restrictions, and Allergies:</label>
+            <textarea id="player_medical_${escapeHtml(index)}" name="player_medical" maxlength="500" aria-describedby="medical-instructions-${escapeHtml(index)}">${escapeHtml(medical)}</textarea>
+            <span id="medical-instructions-${escapeHtml(index)}" class="screen-reader-text">Optional field for medical conditions, dietary restrictions, and allergies.</span>
+            <span class="error-message" style="display: none;"></span>`
+        : `<p class="pm-medical-field-denied-note">${escapeHtml(deniedNotice)}</p>`;
       const $medicalRow = $(`
         <tr class="medical-row active" data-player-index="${escapeHtml(index)}">
           <td colspan="11">
-            <label for="player_medical_${escapeHtml(index)}">Medical Conditions, Dietary Restrictions, and Allergies:</label>
-            <textarea id="player_medical_${escapeHtml(index)}" name="player_medical" maxlength="500" aria-describedby="medical-instructions-${escapeHtml(index)}">${escapeHtml(decodeURIComponent(medical))}</textarea>
-            <span id="medical-instructions-${escapeHtml(index)}" class="screen-reader-text">Optional field for medical conditions, dietary restrictions, and allergies.</span>
-            <span class="error-message" style="display: none;"></span>
+            ${medicalRowHtml}
           </td>
         </tr>
       `);
