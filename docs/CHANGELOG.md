@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.10.30 — 2026-10-30
+
+### Changed
+- Calendar version cut covering #48, #59, #60, #61 and #62.
+- Remove unused dompdf dependency (#48).
+- docs: correct README release date for 2.10.23 (#59).
+- Scope player form .form-row styles to the plugin wrapper (#60).
+- Remove dead export format dropdown and stale coverage report (#61).
+
+### Fixed
+- Order display: show Assigned Attendee once (#62).
+
 ## 2.9.28 — 2026-09-28
 
 ### Changed
