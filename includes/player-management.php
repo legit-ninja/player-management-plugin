@@ -85,6 +85,59 @@ if (!function_exists('intersoccer_is_valid_player_age')) {
     }
 }
 
+/**
+ * Product id in the default language, so a translated copy counts once.
+ *
+ * @param int $product_id WooCommerce product or variation id.
+ * @return int
+ */
+if (!function_exists('intersoccer_pm_original_product_id')) {
+    function intersoccer_pm_original_product_id($product_id) {
+        $product_id = (int) $product_id;
+        if ($product_id <= 0) {
+            return 0;
+        }
+        if (!function_exists('icl_object_id') && !function_exists('wpml_object_id_filter')) {
+            return $product_id;
+        }
+
+        $default = apply_filters('wpml_default_language', null);
+        $original = apply_filters('wpml_object_id', $product_id, 'product', true, $default);
+
+        return $original ? (int) $original : $product_id;
+    }
+}
+
+/**
+ * Customer orders in every WPML language. Without WPML this is a normal order query.
+ *
+ * @param int $user_id WordPress user ID.
+ * @return array
+ */
+if (!function_exists('intersoccer_pm_customer_orders')) {
+    function intersoccer_pm_customer_orders($user_id) {
+        $args = [
+            'customer_id' => $user_id,
+            'status' => ['wc-completed', 'wc-processing', 'wc-on-hold', 'wc-pending'],
+            'limit' => -1,
+        ];
+        $previous = null;
+        $switched = false;
+        if (function_exists('icl_object_id') || function_exists('wpml_object_id_filter')) {
+            $previous = apply_filters('wpml_current_language', null);
+            do_action('wpml_switch_language', 'all');
+            $switched = true;
+        }
+        try {
+            return wc_get_orders($args);
+        } finally {
+            if ($switched) {
+                do_action('wpml_switch_language', $previous);
+            }
+        }
+    }
+}
+
 // Helper function to count events for a player
 if (!function_exists('intersoccer_get_player_event_count')) {
     function intersoccer_get_player_event_count($user_id, $player_index) {
@@ -108,13 +161,11 @@ if (!function_exists('intersoccer_get_player_event_count')) {
             return 0;
         }
         
-        $orders = wc_get_orders([
-            'customer_id' => $user_id,
-            'status' => ['wc-completed', 'wc-processing', 'wc-on-hold', 'wc-pending'],
-            'limit' => -1
-        ]);
+        $orders = intersoccer_pm_customer_orders($user_id);
+        $seen_products = [];
         
         foreach ($orders as $order) {
+            $order_id = is_object($order) && method_exists($order, 'get_id') ? (int) $order->get_id() : 0;
             foreach ($order->get_items() as $item_id => $item) {
                 $attendee = trim($item->get_meta('Assigned Attendee') ?? '');
                 $player_index_meta = $item->get_meta('assigned_player', true);
@@ -129,6 +180,17 @@ if (!function_exists('intersoccer_get_player_event_count')) {
                 $index_match = ($player_index_meta == $player_index);
                 
                 if ($name_match || $index_match) {
+                    $product_id = 0;
+                    if (is_object($item) && method_exists($item, 'get_product_id')) {
+                        $product_id = intersoccer_pm_original_product_id($item->get_product_id());
+                    }
+                    if ($product_id > 0) {
+                        $seen_key = $order_id . ':' . $product_id;
+                        if (isset($seen_products[$seen_key])) {
+                            continue;
+                        }
+                        $seen_products[$seen_key] = true;
+                    }
                     $count++;
                 }
             }

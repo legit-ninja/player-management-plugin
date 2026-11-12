@@ -264,6 +264,83 @@ class HelpersTest extends InterSoccer_Test_Case
     }
 
     /**
+     * Translated copies of one product on one order count once. Separate orders still count.
+     */
+    public function test_get_player_event_count_counts_each_original_product_once()
+    {
+        $this->setUserMeta(1, [
+            'intersoccer_players' => [$this->fixtures['valid_player']],
+        ]);
+
+        $line = static function ($product_id) {
+            return new class($product_id) {
+                private $product_id;
+
+                public function __construct($product_id)
+                {
+                    $this->product_id = $product_id;
+                }
+
+                public function get_meta($key, $single = true)
+                {
+                    return $key === 'Assigned Attendee' ? 'John Doe' : null;
+                }
+
+                public function get_product_id()
+                {
+                    return $this->product_id;
+                }
+            };
+        };
+
+        $order = new class($line) {
+            private $line;
+
+            public function __construct($line)
+            {
+                $this->line = $line;
+            }
+
+            public function get_id()
+            {
+                return 200;
+            }
+
+            public function get_items()
+            {
+                return [
+                    1 => ($this->line)(50),
+                    2 => ($this->line)(50),
+                    3 => ($this->line)(77),
+                ];
+            }
+        };
+
+        $repeat_order = new class($line) {
+            private $line;
+
+            public function __construct($line)
+            {
+                $this->line = $line;
+            }
+
+            public function get_id()
+            {
+                return 201;
+            }
+
+            public function get_items()
+            {
+                return [1 => ($this->line)(50)];
+            }
+        };
+
+        $this->mockWcGetOrders([$order, $repeat_order]);
+
+        $this->assertSame(3, intersoccer_get_player_event_count(1, 0));
+    }
+
+    /**
      * Test intersoccer_get_player_event_count with different statuses
      */
     public function test_get_player_event_count_different_statuses()
