@@ -32,7 +32,16 @@ class InterSoccer_Player_Management_Link_Widget extends \Elementor\Widget_Base {
     public function get_keywords() {
         return ['intersoccer', 'player', 'management', 'attendee', 'registration'];
     }
-    
+
+    /**
+     * Prevent Elementor from caching empty frontend output for logged-out visitors.
+     *
+     * @since 3.22.0 Elementor Element_Base API
+     */
+    protected function is_dynamic_content(): bool {
+        return true;
+    }
+
     public function get_style_depends() {
         return ['intersoccer-player-widget'];
     }
@@ -277,6 +286,10 @@ class InterSoccer_Player_Management_Link_Widget extends \Elementor\Widget_Base {
 
     protected function render() {
         $settings = $this->get_settings_for_display();
+        $stored_settings = $this->get_data('settings');
+        if (!is_array($stored_settings)) {
+            $stored_settings = [];
+        }
         
         // Check if we're in Elementor editor
         $is_editor = \Elementor\Plugin::$instance->editor->is_edit_mode();
@@ -291,14 +304,11 @@ class InterSoccer_Player_Management_Link_Widget extends \Elementor\Widget_Base {
         // Get the Player Management URL
         $manage_players_url = $this->get_manage_players_url();
         
-        // Check if user has players (only on frontend, not in editor)
-        $has_players = false;
-        if (!$is_editor && function_exists('intersoccer_user_has_players')) {
-            $has_players = intersoccer_user_has_players($user_id);
-        }
-        
-        // Determine if tour should be shown (never in editor)
-        $show_tour = !$is_editor && $settings['show_tour'] === 'yes' && !$has_players;
+        $show_tour = intersoccer_pm_player_link_widget_should_show_tour(
+            $is_editor,
+            $stored_settings,
+            $user_id
+        );
         $tour_auto_start = $settings['tour_auto_start'] === 'yes';
         $tour_delay = floatval($settings['tour_delay'] ?? 2);
         
@@ -429,28 +439,17 @@ class InterSoccer_Player_Management_Link_Widget extends \Elementor\Widget_Base {
      * Enqueue Shepherd.js and tour script
      */
     private function enqueue_tour_assets($auto_start, $delay) {
-        // Enqueue Shepherd.js CSS
-        wp_enqueue_style(
-            'shepherd-js',
-            'https://cdn.jsdelivr.net/npm/shepherd.js@latest/dist/css/shepherd.css',
-            [],
-            null
-        );
-        
-        // Enqueue Shepherd.js JS
-        wp_enqueue_script(
-            'shepherd-js',
-            'https://cdn.jsdelivr.net/npm/shepherd.js@latest/dist/js/shepherd.min.js',
-            [],
-            null,
-            true
-        );
-        
+        if (!is_user_logged_in() || intersoccer_pm_shepherd_is_wc_blocked_context()) {
+            return;
+        }
+
+        intersoccer_pm_enqueue_shepherd_vendor_assets();
+
         // Enqueue tour script
         wp_enqueue_script(
             'intersoccer-player-tour',
             PLAYER_MANAGEMENT_URL . 'js/shepherd-tour.js',
-            ['shepherd-js', 'jquery'],
+            [intersoccer_pm_shepherd_asset_handle(), 'jquery'],
             PLAYER_MANAGEMENT_VERSION,
             true
         );
@@ -467,18 +466,9 @@ class InterSoccer_Player_Management_Link_Widget extends \Elementor\Widget_Base {
         wp_localize_script('intersoccer-player-tour', 'intersoccerPlayerTour', [
             'autoStart' => $auto_start,
             'delay' => $delay,
-            'hasPlayers' => function_exists('intersoccer_user_has_players') ? intersoccer_user_has_players() : false,
-            'managePlayersUrl' => $this->get_manage_players_url(),
-            'i18n' => [
-                'tourTitle' => __('Register Your Players', 'player-management'),
-                'tourIntro' => __('Before you can register for camps and courses, you need to add at least one player (attendee) to your account.', 'player-management'),
-                'tourHighlight' => __('Click here to manage your players and add your first attendee.', 'player-management'),
-                'tourAction' => __('Click this link to get started!', 'player-management'),
-                'tourDismiss' => __('Don\'t show again', 'player-management'),
-                'tourNext' => __('Next', 'player-management'),
-                'tourBack' => __('Back', 'player-management'),
-                'tourComplete' => __('Got it!', 'player-management'),
-            ],
+            'hasPlayers' => intersoccer_user_has_players(get_current_user_id()),
+            'managePlayersUrl' => esc_url($this->get_manage_players_url()),
+            'i18n'             => intersoccer_pm_player_link_widget_tour_i18n(),
         ]);
     }
 }

@@ -414,6 +414,9 @@ if (!function_exists('wp_send_json_success')) {
 
 if (!function_exists('add_action')) {
     function add_action($hook, $callback, $priority = 10, $accepted_args = 1) {
+        if (!isset($GLOBALS['wp_stub_actions'])) {
+            $GLOBALS['wp_stub_actions'] = [];
+        }
         $GLOBALS['wp_stub_actions'][$hook][] = [
             'callback' => $callback,
             'priority' => $priority,
@@ -421,6 +424,36 @@ if (!function_exists('add_action')) {
         ];
 
         return true;
+    }
+}
+
+if (!function_exists('has_action')) {
+    function has_action($hook, $callback = null) {
+        if (empty($GLOBALS['wp_stub_actions'][$hook])) {
+            return false;
+        }
+        if ($callback === null) {
+            return true;
+        }
+        foreach ($GLOBALS['wp_stub_actions'][$hook] as $item) {
+            if ($item['callback'] === $callback) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+}
+
+if (!function_exists('did_action')) {
+    function did_action($hook) {
+        return !empty($GLOBALS['wp_stub_did_actions'][$hook]);
+    }
+}
+
+if (!function_exists('is_readable')) {
+    function is_readable($filename) {
+        return @is_readable($filename);
     }
 }
 
