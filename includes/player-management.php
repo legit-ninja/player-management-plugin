@@ -352,7 +352,7 @@ function intersoccer_render_players_form($is_admin = false, $settings = []) {
 
             <?php if ($show_add_button) : ?>
                 <div class="intersoccer-player-actions">
-                    <a href="#" class="toggle-add-player" aria-label="<?php esc_attr_e('Add New Player', 'player-management'); ?>" aria-controls="player-form">
+                    <a href="#" class="button toggle-add-player" aria-label="<?php esc_attr_e('Add New Player', 'player-management'); ?>" aria-controls="player-form">
                         <?php esc_html_e('Add', 'player-management'); ?>
                     </a>
                 </div>
@@ -458,7 +458,7 @@ function intersoccer_render_players_form($is_admin = false, $settings = []) {
                                         </td>
                                     <?php endif; ?>
                                     <td class="actions" data-label="<?php echo esc_attr($actions_heading); ?>">
-                                        <a href="#" class="edit-player" data-index="<?php echo esc_attr($is_admin ? $player['player_index'] : $index); ?>" data-user-id="<?php echo esc_attr($player['user_id'] ?? $user_id); ?>" aria-label="<?php esc_attr_e('Edit player', 'player-management'); ?> <?php echo esc_attr($player['first_name'] ?? ''); ?>" aria-expanded="false">
+                                        <a href="#" class="button edit-player" data-index="<?php echo esc_attr($is_admin ? $player['player_index'] : $index); ?>" data-user-id="<?php echo esc_attr($player['user_id'] ?? $user_id); ?>" aria-label="<?php esc_attr_e('Edit player', 'player-management'); ?> <?php echo esc_attr($player['first_name'] ?? ''); ?>" aria-expanded="false">
                                             <?php esc_html_e('Edit', 'player-management'); ?>
                                         </a>
                                     </td>
@@ -515,11 +515,11 @@ function intersoccer_render_players_form($is_admin = false, $settings = []) {
                         <span class="error-message" style="display: none;"></span>
                     </div>
                     <div class="form-actions">
-                        <a href="#" id="save-player" aria-label="<?php esc_attr_e('Save Player', 'player-management'); ?>">
+                        <a href="#" id="save-player" class="button" aria-label="<?php esc_attr_e('Save Player', 'player-management'); ?>">
                             <?php esc_html_e('Save', 'player-management'); ?>
                             <span class="spinner" style="display: none;"></span>
                         </a>
-                        <a href="#" id="cancel-player" aria-label="<?php esc_attr_e('Cancel', 'player-management'); ?>">
+                        <a href="#" id="cancel-player" class="button" aria-label="<?php esc_attr_e('Cancel', 'player-management'); ?>">
                             <?php esc_html_e('Cancel', 'player-management'); ?>
                         </a>
                         <input type="hidden" id="player_index" name="player_index" value="-1">

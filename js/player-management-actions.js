@@ -260,7 +260,7 @@ jQuery(document).ready(function($) {
 
         const $editLink = $('<a>')
             .attr('href', '#')
-            .addClass('edit-player')
+            .addClass('button edit-player')
             .attr('data-index', playerIdx)
             .attr('aria-label', 'Edit ' + escHtml(firstName))
             .text('Edit');
