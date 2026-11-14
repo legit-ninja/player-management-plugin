@@ -612,3 +612,44 @@
   width: auto;
   min-width: 0;
 }
+
+/* pm-participants-table-responsive:start
+   My Account participants table. The account column is often a flex item whose
+   minimum size follows this table, so a wide heading row stretches the column
+   and the scroll wrapper never overflows. A single zero-minimum column keeps
+   the section in the account column. The table keeps its content width, so
+   headings stay intact, and the wrapper scrolls when that width exceeds the
+   column. Edit stays reachable. At 768px and below, headings may wrap on word
+   boundaries instead of forcing the old per-column minimums. */
+.intersoccer-player-management:has(> form > .intersoccer-table-wrapper) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.intersoccer-player-management > form:has(> .intersoccer-table-wrapper) {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.intersoccer-player-management .intersoccer-table-wrapper {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media screen and (max-width: 768px) {
+  .intersoccer-player-management .intersoccer-table-wrapper th,
+  .intersoccer-player-management .intersoccer-table-wrapper td {
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+  }
+}
+/* pm-participants-table-responsive:end */
