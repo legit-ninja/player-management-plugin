@@ -1569,3 +1569,11 @@ msgstr "Every Minute"
 #, php-format
 msgid "Every %d Minutes"
 msgstr "Every %d Minutes"
+
+#: includes/account-dashboard.php
+msgid "Back to your booking"
+msgstr "Back to your booking"
+
+#: includes/account-dashboard.php
+msgid "Save and go back to your booking"
+msgstr "Save and go back to your booking"

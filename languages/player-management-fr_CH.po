@@ -1594,3 +1594,11 @@ msgstr "Aucun participant trouvé."
 #: includes/player-management.php:382
 msgid "Medical Conditions:"
 msgstr "Conditions médicales :"
+
+#: includes/account-dashboard.php
+msgid "Back to your booking"
+msgstr "Revenir à votre réservation"
+
+#: includes/account-dashboard.php
+msgid "Save and go back to your booking"
+msgstr "Enregistrer et revenir à votre réservation"
