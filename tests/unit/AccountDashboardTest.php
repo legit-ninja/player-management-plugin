@@ -124,6 +124,7 @@ class AccountDashboardTest extends InterSoccer_Test_Case
         $target = intersoccer_pm_manage_players_redirect_target();
 
         $this->assertStringStartsWith($dashboard . '?', $target);
+        $this->assertStringContainsString('redirect=' . rawurlencode($product), $target);
         $query = $this->queryArgs($target);
         $this->assertSame($product, $query['redirect']);
         $this->assertStringContainsString('bf_return=1', $query['redirect']);
@@ -388,16 +389,23 @@ class AccountDashboardTest extends InterSoccer_Test_Case
                 $fragment = substr($url, $hash);
                 $url = substr($url, 0, $hash);
             }
-            $existing = [];
+            $pairs = [];
             $query_pos = strpos($url, '?');
             if ($query_pos !== false) {
-                parse_str(substr($url, $query_pos + 1), $existing);
+                $existing = substr($url, $query_pos + 1);
+                if ($existing !== '') {
+                    $pairs[] = $existing;
+                }
                 $url = substr($url, 0, $query_pos);
             }
+            // WordPress add_query_arg() does not encode newly added values.
             foreach ($args as $key => $value) {
-                $existing[$key] = $value;
+                if ($value === false || $value === null) {
+                    continue;
+                }
+                $pairs[] = rawurlencode((string) $key) . '=' . (string) $value;
             }
-            $query = http_build_query($existing, '', '&', PHP_QUERY_RFC3986);
+            $query = implode('&', $pairs);
             return $url . ($query !== '' ? '?' . $query : '') . $fragment;
         });
     }

@@ -306,7 +306,11 @@ function intersoccer_pm_dashboard_url_with_booking_return($dashboard_url) {
 	$args = [];
 	$return_url = intersoccer_pm_request_return_url();
 	if ($return_url !== '') {
-		$args['redirect'] = $return_url;
+		// add_query_arg() does not encode values added on this call. An
+		// unencoded URL is split on "&", so only the first query parameter
+		// survives. Encode once here. PHP decodes the query argument once
+		// before intersoccer_pm_request_return_url() reads it.
+		$args['redirect'] = rawurlencode($return_url);
 	}
 	if (intersoccer_pm_request_has_booking_return_flag()) {
 		$args['bf_return'] = '1';
