@@ -207,6 +207,9 @@ jQuery(document).ready(function($) {
                 $('#save-player .spinner').hide();
                 if (response.success) {
                     $message.text(response.data.message).show();
+                    if (typeof window.intersoccerScheduleReturnToBooking === 'function') {
+                        window.intersoccerScheduleReturnToBooking(String(index) === '-1');
+                    }
                     setTimeout(() => $message.hide(), 5000);
                     updateTable(response.data.player, index);  // New function to update/add row
                     $form.hide();

@@ -1,5 +1,65 @@
 "use strict";
 (function ($) {
+  /**
+   * Same-origin http(s) return URL from localized data, or an empty string.
+   * The server already validated it. This rejects anything the browser should not follow.
+   */
+  window.intersoccerBookingReturnUrl = function () {
+    var player = window.intersoccerPlayer || {};
+    var url = typeof player.returnUrl === "string" ? player.returnUrl.trim() : "";
+    if (!url || /[\u0000-\u001F\u007F\\]/.test(url)) {
+      return "";
+    }
+    var decoded;
+    try {
+      decoded = decodeURIComponent(url);
+    } catch (error) {
+      return "";
+    }
+    if (/[\u0000-\u001F\u007F\\]/.test(decoded)) {
+      return "";
+    }
+    var trimmed = decoded.replace(/^\s+/, "");
+    if (trimmed.indexOf("//") === 0 || /^(javascript|data):/i.test(trimmed)) {
+      return "";
+    }
+    try {
+      var parsed = new URL(url, window.location.origin);
+      if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+        return "";
+      }
+      if (parsed.origin !== window.location.origin) {
+        return "";
+      }
+      return parsed.href;
+    } catch (error) {
+      return "";
+    }
+  };
+
+  /**
+   * After the first player is saved on a visit that loaded with none, go back to the product.
+   * A parent who already has children stays on My Account and uses the back link.
+   */
+  window.intersoccerScheduleReturnToBooking = function (isAdd) {
+    if (!isAdd || window.intersoccerReturnScheduled) {
+      return false;
+    }
+    var player = window.intersoccerPlayer || {};
+    if (String(player.returnAfterFirstPlayer) !== "1") {
+      return false;
+    }
+    var target = window.intersoccerBookingReturnUrl();
+    if (!target) {
+      return false;
+    }
+    window.intersoccerReturnScheduled = true;
+    window.setTimeout(function () {
+      window.location.assign(target);
+    }, 600);
+    return true;
+  };
+
   if (typeof $ === "undefined") {
     console.error("InterSoccer: jQuery is not loaded. Player management disabled.");
     return;

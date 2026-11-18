@@ -392,6 +392,16 @@ function intersoccer_render_players_form($is_admin = false, $settings = []) {
         unset($player); // Unset reference to avoid issues
     }
 
+    $booking_return_url = (!$is_admin && function_exists('intersoccer_pm_request_return_url'))
+        ? intersoccer_pm_request_return_url()
+        : '';
+    $save_label = function_exists('intersoccer_pm_add_player_submit_label')
+        ? intersoccer_pm_add_player_submit_label(count($players), $booking_return_url)
+        : __('Save', 'player-management');
+    $save_aria = ($booking_return_url !== '' && count($players) === 0)
+        ? $save_label
+        : __('Save Player', 'player-management');
+
     // Calculate colspan for table rows
     $colspan = ($is_admin ? 3 : 0) + 1 + ($show_dob ? 1 : 0) + ($show_gender ? 1 : 0) + ($show_avs_number ? 1 : 0) + ($show_events ? 1 : 0) + ($is_admin ? 3 : 0) + 1;
 
@@ -405,6 +415,12 @@ function intersoccer_render_players_form($is_admin = false, $settings = []) {
                 </div>
             <?php endif; ?>
             <div class="intersoccer-message" style="display: none;" role="alert" aria-live="polite"></div>
+
+            <?php
+            if ($booking_return_url !== '' && function_exists('intersoccer_pm_booking_return_link_html')) {
+                echo intersoccer_pm_booking_return_link_html($booking_return_url);
+            }
+            ?>
 
             <?php if ($is_admin && $total_players > 0) : ?>
                 <div class="total-players">
@@ -577,8 +593,8 @@ function intersoccer_render_players_form($is_admin = false, $settings = []) {
                         <span class="error-message" style="display: none;"></span>
                     </div>
                     <div class="form-actions">
-                        <a href="#" id="save-player" class="button" aria-label="<?php esc_attr_e('Save Player', 'player-management'); ?>">
-                            <?php esc_html_e('Save', 'player-management'); ?>
+                        <a href="#" id="save-player" class="button" aria-label="<?php echo esc_attr($save_aria); ?>">
+                            <?php echo esc_html($save_label); ?>
                             <span class="spinner" style="display: none;"></span>
                         </a>
                         <a href="#" id="cancel-player" class="button" aria-label="<?php esc_attr_e('Cancel', 'player-management'); ?>">

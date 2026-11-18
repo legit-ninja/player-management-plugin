@@ -469,7 +469,13 @@ add_action('wp_enqueue_scripts', function () {
             );
         }
 
-        // Localize script
+        // Localize script. returnUrl is validated; wp_localize_script JSON-encodes it.
+        $return_data = function_exists('intersoccer_pm_player_script_return_data')
+            ? intersoccer_pm_player_script_return_data(count($preload_players))
+            : [
+                'returnUrl' => '',
+                'returnAfterFirstPlayer' => '0',
+            ];
         $localize_data = [
             'ajax_url' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('intersoccer_player_nonce'),
@@ -478,6 +484,8 @@ add_action('wp_enqueue_scripts', function () {
             'nonce_refresh_url' => admin_url('admin-ajax.php?action=intersoccer_refresh_nonce'),
             'debug' => defined('WP_DEBUG') && WP_DEBUG ? '1' : '0',
             'preload_players' => $preload_players,
+            'returnUrl' => $return_data['returnUrl'],
+            'returnAfterFirstPlayer' => $return_data['returnAfterFirstPlayer'],
             'server_time' => current_time('mysql'),
             'version' => PLAYER_MANAGEMENT_VERSION,
             // Gender translations for JavaScript
