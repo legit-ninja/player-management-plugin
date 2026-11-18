@@ -1,5 +1,7 @@
 "use strict";
 (function ($) {
+  var RETURN_DELAY_MS = 1500;
+
   /**
    * Same-origin http(s) return URL from localized data, or an empty string.
    * The server already validated it. This rejects anything the browser should not follow.
@@ -56,7 +58,7 @@
     window.intersoccerReturnScheduled = true;
     window.setTimeout(function () {
       window.location.assign(target);
-    }, 600);
+    }, RETURN_DELAY_MS);
     return true;
   };
 
