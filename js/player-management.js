@@ -280,6 +280,9 @@
                             }
                             populatePlayers();
                             $message.text(response.data.message || "Player added successfully.").show();
+                            if (typeof window.intersoccerScheduleReturnToBooking === "function") {
+                                window.intersoccerScheduleReturnToBooking(true);
+                            }
                         }
                         setTimeout(() => $message.hide(), 5000);
                     } else {

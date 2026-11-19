@@ -1612,3 +1612,11 @@ msgstr "-- Sélectionner un participant --"
 #: includes/player-management.php
 msgid "Current:"
 msgstr "Actuel :"
+
+#: includes/account-dashboard.php
+msgid "Back to your booking"
+msgstr "Revenir à votre réservation"
+
+#: includes/account-dashboard.php
+msgid "Save and go back to your booking"
+msgstr "Enregistrer et revenir à votre réservation"
