@@ -265,8 +265,6 @@ function intersoccer_edit_player() {
     wp_send_json_error(['message' => __('Failed to update player', 'player-management')], 500);
 }
 
-// add_action('wp_ajax_intersoccer_refresh_nonce', 'intersoccer_refresh_nonce');
-// function intersoccer_refresh_nonce() defined in main plugin file
 
 // Add delete player handler
 add_action('wp_ajax_intersoccer_delete_player', 'intersoccer_delete_player');
